@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DevisEtanche — Estimation gratuite de matériaux d'étanchéité</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+
+<style>
+/* ==========================================================
+   DevisEtanche V4 — style.css
+   Tokens de design + structure de page (header, hero, écrans)
+   Les composants (cartes, champs, résultats...) sont dans
+   components.css
+   ========================================================== */
+
+:root{
+  /* --- Couleurs --- */
+  --blue-deep:#0B3654;
+  --blue-mid:#155E8A;
+  --blue-pale:#EAF2F7;
+  --orange:#E8720C;
+  --orange-soft:#FDEEE1;
+  --white:#FFFFFF;
+  --gray-bg:#F4F6F8;
+  --gray-border:#E1E7EC;
+  --gray-text:#5C6C78;
+  --text-dark:#132433;
+  --green:#1F9D55;
+  --green-soft:#E9F8EF;
+  --amber:#C97A16;
+  --amber-soft:#FBF0DE;
+
+  /* --- Forme --- */
+  --radius:14px;
+  --shadow: 0 1px 2px rgba(11,54,84,0.04), 0 6px 20px rgba(11,54,84,0.06);
+
+  /* --- Typo --- */
+  --font-display:'Space Grotesk', sans-serif;
+  --font-body:'Inter', sans-serif;
+  --font-mono:'IBM Plex Mono', monospace;
+}
+
+*{ box-sizing:border-box; margin:0; padding:0; }
+
+body{
+  font-family: var(--font-body);
+  background: var(--gray-bg);
+  color: var(--text-dark);
+  line-height:1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+.app{ max-width: 640px; margin:0 auto; min-height:100vh; background:var(--gray-bg); position:relative; }
+
+/* ---------- HEADER ---------- */
+header{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:18px 20px; background:var(--white); border-bottom:1px solid var(--gray-border);
+  position:sticky; top:0; z-index:20;
+}
+.brand{ display:flex; align-items:center; gap:10px; cursor:pointer; }
+.brand img{ display:block; }
+.brand span{ font-family:var(--font-display); font-weight:700; font-size:1.05rem; color:var(--blue-deep); letter-spacing:-0.01em; }
+.nav-link{ font-size:0.85rem; color:var(--gray-text); font-weight:500; cursor:pointer; background:none; border:none; font-family:var(--font-body); }
+.nav-link:hover{ color:var(--blue-deep); }
+.nav-link:focus-visible, .brand:focus-visible{ outline:2px solid var(--blue-mid); outline-offset:2px; }
+
+/* ---------- SIGNATURE : bande stratigraphique ---------- */
+.layer-strip{ display:flex; flex-direction:column; width:6px; border-radius:6px; overflow:hidden; flex-shrink:0; }
+.layer-strip div:nth-child(1){ background:var(--blue-deep); flex:1.2; }
+.layer-strip div:nth-child(2){ background:var(--orange); flex:1; }
+.layer-strip div:nth-child(3){ background:var(--blue-mid); flex:1.6; }
+.layer-strip div:nth-child(4){ background:var(--gray-border); flex:0.8; }
+
+/* ---------- HERO / ACCUEIL ---------- */
+.hero{ padding:36px 24px 28px; background:linear-gradient(180deg, var(--blue-deep) 0%, #0E4468 100%); color:var(--white); position:relative; overflow:hidden; }
+.hero-cross-section{ display:flex; height:34px; border-radius:8px; overflow:hidden; margin-bottom:22px; box-shadow: var(--shadow); }
+.hero-cross-section div{ flex:1; }
+.hero-cross-section div:nth-child(1){ background:#9AA9B4; } /* support */
+.hero-cross-section div:nth-child(2){ background:var(--orange); } /* primaire */
+.hero-cross-section div:nth-child(3){ background:var(--blue-mid); } /* membrane */
+.hero-cross-section div:nth-child(4){ background:#2C6E8F; } /* protection */
+.hero-cross-section-labels{ display:flex; font-family:var(--font-mono); font-size:0.62rem; color:rgba(255,255,255,0.65); margin-bottom:20px; letter-spacing:0.02em; }
+.hero-cross-section-labels span{ flex:1; text-align:center; }
+.hero h1{ font-family:var(--font-display); font-size:1.7rem; font-weight:700; letter-spacing:-0.02em; margin-bottom:10px; }
+.hero p{ color:rgba(255,255,255,0.82); font-size:0.95rem; max-width:46ch; margin-bottom:6px; }
+.hero .tag{ display:inline-block; margin-top:14px; font-size:0.75rem; background:rgba(255,255,255,0.12); padding:5px 11px; border-radius:20px; color:rgba(255,255,255,0.9); font-weight:500; }
+
+.feature-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; padding:20px 20px 4px; }
+.feature-chip{ background:var(--white); border:1px solid var(--gray-border); border-radius:12px; padding:14px 12px; display:flex; align-items:center; gap:10px; font-size:0.85rem; font-weight:500; color:var(--text-dark); }
+.feature-chip .ic{ width:30px; height:30px; border-radius:8px; background:var(--orange-soft); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.feature-chip .ic svg{ width:16px; height:16px; stroke:var(--orange); }
+
+.cta-wrap{ padding:22px 20px 36px; }
+
+/* ---------- ÉCRANS ---------- */
+.screen{ display:none; animation: fadeIn .35s ease; }
+.screen.active{ display:block; }
+@keyframes fadeIn{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
+@media (prefers-reduced-motion: reduce){ .screen{ animation:none; } }
+
+main{ padding:20px 20px 60px; }
+
+.section-title{ font-family:var(--font-display); font-size:1.05rem; font-weight:700; color:var(--blue-deep); margin-bottom:4px; display:flex; align-items:center; gap:8px; }
+.section-sub{ font-size:0.82rem; color:var(--gray-text); margin-bottom:14px; }
+
+footer.appfoot{ text-align:center; padding:18px; font-size:0.72rem; color:var(--gray-text); }
+
+/* ---------- IMPRESSION / EXPORT PDF ---------- */
+.print-only{ display:none; }
+
+@media print{
+  body{ background:#fff; }
+  header, footer.appfoot, .btn-primary, .btn-secondary, .cta-wrap{ display:none !important; }
+  .app{ max-width:100%; }
+  main{ padding:0; }
+  .print-only{ display:block; }
+  .print-header{ margin-bottom:18px; padding-bottom:12px; border-bottom:2px solid var(--blue-deep); }
+  .print-header-row{ display:flex; align-items:center; gap:10px; font-family:var(--font-display); font-weight:700; font-size:1.1rem; color:var(--blue-deep); }
+  .print-date{ font-size:0.78rem; color:var(--gray-text); margin-top:4px; margin-left:36px; }
+  .card{ box-shadow:none; border:1px solid #d6dde2; break-inside:avoid; page-break-inside:avoid; }
+  .confidence-badge.amber{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  .confidence-badge.green{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+}
+
+
+/* ==========================================================
+   DevisEtanche V4 — components.css
+   Boutons, cartes, champs de formulaire, badges de confiance,
+   lignes de matériaux, checklist, page À propos
+   ========================================================== */
+
+/* ---------- BOUTONS ---------- */
+.btn-primary{
+  width:100%; background:var(--orange); color:var(--white); border:none; padding:16px;
+  border-radius:12px; font-family:var(--font-display); font-weight:600; font-size:1rem;
+  cursor:pointer; box-shadow:0 8px 20px rgba(232,114,12,0.28); transition:transform .15s ease, box-shadow .15s ease;
+}
+.btn-primary:hover{ transform:translateY(-1px); box-shadow:0 10px 24px rgba(232,114,12,0.34); }
+.btn-primary:focus-visible{ outline:2px solid var(--blue-deep); outline-offset:2px; }
+@media (prefers-reduced-motion: reduce){ .btn-primary:hover{ transform:none; } }
+
+.btn-secondary{
+  width:100%; background:var(--white); color:var(--blue-deep); border:1.5px solid var(--gray-border); padding:14px;
+  border-radius:12px; font-family:var(--font-body); font-weight:600; font-size:0.9rem; cursor:pointer; margin-top:10px;
+}
+.btn-secondary:hover{ border-color:var(--blue-mid); }
+.btn-secondary:focus-visible{ outline:2px solid var(--blue-mid); outline-offset:2px; }
+
+/* ---------- CARTES ---------- */
+.card{ background:var(--white); border:1px solid var(--gray-border); border-radius:var(--radius); padding:20px; margin-bottom:16px; box-shadow:var(--shadow); }
+.card-header{ display:flex; gap:12px; margin-bottom:16px; }
+
+/* ---------- CHAMPS ---------- */
+.field{ margin-bottom:14px; }
+.field label{ display:block; font-size:0.82rem; font-weight:600; color:var(--text-dark); margin-bottom:6px; }
+.field .hint{ font-size:0.74rem; color:var(--gray-text); margin-top:4px; }
+.field input[type="number"], .field input[type="text"]{
+  width:100%; padding:11px 12px; border:1.5px solid var(--gray-border); border-radius:9px;
+  font-family:var(--font-mono); font-size:0.92rem; color:var(--text-dark); background:var(--gray-bg);
+}
+.field input:focus{ outline:none; border-color:var(--blue-mid); background:var(--white); }
+.field input:focus-visible{ outline:2px solid var(--blue-mid); outline-offset:1px; }
+.row2{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+
+/* ---------- STEPPER (+/-) ---------- */
+.stepper{ display:flex; align-items:stretch; gap:0; }
+.stepper input{ border-radius:0; text-align:center; border-left:none; border-right:none; }
+.stepper input:focus{ position:relative; z-index:1; border-radius:0; }
+.step-btn{
+  flex-shrink:0; width:42px; border:1.5px solid var(--gray-border); background:var(--gray-bg);
+  font-family:var(--font-mono); font-size:1.1rem; font-weight:600; color:var(--blue-deep);
+  cursor:pointer; -webkit-tap-highlight-color: transparent; user-select:none;
+}
+.step-btn:first-child{ border-radius:9px 0 0 9px; border-right:none; }
+.step-btn:last-child{ border-radius:0 9px 9px 0; border-left:none; }
+.step-btn:active{ background:var(--orange-soft); color:var(--orange); }
+.step-btn:focus-visible{ outline:2px solid var(--blue-mid); outline-offset:2px; z-index:1; position:relative; }
+
+/* ---------- PUCES DE SUGGESTION RAPIDE ---------- */
+.quick-chips{ display:flex; gap:6px; flex-wrap:wrap; margin-top:8px; }
+.chip{
+  border:1px solid var(--gray-border); background:var(--white); color:var(--gray-text);
+  font-family:var(--font-mono); font-size:0.74rem; font-weight:600; padding:5px 10px;
+  border-radius:20px; cursor:pointer; -webkit-tap-highlight-color: transparent;
+}
+.chip:hover, .chip:active{ border-color:var(--blue-mid); color:var(--blue-mid); background:var(--blue-pale); }
+.chip:focus-visible{ outline:2px solid var(--blue-mid); outline-offset:2px; }
+
+/* ---------- CHOIX (pills) ---------- */
+.choice-group{ display:flex; gap:8px; flex-wrap:wrap; }
+.choice{
+  flex:1; min-width:110px; border:1.5px solid var(--gray-border); border-radius:9px; padding:10px 12px;
+  text-align:center; font-size:0.82rem; font-weight:600; color:var(--gray-text); cursor:pointer; background:var(--white);
+  transition: all .12s ease;
+}
+.choice.selected{ border-color:var(--orange); background:var(--orange-soft); color:var(--orange); }
+.choice:focus-visible{ outline:2px solid var(--blue-mid); outline-offset:2px; }
+
+/* ---------- INTERRUPTEUR ---------- */
+.toggle-row{ display:flex; align-items:center; justify-content:space-between; padding:4px 0; }
+.toggle-row label{ font-size:0.85rem; font-weight:600; }
+.switch{ position:relative; width:42px; height:24px; }
+.switch input{ opacity:0; width:0; height:0; }
+.slider-tog{ position:absolute; cursor:pointer; inset:0; background:var(--gray-border); border-radius:24px; transition:.2s; }
+.slider-tog::before{ content:""; position:absolute; height:18px; width:18px; left:3px; top:3px; background:white; border-radius:50%; transition:.2s; }
+input:checked + .slider-tog{ background:var(--blue-mid); }
+input:checked + .slider-tog::before{ transform:translateX(18px); }
+.switch input:focus-visible + .slider-tog{ outline:2px solid var(--blue-mid); outline-offset:2px; }
+
+/* ---------- INDICATEUR DE CONFIANCE ---------- */
+.confidence-badge{ display:inline-flex; align-items:center; gap:8px; padding:9px 14px; border-radius:10px; font-weight:600; font-size:0.88rem; margin-bottom:6px; }
+.confidence-badge.green{ background:var(--green-soft); color:var(--green); }
+.confidence-badge.amber{ background:var(--amber-soft); color:var(--amber); }
+.confidence-dot{ width:9px; height:9px; border-radius:50%; }
+.confidence-dot.green{ background:var(--green); }
+.confidence-dot.amber{ background:var(--amber); }
+.confidence-reasons{ list-style:none; margin-top:10px; font-size:0.82rem; color:var(--gray-text); }
+.confidence-reasons li{ padding:3px 0; display:flex; gap:8px; align-items:flex-start; }
+
+/* ---------- LIGNES DE MATÉRIAUX ---------- */
+.material-row{ display:flex; align-items:center; justify-content:space-between; padding:13px 0; border-bottom:1px solid var(--gray-border); }
+.material-row:last-child{ border-bottom:none; }
+.material-name{ font-size:0.88rem; font-weight:600; color:var(--text-dark); }
+.material-detail{ font-size:0.74rem; color:var(--gray-text); margin-top:2px; }
+.material-value{ font-family:var(--font-mono); font-weight:600; font-size:0.98rem; color:var(--blue-deep); text-align:right; white-space:nowrap; }
+
+/* ---------- CONSEILS / AVERTISSEMENTS ---------- */
+.advice-item{ display:flex; gap:10px; padding:9px 0; font-size:0.85rem; color:var(--text-dark); align-items:flex-start; }
+.warn-item{ display:flex; gap:10px; padding:9px 0; font-size:0.85rem; color:#8a5300; align-items:flex-start; }
+
+/* ---------- CHECKLIST DEVIS ---------- */
+.cbx-row{ display:flex; align-items:flex-start; gap:10px; padding:8px 0; font-size:0.87rem; }
+.cbx-row input{ margin-top:3px; width:16px; height:16px; accent-color:var(--blue-mid); flex-shrink:0; }
+
+.disclaimer{ font-size:0.76rem; color:var(--gray-text); background:var(--blue-pale); border-radius:10px; padding:12px 14px; margin-top:6px; }
+
+/* ---------- PAGE À PROPOS ---------- */
+.about-hero{ padding:14px 0 6px; }
+.about-hero h2{ font-family:var(--font-display); font-size:1.3rem; color:var(--blue-deep); margin-bottom:12px; }
+.about-hero p{ font-size:0.92rem; color:var(--text-dark); margin-bottom:12px; }
+.diagram{ display:flex; height:60px; border-radius:10px; overflow:hidden; margin:18px 0; box-shadow:var(--shadow); }
+.diagram div{ flex:1; display:flex; align-items:flex-end; justify-content:center; font-family:var(--font-mono); font-size:0.6rem; color:rgba(255,255,255,0.85); padding-bottom:5px; }
+.diagram div:nth-child(1){ background:#9AA9B4; }
+.diagram div:nth-child(2){ background:var(--orange); }
+.diagram div:nth-child(3){ background:var(--blue-mid); }
+.diagram div:nth-child(4){ background:#2C6E8F; }
+
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header>
+    <div class="brand" onclick="showScreen('home')" tabindex="0" role="button" aria-label="Retour à l'accueil">
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="32" height="32" rx="8" fill="#0B3654"/>
+  <path d="M7 20 L16 10 L25 20" stroke="#E8720C" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M10 22.5 H22" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round"/>
+  <path d="M12 25.2 H20" stroke="#7FB2CE" stroke-width="2.2" stroke-linecap="round"/>
+</svg>
+      <span>DevisEtanche</span>
+    </div>
+    <button class="nav-link" onclick="showScreen('about')">À propos</button>
+  </header>
+
+  <!-- ============ ACCUEIL ============ -->
+  <section class="screen active" id="screen-home">
+    <div class="hero">
+      <div class="hero-cross-section">
+        <div></div><div></div><div></div><div></div>
+      </div>
+      <div class="hero-cross-section-labels">
+        <span>Support</span><span>Primaire</span><span>Membrane</span><span>Protection</span>
+      </div>
+      <h1>Estimez les matériaux nécessaires à votre projet d'étanchéité</h1>
+      <p>Calcul gratuit et indépendant destiné aux particuliers et aux copropriétés.</p>
+      <span class="tag">⏱ 2 minutes · aucune inscription</span>
+    </div>
+
+    <div class="feature-grid">
+      <div class="feature-chip"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg></span> Surface</div>
+      <div class="feature-chip"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg></span> Membranes</div>
+      <div class="feature-chip"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></span> Primaire</div>
+      <div class="feature-chip"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M4 20V10l8-6 8 6v10"/></svg></span> Isolation</div>
+      <div class="feature-chip"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M3 17l6-6 4 4 8-8"/></svg></span> Bandes de renfort</div>
+      <div class="feature-chip"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg></span> Checklist devis</div>
+    </div>
+
+    <div class="cta-wrap">
+      <button class="btn-primary" onclick="showScreen('form')">Commencer l'estimation</button>
+    </div>
+  </section>
+
+  <!-- ============ FORMULAIRE ============ -->
+  <section class="screen" id="screen-form">
+    <main>
+      <div class="section-title">📐 Votre projet</div>
+      <div class="section-sub">Renseignez les caractéristiques de la toiture à traiter.</div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="layer-strip"><div></div><div></div><div></div><div></div></div>
+          <div>
+            <div style="font-weight:700; font-size:0.95rem;">Surface et géométrie</div>
+            <div class="section-sub" style="margin:2px 0 0;">Base de tout le calcul</div>
+          </div>
+        </div>
+
+        <div class="toggle-row" style="margin-bottom:12px;">
+          <label for="irregular">Toiture de forme irrégulière</label>
+          <label class="switch"><input type="checkbox" id="irregular" onchange="toggleGeometryMode()"><span class="slider-tog"></span></label>
+        </div>
+
+        <div id="geo-rect">
+          <div class="row2">
+            <div class="field">
+              <label for="longueur">Longueur (m)</label>
+              <div class="stepper">
+                <button type="button" class="step-btn" aria-label="Diminuer la longueur" onclick="adjustValue('longueur', -0.5, 0)">−</button>
+                <input type="number" inputmode="decimal" id="longueur" min="0" step="0.1" placeholder="ex : 12" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('largeur').focus();}">
+                <button type="button" class="step-btn" aria-label="Augmenter la longueur" onclick="adjustValue('longueur', 0.5, 0)">+</button>
+              </div>
+              <div class="quick-chips">
+                <button type="button" class="chip" onclick="setQuickValue('longueur', 6)">6 m</button>
+                <button type="button" class="chip" onclick="setQuickValue('longueur', 10)">10 m</button>
+                <button type="button" class="chip" onclick="setQuickValue('longueur', 15)">15 m</button>
+                <button type="button" class="chip" onclick="setQuickValue('longueur', 20)">20 m</button>
+              </div>
+            </div>
+            <div class="field">
+              <label for="largeur">Largeur (m)</label>
+              <div class="stepper">
+                <button type="button" class="step-btn" aria-label="Diminuer la largeur" onclick="adjustValue('largeur', -0.5, 0)">−</button>
+                <input type="number" inputmode="decimal" id="largeur" min="0" step="0.1" placeholder="ex : 8">
+                <button type="button" class="step-btn" aria-label="Augmenter la largeur" onclick="adjustValue('largeur', 0.5, 0)">+</button>
+              </div>
+              <div class="quick-chips">
+                <button type="button" class="chip" onclick="setQuickValue('largeur', 5)">5 m</button>
+                <button type="button" class="chip" onclick="setQuickValue('largeur', 8)">8 m</button>
+                <button type="button" class="chip" onclick="setQuickValue('largeur', 10)">10 m</button>
+                <button type="button" class="chip" onclick="setQuickValue('largeur', 12)">12 m</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="geo-direct" style="display:none;">
+          <div class="field"><label for="surfaceDirecte">Surface totale (m²)</label><input type="number" inputmode="decimal" id="surfaceDirecte" min="0" step="0.1" placeholder="ex : 96"><div class="hint">Mesurée sur place ou issue d'un plan.</div></div>
+        </div>
+
+        <div class="field">
+          <label>Pente de la toiture</label>
+          <div class="choice-group" id="pente-group">
+            <div class="choice selected" data-val="faible" tabindex="0">Plate / faible (&lt; 3%)</div>
+            <div class="choice" data-val="moyenne" tabindex="0">Moyenne (3–5%)</div>
+            <div class="choice" data-val="forte" tabindex="0">Forte (&gt; 5%)</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="layer-strip"><div></div><div></div><div></div><div></div></div>
+          <div>
+            <div style="font-weight:700; font-size:0.95rem;">Système d'étanchéité</div>
+            <div class="section-sub" style="margin:2px 0 0;">Membrane, primaire, relevés</div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Type de pose</label>
+          <div class="choice-group">
+            <div class="choice selected" data-group="systeme" data-val="mono" tabindex="0">Monocouche</div>
+            <div class="choice" data-group="systeme" data-val="bi" tabindex="0">Bicouche</div>
+          </div>
+        </div>
+
+        <div class="row2">
+          <div class="field">
+            <label for="releves">Hauteur des relevés (cm)</label>
+            <div class="stepper">
+              <button type="button" class="step-btn" aria-label="Diminuer la hauteur des relevés" onclick="adjustValue('releves', -1, 0)">−</button>
+              <input type="number" inputmode="numeric" id="releves" min="0" step="1" value="15">
+              <button type="button" class="step-btn" aria-label="Augmenter la hauteur des relevés" onclick="adjustValue('releves', 1, 0)">+</button>
+            </div>
+          </div>
+          <div class="field">
+            <label for="evacuations">Nombre d'évacuations EP</label>
+            <div class="stepper">
+              <button type="button" class="step-btn" aria-label="Diminuer le nombre d'évacuations" onclick="adjustValue('evacuations', -1, 0)">−</button>
+              <input type="number" inputmode="numeric" id="evacuations" min="0" step="1" value="2">
+              <button type="button" class="step-btn" aria-label="Augmenter le nombre d'évacuations" onclick="adjustValue('evacuations', 1, 0)">+</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="toggle-row">
+          <div>
+            <div style="font-weight:700; font-size:0.95rem;">Isolation thermique</div>
+            <div class="section-sub" style="margin:2px 0 0;">Optionnel</div>
+          </div>
+          <label class="switch"><input type="checkbox" id="isolationOn" onchange="toggleIsolation()"><span class="slider-tog"></span></label>
+        </div>
+        <div id="isolation-fields" style="display:none; margin-top:12px;">
+          <div class="field">
+            <label>Épaisseur de l'isolant</label>
+            <div class="choice-group">
+              <div class="choice selected" data-group="isolant" data-val="60" tabindex="0">60 mm</div>
+              <div class="choice" data-group="isolant" data-val="80" tabindex="0">80 mm</div>
+              <div class="choice" data-group="isolant" data-val="100" tabindex="0">100 mm</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn-primary" onclick="calculer()">Calculer mon estimation</button>
+      <button class="btn-secondary" onclick="showScreen('home')">Retour</button>
+    </main>
+  </section>
+
+  <!-- ============ RÉSULTATS ============ -->
+  <section class="screen" id="screen-results">
+    <main>
+      <div class="print-only print-header">
+        <div class="print-header-row">
+          <svg width="26" height="26" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="32" height="32" rx="8" fill="#0B3654"/>
+            <path d="M7 20 L16 10 L25 20" stroke="#E8720C" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M10 22.5 H22" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round"/>
+            <path d="M12 25.2 H20" stroke="#7FB2CE" stroke-width="2.2" stroke-linecap="round"/>
+          </svg>
+          <span>DevisEtanche — Rapport d'estimation</span>
+        </div>
+        <div class="print-date" id="print-date"></div>
+      </div>
+
+      <div class="section-title">📋 Votre estimation</div>
+      <div class="section-sub">Rapport indicatif basé sur les données saisies.</div>
+
+      <div class="card">
+        <div id="confidence-badge" class="confidence-badge green">
+          <span class="confidence-dot green"></span>
+          <span id="confidence-label">Très fiable</span>
+        </div>
+        <ul class="confidence-reasons" id="confidence-reasons"></ul>
+      </div>
+
+      <div class="card">
+        <div class="section-title" style="font-size:0.95rem;">📐 Surface</div>
+        <div class="material-row">
+          <div><div class="material-name">Surface à traiter</div><div class="material-detail" id="surface-detail"></div></div>
+          <div class="material-value" id="surface-value"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="section-title" style="font-size:0.95rem;">🧱 Matériaux</div>
+        <div id="materials-list"></div>
+      </div>
+
+      <div class="card">
+        <div class="section-title" style="font-size:0.95rem;">📄 Conseils</div>
+        <div id="advice-list"></div>
+      </div>
+
+      <div class="card" id="warnings-card" style="display:none;">
+        <div class="section-title" style="font-size:0.95rem;">⚠️ Points d'attention</div>
+        <div id="warnings-list"></div>
+      </div>
+
+      <div class="card">
+        <div class="section-title" style="font-size:0.95rem;">☑️ Avant de signer votre devis</div>
+        <div class="section-sub">Vérifiez que celui-ci mentionne bien :</div>
+        <div class="cbx-row"><input type="checkbox"><span>Primaire d'accrochage</span></div>
+        <div class="cbx-row"><input type="checkbox"><span>Membrane(s) d'étanchéité — nombre de couches précisé</span></div>
+        <div class="cbx-row"><input type="checkbox"><span>Bandes de renfort aux points singuliers</span></div>
+        <div class="cbx-row"><input type="checkbox"><span>Relevés d'étanchéité en périphérie</span></div>
+        <div class="cbx-row" id="cbx-isolation"><input type="checkbox"><span>Isolation thermique (si prévue)</span></div>
+        <div class="cbx-row"><input type="checkbox"><span>Évacuation des eaux pluviales</span></div>
+        <div class="disclaimer">Cette estimation est fournie à titre indicatif et ne remplace pas une étude réalisée sur site par un professionnel qualifié.</div>
+      </div>
+
+      <button class="btn-primary" onclick="telechargerPDF()">📄 Télécharger en PDF</button>
+      <button class="btn-secondary" onclick="showScreen('form')">Modifier les données</button>
+      <button class="btn-secondary" onclick="showScreen('home')">Nouvelle estimation</button>
+    </main>
+  </section>
+
+  <!-- ============ À PROPOS ============ -->
+  <section class="screen" id="screen-about">
+    <main>
+      <div class="about-hero">
+        <h2>Pourquoi DevisEtanche ?</h2>
+        <p>DevisEtanche est un outil indépendant destiné à estimer les surfaces et les matériaux nécessaires à des travaux d'étanchéité. Il a été conçu pour aider les particuliers et les copropriétés à mieux comprendre les devis qui leur sont proposés.</p>
+        <div class="diagram">
+          <div>Support</div><div>Primaire</div><div>Membrane</div><div>Protection</div>
+        </div>
+        <p>Les résultats sont fournis à titre indicatif et ne remplacent pas une étude réalisée sur site par un professionnel.</p>
+      </div>
+      <button class="btn-secondary" onclick="showScreen('home')">Retour à l'accueil</button>
+    </main>
+  </section>
+
+  <footer class="appfoot">DevisEtanche — outil gratuit et indépendant</footer>
+</div>
+
+<script>
+/* ==========================================================
+   DevisEtanche V4 — calculs.js
+   Toute la logique métier est isolée ici.
+   ⚠️ Les constantes ci-dessous sont des valeurs standards de
+   départ. À ajuster avec les valeurs terrain réelles.
+   ========================================================== */
+
+const CONSTANTES = {
+  ROLL_USABLE_M2: 8,        // surface utile d'un rouleau de membrane (1x10m) après recouvrements
+  PRIMER_L_PER_M2: 0.3,     // consommation moyenne d'EIF (primaire) au m²
+  PRIMER_DRUM_L: 20,        // volume d'un bidon standard
+  RENFORT_ROLL_M: 25,       // longueur d'un rouleau de bande de renfort
+  RENFORT_PER_EVAC_M: 1.5,  // ml de renfort ajoutés par point singulier (évacuation EP)
+  PANEL_M2: 0.72,           // surface d'un panneau isolant (1.2 x 0.6 m)
+  RELEVES_MIN_CM: 10,       // hauteur de relevé considérée standard (borne basse)
+  RELEVES_MAX_CM: 30        // hauteur de relevé considérée standard (borne haute)
+};
+
+/**
+ * Calcule l'estimation complète à partir des données du formulaire.
+ * @param {Object} input
+ * @param {boolean} input.irregular - forme irrégulière (saisie directe de la surface)
+ * @param {number} input.longueur
+ * @param {number} input.largeur
+ * @param {number} input.surfaceDirecte
+ * @param {string} input.pente - 'faible' | 'moyenne' | 'forte'
+ * @param {string} input.systeme - 'mono' | 'bi'
+ * @param {number} input.releves - hauteur en cm
+ * @param {number} input.evacuations - nombre de points d'évacuation EP
+ * @param {boolean} input.isolationOn
+ * @param {string} input.isolant - épaisseur en mm ('60' | '80' | '100')
+ * @returns {Object} résultat structuré prêt pour l'affichage (ui.js)
+ */
+function calculerEstimation(input){
+  const C = CONSTANTES;
+
+  // --- Surface ---
+  let surface, geoDetail, perimeter;
+  if(input.irregular){
+    surface = input.surfaceDirecte || 0;
+    geoDetail = 'Saisie directe (forme irrégulière)';
+    perimeter = surface > 0 ? 4 * Math.sqrt(surface) : 0; // approximation carrée équivalente
+  } else {
+    const L = input.longueur || 0;
+    const W = input.largeur || 0;
+    surface = L * W;
+    geoDetail = (L && W) ? `${L} m × ${W} m` : 'Dimensions incomplètes';
+    perimeter = (L && W) ? 2 * (L + W) : 0;
+  }
+
+  // --- Membrane ---
+  const wasteFactor = input.pente === 'forte' ? 1.15 : 1.10;
+  const layers = input.systeme === 'bi' ? 2 : 1;
+  const membraneSurface = surface * wasteFactor * layers;
+  const rolls = Math.ceil(membraneSurface / C.ROLL_USABLE_M2);
+
+  // --- Primaire ---
+  const primerL = Math.ceil(surface * C.PRIMER_L_PER_M2);
+  const primerDrums = Math.ceil(primerL / C.PRIMER_DRUM_L);
+
+  // --- Bandes de renfort ---
+  const renfortLength = perimeter + (input.evacuations * C.RENFORT_PER_EVAC_M);
+  const renfortRolls = Math.ceil(renfortLength / C.RENFORT_ROLL_M);
+
+  // --- Isolation ---
+  const panels = input.isolationOn ? Math.ceil((surface / C.PANEL_M2) * 1.05) : 0;
+
+  // --- Indice de confiance ---
+  const reasons = [];
+  let confident = true;
+
+  if(input.irregular){ confident = false; reasons.push({ ok:false, text:'Géométrie complexe (forme irrégulière)' }); }
+  else reasons.push({ ok:true, text:'Toiture de forme simple' });
+
+  if(input.pente === 'forte'){ confident = false; reasons.push({ ok:false, text:'Pente importante' }); }
+  else reasons.push({ ok:true, text:'Pente standard' });
+
+  if(surface <= 0){ confident = false; reasons.push({ ok:false, text:'Dimensions incomplètes' }); }
+  else reasons.push({ ok:true, text:'Dimensions complètes' });
+
+  if(input.releves < C.RELEVES_MIN_CM || input.releves > C.RELEVES_MAX_CM){
+    confident = false; reasons.push({ ok:false, text:'Hauteur de relevés atypique' });
+  } else reasons.push({ ok:true, text:'Paramètres standards' });
+
+  // --- Conseils ---
+  const advice = [];
+  advice.push("Prévoir toujours une marge de 10 à 15% sur les rouleaux de membrane pour les chutes et recouvrements.");
+  advice.push("Le primaire doit être appliqué sur support propre, sec et dépoussiéré pour garantir l'adhérence.");
+  if(input.systeme === 'bi') advice.push("En pose bicouche, décaler les joints entre la première et la seconde couche.");
+  if(input.evacuations > 0) advice.push("Renforcer systématiquement les abords des évacuations d'eaux pluviales.");
+
+  // --- Avertissements ---
+  const warnings = [];
+  if(input.pente === 'forte') warnings.push("Pente forte : la mise en œuvre et la quantité de matériaux peuvent varier sensiblement. Un passage sur site est recommandé.");
+  if(input.irregular) warnings.push("Forme irrégulière : cette estimation est approximative. Un relevé précis affinera les quantités.");
+  if(input.releves < C.RELEVES_MIN_CM || input.releves > C.RELEVES_MAX_CM) warnings.push("Hauteur de relevés inhabituelle : à vérifier avec le professionnel.");
+
+  return {
+    surface, geoDetail, pente: input.pente,
+    membrane: { rolls, systeme: input.systeme },
+    primer: { liters: primerL, drums: primerDrums },
+    renfort: { length: renfortLength, rolls: renfortRolls },
+    isolation: { on: input.isolationOn, panels, epaisseur: input.isolant },
+    confidence: { confident, reasons },
+    advice, warnings
+  };
+}
+
+
+/* ==========================================================
+   DevisEtanche V4 — ui.js
+   Tout ce qui touche à l'affichage : navigation, rendu du
+   rapport de résultats. Ne contient aucun calcul métier
+   (voir calculs.js).
+   ========================================================== */
+
+function showScreen(name){
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function toggleGeometryMode(){
+  const irregular = document.getElementById('irregular').checked;
+  document.getElementById('geo-rect').style.display = irregular ? 'none' : 'block';
+  document.getElementById('geo-direct').style.display = irregular ? 'block' : 'none';
+}
+
+function toggleIsolation(){
+  document.getElementById('isolation-fields').style.display =
+    document.getElementById('isolationOn').checked ? 'block' : 'none';
+}
+
+/**
+ * Prépare puis déclenche l'export PDF via l'impression du navigateur.
+ * Sur mobile, la boîte de dialogue d'impression propose nativement
+ * "Enregistrer en PDF" comme imprimante.
+ */
+function telechargerPDF(){
+  const dateStr = new Date().toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' });
+  document.getElementById('print-date').textContent = 'Généré le ' + dateStr;
+  window.print();
+}
+
+function materialRow(name, detail, value){
+  return `<div class="material-row">
+    <div><div class="material-name">${name}</div><div class="material-detail">${detail}</div></div>
+    <div class="material-value">${value}</div>
+  </div>`;
+}
+
+/**
+ * Affiche le résultat structuré (issu de calculerEstimation) dans l'écran résultats.
+ * @param {Object} result
+ */
+function afficherResultats(result){
+  // --- Badge de confiance ---
+  const badge = document.getElementById('confidence-badge');
+  const dot = badge.querySelector('.confidence-dot');
+  const label = document.getElementById('confidence-label');
+  badge.classList.remove('green', 'amber');
+  dot.classList.remove('green', 'amber');
+
+  if(result.confidence.confident){
+    badge.classList.add('green'); dot.classList.add('green'); label.textContent = 'Très fiable';
+  } else {
+    badge.classList.add('amber'); dot.classList.add('amber'); label.textContent = 'Estimation à confirmer';
+  }
+  document.getElementById('confidence-reasons').innerHTML = result.confidence.reasons
+    .map(r => `<li>${r.ok ? '✔' : '•'} ${r.text}</li>`).join('');
+
+  // --- Surface ---
+  document.getElementById('surface-value').textContent = result.surface > 0 ? result.surface.toFixed(1) + ' m²' : '—';
+  document.getElementById('surface-detail').textContent = result.geoDetail + ` · pente ${result.pente}`;
+
+  // --- Matériaux ---
+  let html = '';
+  html += materialRow(
+    "Membrane d'étanchéité",
+    `${result.membrane.systeme === 'bi' ? 'Bicouche' : 'Monocouche'} · recouvrements inclus`,
+    result.membrane.rolls + (result.membrane.rolls > 1 ? ' rouleaux' : ' rouleau')
+  );
+  html += materialRow(
+    "Primaire d'accrochage (EIF)",
+    `${result.primer.liters} L au total`,
+    result.primer.drums + (result.primer.drums > 1 ? ' bidons de 20 L' : ' bidon de 20 L')
+  );
+  html += materialRow(
+    "Bandes de renfort",
+    `≈ ${result.renfort.length.toFixed(1)} ml (périphérie + points singuliers)`,
+    result.renfort.rolls + (result.renfort.rolls > 1 ? ' rouleaux' : ' rouleau')
+  );
+  if(result.isolation.on){
+    html += materialRow("Panneaux isolants", `Épaisseur ${result.isolation.epaisseur} mm`, result.isolation.panels + ' panneaux');
+  }
+  document.getElementById('materials-list').innerHTML = html;
+  document.getElementById('cbx-isolation').style.display = result.isolation.on ? 'flex' : 'none';
+
+  // --- Conseils ---
+  document.getElementById('advice-list').innerHTML = result.advice
+    .map(a => `<div class="advice-item">💬 ${a}</div>`).join('');
+
+  // --- Avertissements ---
+  const warnCard = document.getElementById('warnings-card');
+  if(result.warnings.length){
+    warnCard.style.display = 'block';
+    document.getElementById('warnings-list').innerHTML = result.warnings
+      .map(w => `<div class="warn-item">⚠️ ${w}</div>`).join('');
+  } else {
+    warnCard.style.display = 'none';
+  }
+
+  showScreen('results');
+}
+
+
+/* ==========================================================
+   DevisEtanche V4 — app.js
+   Point d'entrée : lit le formulaire, garde l'état des
+   sélecteurs (pills), déclenche calculs.js puis ui.js.
+   ========================================================== */
+
+let state = { systeme: 'mono', pente: 'faible', isolant: '60' };
+
+// --- Gestion des groupes de choix (pills) ---
+document.addEventListener('click', (e) => {
+  const el = e.target.closest('.choice');
+  if(!el) return;
+  const group = el.parentElement;
+  group.querySelectorAll('.choice').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+
+  if(el.dataset.group === 'systeme') state.systeme = el.dataset.val;
+  else if(el.dataset.group === 'isolant') state.isolant = el.dataset.val;
+  else if(group.id === 'pente-group') state.pente = el.dataset.val;
+});
+
+// Accessibilité clavier : Entrée valide une pill au focus
+document.addEventListener('keydown', (e) => {
+  if(e.key === 'Enter' && e.target.classList.contains('choice')) e.target.click();
+});
+
+/**
+ * Incrémente/décrémente la valeur d'un champ numérique (boutons +/-).
+ * Évite la saisie clavier pour les ajustements fins sur mobile.
+ */
+function adjustValue(id, delta, min){
+  const input = document.getElementById(id);
+  const current = parseFloat(input.value) || 0;
+  let next = Math.round((current + delta) * 10) / 10; // évite les erreurs d'arrondi flottant
+  if(next < min) next = min;
+  input.value = next;
+}
+
+/**
+ * Renseigne directement une valeur suggérée (puce rapide) dans un champ.
+ * Utile pour les dimensions courantes de toiture.
+ */
+function setQuickValue(id, value){
+  document.getElementById(id).value = value;
+}
+
+/**
+ * Lit les champs du formulaire, lance le calcul, puis demande
+ * l'affichage du rapport de résultats.
+ */
+function calculer(){
+  const irregular = document.getElementById('irregular').checked;
+
+  const input = {
+    irregular,
+    longueur: parseFloat(document.getElementById('longueur').value) || 0,
+    largeur: parseFloat(document.getElementById('largeur').value) || 0,
+    surfaceDirecte: parseFloat(document.getElementById('surfaceDirecte').value) || 0,
+    pente: state.pente,
+    systeme: state.systeme,
+    releves: parseFloat(document.getElementById('releves').value) || 0,
+    evacuations: parseInt(document.getElementById('evacuations').value) || 0,
+    isolationOn: document.getElementById('isolationOn').checked,
+    isolant: state.isolant
+  };
+
+  const result = calculerEstimation(input);
+  afficherResultats(result);
+}
+
+</script>
+</body>
+</html>
