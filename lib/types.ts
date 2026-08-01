@@ -1,0 +1,61 @@
+export type StatutChantier = "en_preparation" | "en_cours" | "termine" | "en_attente";
+
+export interface Client {
+  id: string;
+  nom: string;
+  type: "syndic" | "particulier" | "entreprise";
+  ville: string;
+  email?: string;
+  telephone?: string;
+  created_at: string;
+}
+
+export interface Zone {
+  id: string;
+  chantier_id: string;
+  nom: string;
+  surface_m2: number;
+  statut: "termine" | "en_cours" | "en_attente" | "probleme";
+  avancement_pct: number;
+}
+
+export interface Chantier {
+  id: string;
+  nom: string;
+  ville: string;
+  client_id: string;
+  statut: StatutChantier;
+  surface_totale_m2: number;
+  avancement_pct: number;
+  systeme: "bicouche" | "pvc" | "resine";
+  date_debut: string;
+  date_fin_prevue?: string;
+  zones?: Zone[];
+}
+
+export interface LigneDevis {
+  designation: string;
+  quantite: number;
+  unite: string;
+  prix_unitaire: number;
+}
+
+export interface Devis {
+  id: string;
+  numero: string;
+  chantier_id: string;
+  client_id: string;
+  statut: "brouillon" | "envoye" | "accepte" | "refuse";
+  lignes: LigneDevis[];
+  total_ht: number;
+  tva_pct: number;
+  total_ttc: number;
+  created_at: string;
+}
+
+export interface Profile {
+  id: string;
+  nom: string;
+  role: "ouvrier" | "chef_de_chantier" | "conducteur_de_travaux" | "administrateur" | "client";
+  entreprise_id: string;
+}

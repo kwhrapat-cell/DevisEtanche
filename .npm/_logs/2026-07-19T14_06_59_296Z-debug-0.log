@@ -1,0 +1,40 @@
+0 verbose cli /data/data/com.termux/files/usr/bin/node /data/data/com.termux/files/usr/bin/npm
+1 info using npm@11.18.0
+2 info using node@v26.4.0
+3 silly config load:file:/data/data/com.termux/files/usr/lib/node_modules/npm/npmrc
+4 silly config load:file:/data/data/com.termux/files/home/.npmrc
+5 silly config load:file:/data/data/com.termux/files/usr/etc/npmrc
+6 verbose title npm install
+7 verbose argv "install" "--global" "--allow-scripts" "@anthropic-ai/claude-code"
+8 verbose logfile logs-max:10 dir:/data/data/com.termux/files/home/.npm/_logs/2026-07-19T14_06_59_296Z-
+9 verbose logfile /data/data/com.termux/files/home/.npm/_logs/2026-07-19T14_06_59_296Z-debug-0.log
+10 silly packumentCache heap:1095499776 maxSize:273874944 maxEntrySize:136937472
+11 silly logfile done cleaning log files
+12 verbose stack Error: Could not read package.json: Error: ENOENT: no such file or directory, open '/data/data/com.termux/files/home/package.json'
+12 verbose stack     at async open (node:internal/fs/promises:1360:25)
+12 verbose stack     at async readFile (node:internal/fs/promises:2149:14)
+12 verbose stack     at async read (/data/data/com.termux/files/usr/lib/node_modules/npm/node_modules/@npmcli/package-json/lib/read-package.js:9:18)
+12 verbose stack     at async PackageJson.load (/data/data/com.termux/files/usr/lib/node_modules/npm/node_modules/@npmcli/package-json/lib/index.js:131:31)
+12 verbose stack     at async PackageJson.normalize (/data/data/com.termux/files/usr/lib/node_modules/npm/node_modules/@npmcli/package-json/lib/index.js:117:5)
+12 verbose stack     at async /data/data/com.termux/files/usr/lib/node_modules/npm/node_modules/@npmcli/arborist/lib/arborist/build-ideal-tree.js:541:22
+12 verbose stack     at async Promise.all (index 0)
+12 verbose stack     at async #add (/data/data/com.termux/files/usr/lib/node_modules/npm/node_modules/@npmcli/arborist/lib/arborist/build-ideal-tree.js:530:5)
+12 verbose stack     at async #applyUserRequestsToNode (/data/data/com.termux/files/usr/lib/node_modules/npm/node_modules/@npmcli/arborist/lib/arborist/build-ideal-tree.js:501:7)
+12 verbose stack     at async #applyUserRequests (/data/data/com.termux/files/usr/lib/node_modules/npm/node_modules/@npmcli/arborist/lib/arborist/build-ideal-tree.js:432:7)
+13 error code ENOENT
+14 error syscall open
+15 error path /data/data/com.termux/files/home/package.json
+16 error errno -2
+17 error enoent Could not read package.json: Error: ENOENT: no such file or directory, open '/data/data/com.termux/files/home/package.json'
+18 error enoent This is related to npm not being able to find a file.
+18 error enoent
+19 silly unfinished npm timer reify 1784470020742
+20 silly unfinished npm timer reify:loadTrees 1784470020757
+21 silly unfinished npm timer idealTree:userRequests 1784470020798
+22 verbose cwd /data/data/com.termux/files/home
+23 verbose os Linux 5.15.178-android13-8-00006-g0c6055fd2d8b-ab13363910
+24 verbose node v26.4.0
+25 verbose npm  v11.18.0
+26 verbose exit -2
+27 verbose code -2
+28 error A complete log of this run can be found in: /data/data/com.termux/files/home/.npm/_logs/2026-07-19T14_06_59_296Z-debug-0.log

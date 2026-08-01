@@ -1,0 +1,34 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap");
+
+body {
+  background: #F7F4EC;
+  color: #1B2230;
+  font-family: "IBM Plex Sans", sans-serif;
+}
+
+.card {
+  background: #fff;
+  border: 1px solid #DDD5C2;
+  border-radius: 16px;
+}
+
+.badge {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.72rem;
+  padding: 4px 9px;
+  border-radius: 100px;
+  font-weight: 600;
+}
+.badge-en_cours { background: #FCE9DE; color: #E2622C; }
+.badge-termine { background: #E4F3EA; color: #2F9E5B; }
+.badge-en_attente { background: #F2EDDD; color: #D9A441; }
+.badge-en_preparation { background: #ECEAF6; color: #6B5FB0; }
+
+@media print {
+  body { background: #fff; }
+  .print\:hidden { display: none !important; }
+}

@@ -1,0 +1,9 @@
+{
+  "name": "DevisEtanche",
+  "short_name": "DevisEtanche",
+  "start_url": "/dashboard",
+  "display": "standalone",
+  "background_color": "#F7F4EC",
+  "theme_color": "#0E2038",
+  "icons": []
+}
