@@ -75,4 +75,4 @@ export default function LoginFormWrapper() {
       <LoginForm />
     </Suspense>
   );
-})
+}
