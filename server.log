@@ -1,0 +1,125 @@
+npm warn Unknown project config "allow-scripts". This will stop working in the next major version of npm.
+
+> devisetanche-app@0.1.0 dev
+> next dev
+
+  ▲ Next.js 14.2.35
+  - Local:        http://localhost:3000
+  - Environments: .env.local
+
+ ✓ Starting...
+   Disabled SWC as replacement for Babel because of custom Babel configuration ".babelrc" https://nextjs.org/docs/messages/swc-disabled
+ ✓ Ready in 2.1s
+ ○ Compiling / ...
+   Using external babel configuration from /workspaces/DevisEtanche/.babelrc
+ ⚠ It looks like there is a custom Babel configuration that can be removed.
+ ⨯ ./lib/offline/queue.ts
+Error: Failed to resolve "@babel/runtime/regenerator" relative to "/workspaces/DevisEtanche"
+Import trace for requested module:
+./lib/offline/queue.ts
+./components/OfflineBanner.tsx
+ ⨯ TypeError [ERR_INVALID_ARG_TYPE]: The "path" argument must be of type string. Received undefined
+    at Object.dirname (node:path:1442:5)
+    at getBabelLoader (/workspaces/DevisEtanche/node_modules/next/dist/build/webpack-config.js:359:39)
+    at getBaseWebpackConfig (/workspaces/DevisEtanche/node_modules/next/dist/build/webpack-config.js:366:6)
+    at HotReloaderWebpack.buildFallbackError (/workspaces/DevisEtanche/node_modules/next/dist/server/dev/hot-reloader-webpack.js:553:65)
+    at async DevBundlerService.getFallbackErrorComponents (/workspaces/DevisEtanche/node_modules/next/dist/server/lib/dev-bundler-service.js:25:9)
+    at async DevServer.getFallbackErrorComponents (/workspaces/DevisEtanche/node_modules/next/dist/server/dev/next-dev-server.js:593:9)
+    at async DevServer.renderErrorToResponseImpl (/workspaces/DevisEtanche/node_modules/next/dist/server/base-server.js:2203:40)
+    at async DevServer.renderToResponseImpl (/workspaces/DevisEtanche/node_modules/next/dist/server/base-server.js:2019:30)
+    at async DevServer.pipeImpl (/workspaces/DevisEtanche/node_modules/next/dist/server/base-server.js:922:25)
+    at async NextNodeServer.handleCatchallRenderRequest (/workspaces/DevisEtanche/node_modules/next/dist/server/next-server.js:272:17)
+    at async DevServer.handleRequestImpl (/workspaces/DevisEtanche/node_modules/next/dist/server/base-server.js:818:17)
+    at async /workspaces/DevisEtanche/node_modules/next/dist/server/dev/next-dev-server.js:339:20
+    at async Span.traceAsyncFn (/workspaces/DevisEtanche/node_modules/next/dist/trace/trace.js:154:20)
+    at async DevServer.handleRequest (/workspaces/DevisEtanche/node_modules/next/dist/server/dev/next-dev-server.js:336:24)
+    at async invokeRender (/workspaces/DevisEtanche/node_modules/next/dist/server/lib/router-server.js:179:21)
+    at async handleRequest (/workspaces/DevisEtanche/node_modules/next/dist/server/lib/router-server.js:359:24)
+    at async requestHandlerImpl (/workspaces/DevisEtanche/node_modules/next/dist/server/lib/router-server.js:383:13)
+    at async Server.requestListener (/workspaces/DevisEtanche/node_modules/next/dist/server/lib/start-server.js:141:13) {
+  code: 'ERR_INVALID_ARG_TYPE'
+}
+TypeError [ERR_INVALID_ARG_TYPE]: The "path" argument must be of type string. Received undefined
+    at Object.dirname (node:path:1442:5)
+    at getBabelLoader (/workspaces/DevisEtanche/node_modules/next/dist/build/webpack-config.js:359:39)
+    at getBaseWebpackConfig (/workspaces/DevisEtanche/node_modules/next/dist/build/webpack-config.js:366:6)
+    at HotReloaderWebpack.buildFallbackError (/workspaces/DevisEtanche/node_modules/next/dist/server/dev/hot-reloader-webpack.js:553:65)
+    at async DevBundlerService.getFallbackErrorComponents (/workspaces/DevisEtanche/node_modules/next/dist/server/lib/dev-bundler-service.js:25:9)
+    at async DevServer.getFallbackErrorComponents (/workspaces/DevisEtanche/node_modules/next/dist/server/dev/next-dev-server.js:593:9)
+    at async DevServer.renderErrorToResponseImpl (/workspaces/DevisEtanche/node_modules/next/dist/server/base-server.js:2203:40)
+    at async DevServer.renderToResponseImpl (/workspaces/DevisEtanche/node_modules/next/dist/server/base-server.js:2019:30)
+    at async DevServer.pipeImpl (/workspaces/DevisEtanche/node_modules/next/dist/server/base-server.js:922:25)
+    at async NextNodeServer.handleCatchallRenderRequest (/workspaces/DevisEtanche/node_modules/next/dist/server/next-server.js:272:17)
+    at async DevServer.handleRequestImpl (/workspaces/DevisEtanche/node_modules/next/dist/server/base-server.js:818:17)
+    at async /workspaces/DevisEtanche/node_modules/next/dist/server/dev/next-dev-server.js:339:20
+    at async Span.traceAsyncFn (/workspaces/DevisEtanche/node_modules/next/dist/trace/trace.js:154:20)
+    at async DevServer.handleRequest (/workspaces/DevisEtanche/node_modules/next/dist/server/dev/next-dev-server.js:336:24)
+    at async invokeRender (/workspaces/DevisEtanche/node_modules/next/dist/server/lib/router-server.js:179:21)
+    at async handleRequest (/workspaces/DevisEtanche/node_modules/next/dist/server/lib/router-server.js:359:24)
+    at async requestHandlerImpl (/workspaces/DevisEtanche/node_modules/next/dist/server/lib/router-server.js:383:13)
+    at async Server.requestListener (/workspaces/DevisEtanche/node_modules/next/dist/server/lib/start-server.js:141:13) {
+  code: 'ERR_INVALID_ARG_TYPE'
+}
+TypeError [ERR_INVALID_ARG_TYPE]: The "path" argument must be of type string. Received undefined
+    at Object.dirname (node:path:1442:5)
+    at getBabelLoader (/workspaces/DevisEtanche/node_modules/next/dist/build/webpack-config.js:359:39)
+    at getBaseWebpackConfig (/workspaces/DevisEtanche/node_modules/next/dist/build/webpack-config.js:366:6)
+    at HotReloaderWebpack.buildFallbackError (/workspaces/DevisEtanche/node_modules/next/dist/server/dev/hot-reloader-webpack.js:553:65)
+    at async DevBundlerService.getFallbackErrorComponents (/workspaces/DevisEtanche/node_modules/next/dist/server/lib/dev-bundler-service.js:25:9)
+    at async DevServer.getFallbackErrorComponents (/workspaces/DevisEtanche/node_modules/next/dist/server/dev/next-dev-server.js:593:9)
+    at async DevServer.renderErrorToResponseImpl (/workspaces/DevisEtanche/node_modules/next/dist/server/base-server.js:2203:40)
+    at async pipe.req.req (/workspaces/DevisEtanche/node_modules/next/dist/server/base-server.js:2056:30)
+    at async DevServer.pipeImpl (/workspaces/DevisEtanche/node_modules/next/dist/server/base-server.js:922:25)
+    at async /workspaces/DevisEtanche/node_modules/next/dist/server/dev/next-dev-server.js:339:20
+    at async Span.traceAsyncFn (/workspaces/DevisEtanche/node_modules/next/dist/trace/trace.js:154:20)
+    at async DevServer.handleRequest (/workspaces/DevisEtanche/node_modules/next/dist/server/dev/next-dev-server.js:336:24)
+    at async invokeRender (/workspaces/DevisEtanche/node_modules/next/dist/server/lib/router-server.js:179:21)
+    at async requestHandlerImpl (/workspaces/DevisEtanche/node_modules/next/dist/server/lib/router-server.js:395:24)
+    at async Server.requestListener (/workspaces/DevisEtanche/node_modules/next/dist/server/lib/start-server.js:141:13) {
+  code: 'ERR_INVALID_ARG_TYPE'
+}
+ GET / 500 in 2226ms
+ GET / 500 in 8ms
+ ✓ Compiled / in 51ms
+ ⨯ ./node_modules/next/dist/build/deployment-id.js
+Error: ENOENT: no such file or directory, open '/workspaces/DevisEtanche/.babelrc'
+Import trace for requested module:
+./node_modules/next/dist/build/deployment-id.js
+./node_modules/next/dist/client/app-webpack.js
+[Error: ENOENT: no such file or directory, stat '/workspaces/DevisEtanche/.next/cache/webpack/client-development/1.pack.gz'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'stat',
+  path: '/workspaces/DevisEtanche/.next/cache/webpack/client-development/1.pack.gz'
+}
+ ⨯ unhandledRejection: [Error: ENOENT: no such file or directory, stat '/workspaces/DevisEtanche/.next/cache/webpack/client-development/1.pack.gz'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'stat',
+  path: '/workspaces/DevisEtanche/.next/cache/webpack/client-development/1.pack.gz'
+}
+ ⨯ unhandledRejection: [Error: ENOENT: no such file or directory, stat '/workspaces/DevisEtanche/.next/cache/webpack/client-development/1.pack.gz'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'stat',
+  path: '/workspaces/DevisEtanche/.next/cache/webpack/client-development/1.pack.gz'
+}
+[Error: ENOENT: no such file or directory, stat '/workspaces/DevisEtanche/.next/cache/webpack/client-development/2.pack.gz'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'stat',
+  path: '/workspaces/DevisEtanche/.next/cache/webpack/client-development/2.pack.gz'
+}
+ ⨯ unhandledRejection: [Error: ENOENT: no such file or directory, stat '/workspaces/DevisEtanche/.next/cache/webpack/client-development/2.pack.gz'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'stat',
+  path: '/workspaces/DevisEtanche/.next/cache/webpack/client-development/2.pack.gz'
+}
+ ⨯ unhandledRejection: [Error: ENOENT: no such file or directory, stat '/workspaces/DevisEtanche/.next/cache/webpack/client-development/2.pack.gz'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'stat',
+  path: '/workspaces/DevisEtanche/.next/cache/webpack/client-development/2.pack.gz'
+}
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, stat '/workspaces/DevisEtanche/.next/cache/webpack/client-development/1.pack.gz'
