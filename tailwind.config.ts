@@ -7,7 +7,7 @@ const config: Config = {
       colors: {
         ardoise: { DEFAULT: "#0E2038", 2: "#152B4A" },
         bitume: "#12141A",
-        rouille: { DEFAULT: "#E2622C", 2: "#F2905E" },
+        rouille: { DEFAULT: "#E2622B", 2: "#1D4ED8" },
         papier: "#F7F4EC",
         sable: "#EDE7DA",
         vert: "#2F9E5B",
