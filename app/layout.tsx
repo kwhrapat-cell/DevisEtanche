@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import OfflineBanner from "@/components/OfflineBanner";
 import RegisterSW from "@/components/RegisterSW";
+import AppShell from "@/components/AppShell";
 
 export const metadata: Metadata = {
   title: "DevisEtanche — Application",
@@ -15,7 +16,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <OfflineBanner />
         <RegisterSW />
-        {children}
+       <AppShell>{children}</AppShell>
       </body>
     </html>
   );
