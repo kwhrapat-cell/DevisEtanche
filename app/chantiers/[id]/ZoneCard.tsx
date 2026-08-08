@@ -8,7 +8,7 @@ import { createClient } from "@/lib/supabase/client";
 const couleurStatut: Record<string, string> = {
   termine: "bg-vert",
   en_cours: "bg-ambre",
-  en-attente: "bg-ardoise/20",
+  en_attente: "bg-ardoise/20",
   probleme: "bg[#C64A2C]",
 };
 
@@ -29,13 +29,13 @@ export default function ZoneCard({ zone }: {zone: any }) {
   async function changerStatut(nouveau: string) {
     setOuvert(false);
 
-    if (!navigator.online) {
+    if (!navigator.onLine) {
       alert("connexion nécessaire pour changer le statut.");
       return;
     }
 
     setStatut(nouveau);
-    const supabase = creatClient();
+    const supabase = createClient();
     await supabase.from("zones").update({ statut: nouveau }).eq("id", zone.id);
     router.refresh();
   }
@@ -68,7 +68,7 @@ export default function ZoneCard({ zone }: {zone: any }) {
   </div>
   )}
   </div>
-   );
+ );
 
     
 
