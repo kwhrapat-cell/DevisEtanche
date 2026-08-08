@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import AjouterZoneForm from "./AjouterZoneForm";
 import PhotosSection from "./PhotosSection";
 import LienClientButton from "./LienClientButton";
+import ZoneCard from "./ZoneCard";
 
 const couleurStatut: Record<string, string> = {
   termine: "bg-vert",
@@ -47,15 +48,12 @@ export default async function ChantierDetailPage({ params }: { params: Promise<{
             ) : (
               <div className="grid grid-cols-2 gap-3 mb-6">
                 {zones.map((z) => (
-                  <div key={z.id} className={`rounded-xl p-4 text-white flex flex-col justify-end h-32 ${couleurStatut[z.statut] ?? "bg-ardoise/20"}`}>
-                    <div className="font-medium text-sm">{z.nom}</div>
-                    <div className="font-mono text-xs opacity-80">{z.avancement_pct}% · {z.surface_m2} m²</div>
-                  </div>
+                  <ZoneCard key={z.id} zone={z} />
                 ))}
-              </div>
-            )}
-            <AjouterZoneForm chantierId={chantier.id} />
           </div>
+           )}
+</div>
+
 
           <div className="flex flex-col gap-4">
             <div className="card p-5">
