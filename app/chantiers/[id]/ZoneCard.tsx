@@ -68,13 +68,5 @@ export default function ZoneCard({ zone }: {zone: any }) {
   </div>
   )}
   </div>
- );
-
-    
-
-  
-
-  
-
-
-
+  );
+}
