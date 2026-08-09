@@ -36,7 +36,7 @@ export default function SignupPage() {
 
     if (entrepriseError) {
       setChargement(false);
-      setErreur("Compte créé, mais l'entreprise n'a pas pu être enregistrée. Contactez le support.");
+      setErreur(entrepriseError.message);
       return;
     }
 
