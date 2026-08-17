@@ -7,6 +7,7 @@ import { calculerEtancheite, type Systeme } from "@/lib/calc/etancheite";
 import { createClient } from "@/lib/supabase/client";
 import type { ProduitEtancheite } from "@/lib/types";
 import { GAMME_PAR_SYSTEME, prixMoyen } from "@/lib/catalogue";
+import { calculerRouleaux } from "@/lib/produits-aide";
 
 export default function CalculateurPage() {
   const router = useRouter();
@@ -53,12 +54,18 @@ export default function CalculateurPage() {
     [surface, perimetre, systeme, isolation, epaisseurIsolant, protectionLourde]
   );
 
-  function genererDevis() {
+  const produitMembrane = useMemo(() => {
     const gammeCible = GAMME_PAR_SYSTEME[systeme];
     const usageMembrane = systeme === "resine" ? "resine_liquide" : "finition";
-    const produitMembrane = catalogue.find(
-      (p) => p.fabricant === fabricant && p.gamme === gammeCible && p.usage_type === usageMembrane
-    );
+    return catalogue.find((p) => p.fabricant === fabricant && p.gamme === gammeCible && p.usage_type === usageMembrane);
+  }, [catalogue, fabricant, systeme]);
+
+  const rouleauxNecessaires = useMemo(() => {
+    if (!produitMembrane?.surface_couverte_m2) return null;
+    return calculerRouleaux(resultat.surfaceMembrane, produitMembrane);
+  }, [produitMembrane, resultat.surfaceMembrane]);
+
+  function genererDevis() {
     const produitPrimaire = catalogue.find((p) => p.fabricant === fabricant && p.usage_type === "primaire");
 
     const designationMembrane = produitMembrane
@@ -68,8 +75,17 @@ export default function CalculateurPage() {
       ? `${produitPrimaire.fabricant} — ${produitPrimaire.nom} (${produitPrimaire.reference})`
       : "Primaire d'accrochage";
 
+    // Prix par défaut calibré au m² (15.5 €/m²) ; converti au rouleau pour garder un
+    // coût total cohérent quand on bascule d'unité faute de prix catalogue réel.
+    const prixDefautMembrane =
+      rouleauxNecessaires != null && produitMembrane?.surface_couverte_m2
+        ? 15.5 * produitMembrane.surface_couverte_m2
+        : 15.5;
+
     const lignes = [
-      { designation: designationMembrane, quantite: resultat.surfaceMembrane, unite: "m²", prix_unitaire: (produitMembrane && prixMoyen(produitMembrane)) ?? 15.5 },
+      rouleauxNecessaires != null
+        ? { designation: designationMembrane, quantite: rouleauxNecessaires, unite: "rouleau", prix_unitaire: (produitMembrane && prixMoyen(produitMembrane)) ?? prixDefautMembrane }
+        : { designation: designationMembrane, quantite: resultat.surfaceMembrane, unite: "m²", prix_unitaire: (produitMembrane && prixMoyen(produitMembrane)) ?? prixDefautMembrane },
       { designation: "Relevés d'étanchéité", quantite: resultat.surfaceReleves, unite: "m²", prix_unitaire: 22 },
       { designation: designationPrimaire, quantite: resultat.primaireAccrochage, unite: "L", prix_unitaire: (produitPrimaire && prixMoyen(produitPrimaire)) ?? 8.5 },
       { designation: "Évacuations eaux pluviales", quantite: resultat.evacuationsEP, unite: "u.", prix_unitaire: 65 },
@@ -177,6 +193,12 @@ export default function CalculateurPage() {
             <div className="font-display font-semibold mb-5">{resultat.detailsSysteme.nom}</div>
             <div className="grid grid-cols-2 gap-3">
               <Resultat label="Surface membrane / résine" valeur={`${resultat.surfaceMembrane} m²`} />
+              {rouleauxNecessaires != null && (
+                <Resultat
+                  label={`Rouleaux — ${produitMembrane!.nom} (${produitMembrane!.surface_couverte_m2} m²/rouleau)`}
+                  valeur={`${rouleauxNecessaires} rouleaux`}
+                />
+              )}
               <Resultat label="Surface relevés" valeur={`${resultat.surfaceReleves} m²`} />
               <Resultat label="Linéaire relevés" valeur={`${resultat.metresReleves} ml`} />
               <Resultat label="Primaire d'accrochage" valeur={`${resultat.primaireAccrochage} L`} />
