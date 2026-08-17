@@ -4,7 +4,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import BoutonDeconnexion from "@/components/BoutonDeconnexion";
 import { useSidebar } from "@/components/SidebarContext";
-import IllustrationArchitecture from "@/components/IllustrationArchitecture";
 
 const links = [
   { href: "/dashboard", label: "Tableau de bord", icon: "▦" },
@@ -30,12 +29,11 @@ export default function Sidebar() {
         />
       )}
       <aside
-        className={`relative overflow-hidden w-52 md:w-64 shrink-0 bg-ardoise text-white min-h-screen flex flex-col justify-between fixed md:static inset-y-0 left-0 z-50 transition-transform duration-200 ease-out ${
+        className={`w-52 md:w-64 shrink-0 bg-ardoise text-white min-h-screen flex flex-col justify-between fixed md:static inset-y-0 left-0 z-50 transition-transform duration-200 ease-out ${
           ouvert ? "translate-x-0" : "-translate-x-full"
         } md:translate-x-0`}
       >
-        <IllustrationArchitecture compact />
-        <div className="relative">
+        <div>
           <div className="px-6 py-6 flex items-start justify-between">
             <div>
               <div className="flex items-center gap-2 font-display font-semibold text-lg">
