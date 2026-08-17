@@ -7,8 +7,11 @@ import TopBar from "@/components/TopBar";
 import { createClient } from "@/lib/supabase/client";
 import type { LigneDevis, ProduitEtancheite } from "@/lib/types";
 import { prixMoyen } from "@/lib/catalogue";
+import { calculerConsommationLiquide, calculerRouleaux, verifierCompatibiliteMarque } from "@/lib/produits-aide";
 
 interface ChantierOption { id: string; nom: string; client_id: string | null; }
+
+const FABRICANTS_CONNUS = ["Soprema", "Sika", "Axter"];
 
 function uniteParDefaut(p: ProduitEtancheite): string {
   if (p.unite_consommation) return p.unite_consommation.split("/")[0]; // "L/m2" -> "L", "kg/m2" -> "kg"
@@ -21,6 +24,7 @@ export default function NouveauDevisPage() {
   const [chantierId, setChantierId] = useState("");
   const [catalogue, setCatalogue] = useState<ProduitEtancheite[]>([]);
   const [produitChoisi, setProduitChoisi] = useState("");
+  const [surfaceVisee, setSurfaceVisee] = useState(0);
   const [lignes, setLignes] = useState<LigneDevis[]>(() => {
     if (typeof window !== "undefined") {
       const stocke = sessionStorage.getItem("devisetanche.lignes_calcul");
@@ -59,6 +63,12 @@ export default function NouveauDevisPage() {
   const totalHt = useMemo(() => lignes.reduce((s, l) => s + l.quantite * l.prix_unitaire, 0), [lignes]);
   const totalTtc = useMemo(() => totalHt * (1 + tva / 100), [totalHt, tva]);
 
+  const marquesUtilisees = useMemo(
+    () => lignes.map((l) => l.designation.split(" — ")[0]).filter((f) => FABRICANTS_CONNUS.includes(f)),
+    [lignes]
+  );
+  const compatibilite = useMemo(() => verifierCompatibiliteMarque(marquesUtilisees), [marquesUtilisees]);
+
   function majLigne(i: number, champ: keyof LigneDevis, valeur: string | number) {
     setLignes((prev) => prev.map((l, idx) => (idx === i ? { ...l, [champ]: valeur } : l)));
   }
@@ -68,12 +78,24 @@ export default function NouveauDevisPage() {
   function ajouterLigneCatalogue() {
     const p = catalogue.find((c) => c.id === produitChoisi);
     if (!p) return;
+    let quantite = 0;
+    let unite = uniteParDefaut(p);
+    if (surfaceVisee > 0) {
+      if (p.surface_couverte_m2) {
+        quantite = calculerRouleaux(surfaceVisee, p);
+        unite = "rouleau";
+      } else if (p.consommation_min != null || p.consommation_max != null) {
+        quantite = calculerConsommationLiquide(surfaceVisee, p);
+      } else {
+        quantite = surfaceVisee;
+      }
+    }
     setLignes((prev) => [
       ...prev,
       {
         designation: `${p.fabricant} — ${p.nom} (${p.reference})`,
-        quantite: 0,
-        unite: uniteParDefaut(p),
+        quantite,
+        unite,
         prix_unitaire: prixMoyen(p) ?? 0,
       },
     ]);
@@ -180,6 +202,15 @@ export default function NouveauDevisPage() {
                 <button type="button" onClick={ajouterLigne} className="text-sm text-rouille font-medium">+ Ajouter une ligne</button>
                 {catalogue.length > 0 && (
                   <div className="flex items-center gap-2 ml-auto">
+                    <input
+                      type="number"
+                      min={0}
+                      placeholder="Surface m²"
+                      title="Surface visée — calcule automatiquement le nombre de rouleaux ou la consommation"
+                      value={surfaceVisee || ""}
+                      onChange={(e) => setSurfaceVisee(parseFloat(e.target.value) || 0)}
+                      className="border border-ligne rounded-lg px-2 py-1.5 text-sm w-24"
+                    />
                     <select
                       value={produitChoisi}
                       onChange={(e) => setProduitChoisi(e.target.value)}
@@ -201,6 +232,11 @@ export default function NouveauDevisPage() {
                   </div>
                 )}
               </div>
+              {!compatibilite.compatible && (
+                <div className="text-xs text-[#C64A2C] bg-[#F6E1DE] rounded-lg px-3 py-2 mt-3">
+                  {compatibilite.message}
+                </div>
+              )}
             </div>
 
             <div className="flex items-center gap-3">

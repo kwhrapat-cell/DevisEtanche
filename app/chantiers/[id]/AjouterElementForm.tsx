@@ -1,7 +1,9 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import type { ProduitEtancheite } from "@/lib/types";
+import { suggererProduits, type TypeElementZone } from "@/lib/produits-aide";
 
 const TYPES = [
   { value: "plot" , label: "Plot (clim, PV...)", unite: "unite" },
@@ -10,15 +12,34 @@ const TYPES = [
   {value: "skydome", label: "Skydome", unite: "unite" },
 ];
 
+const TYPE_ELEMENT_CATALOGUE: Record<string, TypeElementZone> = {
+  plot: "point_singulier",
+  releve: "releve_equerre",
+  jardiniere: "jardiniere",
+  skydome: "point_singulier",
+};
+
 export default function AjouterElementForm({ zoneId }: { zoneId: string }) {
     const [ouvert, setOuvert] = useState(false);
     const [type, setType] = useState(TYPES[0].value);
     const [description, setDescription] = useState("");
     const [quantite, setQuantite] = useState("1");
     const [envoi, setEnvoi] = useState(false);
+    const [catalogue, setCatalogue] = useState<ProduitEtancheite[]>([]);
     const router = useRouter();
-    
+
     const uniteActuelle = TYPES.find((t) => t.value === type)?.unite ?? "unite";
+
+    useEffect(() => {
+      if (!ouvert) return;
+      const supabase = createClient();
+      supabase.from("produits_etancheite").select("*").then(({ data }) => setCatalogue((data ?? []) as ProduitEtancheite[]));
+    }, [ouvert]);
+
+    const suggestions = useMemo(
+      () => suggererProduits(catalogue, TYPE_ELEMENT_CATALOGUE[type] ?? "point_singulier"),
+      [catalogue, type]
+    );
 
     async function ajouter() {
         setEnvoi(true);
@@ -71,6 +92,16 @@ export default function AjouterElementForm({ zoneId }: { zoneId: string }) {
               className="text-sm border rounded px-2 py-1"
             />
             <span className="text-xs text-slate-400">Unité : {uniteActuelle}</span>
+            {suggestions.length > 0 && (
+              <div className="text-xs text-slate-500">
+                Produits recommandés :
+                <ul className="list-disc list-inside">
+                  {suggestions.map((p) => (
+                    <li key={p.reference}>{p.fabricant} — {p.nom} <span className="text-slate-400">({p.reference})</span></li>
+                  ))}
+                </ul>
+              </div>
+            )}
             <div className="flex gap-2">
             <button onClick={ajouter} disabled={envoi} className="text-sm bg-blue-600 text-white rounded px-3 py-1">
               {envoi ? "..." : "Ajouter"}
