@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
+import IllustrationArchitecture from "@/components/IllustrationArchitecture";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -107,8 +108,9 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-papier px-4 py-10">
-      <form onSubmit={creerCompte} className="card w-full max-w-sm p-8">
+    <div className="relative min-h-screen overflow-hidden flex items-center justify-center bg-papier px-4 py-10">
+      <IllustrationArchitecture />
+      <form onSubmit={creerCompte} className="relative card w-full max-w-sm p-8">
         <div className="flex items-center gap-2 font-display font-semibold text-lg text-neige mb-1">
           <span className="w-6 h-6 rounded-md bg-gradient-to-br from-rouille to-ambre inline-block" />
           DevisEtanche

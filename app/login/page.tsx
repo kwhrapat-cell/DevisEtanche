@@ -4,6 +4,7 @@ import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
+import IllustrationArchitecture from "@/components/IllustrationArchitecture";
 
 function IconeOeil({ visible }: { visible: boolean }) {
   return visible ? (
@@ -49,8 +50,9 @@ function LoginForm() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-papier px-4">
-      <form onSubmit={seConnecter} className="card w-full max-w-sm p-8">
+    <div className="relative min-h-screen overflow-hidden flex items-center justify-center bg-papier px-4">
+      <IllustrationArchitecture />
+      <form onSubmit={seConnecter} className="relative card w-full max-w-sm p-8">
         <div className="flex items-center gap-2 font-display font-semibold text-lg text-neige mb-1">
           <span className="w-6 h-6 rounded-md bg-gradient-to-br from-rouille to-ambre inline-block" />
           DevisEtanche
