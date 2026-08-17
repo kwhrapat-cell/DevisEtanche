@@ -1,7 +1,6 @@
 import TopBar from "@/components/TopBar";
 import { getUtilisateurCourant } from "@/lib/supabase/auth";
 import { createClient } from "@/lib/supabase/server";
-import ForfaitCard from "./ForfaitCard";
 import MarcheForm from "./MarcheForm";
 import CoordonneesForm from "./CoordonneesForm";
 
@@ -62,13 +61,19 @@ export default async function ParametresPage() {
             )}
           </div>
 
+          {/* Phase de test : la grille tarifaire (ForfaitCard + /api/checkout) est volontairement
+              masquée tant que le service n'est pas commercialisé — voir /mentions-legales. */}
           <div className="lg:col-span-2">
-            <div className="font-medium text-neige mb-3">Forfait</div>
-            <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-              <ForfaitCard id="decouverte" nom="Découverte" prix="0 €/mois" actuel={entreprise?.forfait === "decouverte"} />
-              <ForfaitCard id="artisan" nom="Artisan" prix="29 €/mois" actuel={entreprise?.forfait === "artisan"} recommande />
-              <ForfaitCard id="pro" nom="Pro" prix="59 €/mois" actuel={entreprise?.forfait === "pro"} />
-              <ForfaitCard id="entreprise" nom="Entreprise" prix="Sur devis" actuel={entreprise?.forfait === "entreprise"} />
+            <div className="card p-5">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="font-medium text-neige">Forfait</span>
+                <span className="badge bg-[#123024] text-vert">gratuit</span>
+              </div>
+              <p className="text-sm text-neige/50">
+                L'application est en phase de test : toutes les fonctionnalités sont accessibles gratuitement,
+                sans engagement ni moyen de paiement à renseigner. Les conditions d'abonnement vous seront
+                présentées avant toute mise en service payante.
+              </p>
             </div>
           </div>
 
