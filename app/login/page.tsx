@@ -35,7 +35,13 @@ function LoginForm() {
     const { error } = await supabase.auth.signInWithPassword({ email, password: motDePasse });
     setChargement(false);
     if (error) {
-      setErreur("E-mail ou mot de passe incorrect.");
+      if (error.message.toLowerCase().includes("email not confirmed")) {
+        setErreur("E-mail non confirmé — vérifiez votre boîte mail, ou contactez l'administrateur si la confirmation reste bloquée.");
+      } else if (error.message.toLowerCase().includes("invalid login credentials")) {
+        setErreur("E-mail ou mot de passe incorrect.");
+      } else {
+        setErreur(error.message);
+      }
       return;
     }
     router.push(params.get("suivant") || "/dashboard");
