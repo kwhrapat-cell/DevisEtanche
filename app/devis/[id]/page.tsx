@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
-import ImprimerButton from "./ImprimerButton";
+import ImprimerButton from "@/components/ImprimerButton";
+import StatutDevisForm from "./StatutDevisForm";
 import type { LigneDevis } from "@/lib/types";
 import { formatMontant } from "@/lib/devise";
 
@@ -9,7 +10,9 @@ export default async function DevisDetailPage({ params }: { params: Promise<{ id
 
   const { data: devis } = await supabase
     .from("devis")
-    .select("*, chantiers(nom, ville), clients(nom, ville), entreprises(devise, libelle_taxe)")
+    .select(
+      "*, chantiers(nom, ville), clients(nom, ville, email, telephone), entreprises(nom, adresse, telephone, email, numero_identification, devise, libelle_taxe)"
+    )
     .eq("id", id)
     .single();
 
@@ -17,25 +20,48 @@ export default async function DevisDetailPage({ params }: { params: Promise<{ id
     return <div className="p-10 text-sm text-neige/50">Devis introuvable.</div>;
   }
 
+  const { data: facture } = await supabase.from("factures").select("id").eq("devis_id", id).maybeSingle();
+
   const lignes = (devis.lignes ?? []) as LigneDevis[];
   const devise = devis.entreprises?.devise ?? "XPF";
   const libelleTaxe = devis.entreprises?.libelle_taxe ?? "TGC";
+  const entrepriseNom = devis.entreprises?.nom ?? "—";
 
   return (
     <div className="max-w-3xl mx-auto py-10 px-6">
       <div className="flex justify-between items-start mb-10 print:hidden">
-        <div />
+        <StatutDevisForm
+          devisId={devis.id}
+          statutActuel={devis.statut}
+          factureId={facture?.id ?? null}
+          entrepriseId={devis.entreprise_id}
+          chantierId={devis.chantier_id}
+          clientId={devis.client_id}
+          lignes={lignes}
+          totalHt={Number(devis.total_ht)}
+          tvaPct={Number(devis.tva_pct)}
+          totalTtc={Number(devis.total_ttc)}
+        />
         <ImprimerButton />
       </div>
 
       <div className="flex justify-between items-start mb-10">
         <div>
-          <div className="font-display font-semibold text-xl text-neige mb-1">DevisEtanche</div>
-          <div className="text-xs text-neige/50">Devis n° {devis.numero}</div>
+          <div className="font-display font-semibold text-xl text-neige mb-1">{entrepriseNom}</div>
+          {devis.entreprises?.adresse && <div className="text-xs text-neige/50">{devis.entreprises.adresse}</div>}
+          <div className="text-xs text-neige/50">
+            {[devis.entreprises?.telephone, devis.entreprises?.email].filter(Boolean).join(" · ")}
+          </div>
+          {devis.entreprises?.numero_identification && (
+            <div className="text-xs text-neige/50">{devis.entreprises.numero_identification}</div>
+          )}
+          <div className="text-xs text-neige/50 mt-2">Devis n° {devis.numero}</div>
         </div>
         <div className="text-right text-sm">
           <div className="font-medium text-neige">{devis.clients?.nom ?? "Client à définir"}</div>
           <div className="text-neige/50">{devis.clients?.ville}</div>
+          {devis.clients?.email && <div className="text-neige/50 text-xs">{devis.clients.email}</div>}
+          {devis.clients?.telephone && <div className="text-neige/50 text-xs">{devis.clients.telephone}</div>}
         </div>
       </div>
 

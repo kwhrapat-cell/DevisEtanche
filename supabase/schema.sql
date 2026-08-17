@@ -12,6 +12,13 @@ create table entreprises (
   devise text not null check (devise in ('XPF', 'EUR')) default 'XPF',
   libelle_taxe text not null default 'TGC',
   taux_taxe_defaut numeric not null default 11,
+  -- Coordonnées affichées sur les devis et factures exportés (au lieu du nom
+  -- de l'application) : adresse postale, contact, identifiant professionnel
+  -- (SIRET en France, RIDET en Nouvelle-Calédonie...).
+  adresse text,
+  telephone text,
+  email text,
+  numero_identification text,
   stripe_customer_id text,
   stripe_subscription_id text,
   created_at timestamptz default now()
@@ -76,6 +83,22 @@ create table devis (
   created_at timestamptz default now()
 );
 
+create table factures (
+  id uuid primary key default uuid_generate_v4(),
+  entreprise_id uuid references entreprises(id) on delete cascade,
+  devis_id uuid references devis(id) unique,
+  chantier_id uuid references chantiers(id),
+  client_id uuid references clients(id),
+  numero text not null,
+  statut text check (statut in ('a_payer','payee','annulee')) default 'a_payer',
+  lignes jsonb default '[]',
+  total_ht numeric default 0,
+  tva_pct numeric default 11,
+  total_ttc numeric default 0,
+  date_echeance date,
+  created_at timestamptz default now()
+);
+
 create table photos (
   id uuid primary key default uuid_generate_v4(),
   chantier_id uuid references chantiers(id) on delete cascade,
@@ -90,6 +113,7 @@ alter table clients enable row level security;
 alter table chantiers enable row level security;
 alter table zones enable row level security;
 alter table devis enable row level security;
+alter table factures enable row level security;
 alter table photos enable row level security;
 alter table profiles enable row level security;
 
@@ -106,6 +130,11 @@ create policy "Ecriture clients entreprise" on clients for all
 create policy "Lecture devis entreprise" on devis for select
   using (entreprise_id in (select entreprise_id from profiles where id = auth.uid()));
 create policy "Ecriture devis entreprise" on devis for all
+  using (entreprise_id in (select entreprise_id from profiles where id = auth.uid()));
+
+create policy "Lecture factures entreprise" on factures for select
+  using (entreprise_id in (select entreprise_id from profiles where id = auth.uid()));
+create policy "Ecriture factures entreprise" on factures for all
   using (entreprise_id in (select entreprise_id from profiles where id = auth.uid()));
 
 create policy "Zones via chantier" on zones for all

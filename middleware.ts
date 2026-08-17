@@ -1,7 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-const PAGES_PROTEGEES = ["/dashboard", "/chantiers", "/devis", "/clients", "/calculateur", "/parametres", "/catalogue"];
+const PAGES_PROTEGEES = ["/dashboard", "/chantiers", "/devis", "/factures", "/clients", "/calculateur", "/parametres", "/catalogue"];
 
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({ request });
@@ -56,6 +56,7 @@ export const config = {
     "/dashboard/:path*",
     "/chantiers/:path*",
     "/devis/:path*",
+    "/factures/:path*",
     "/clients/:path*",
     "/calculateur/:path*",
     "/parametres/:path*",

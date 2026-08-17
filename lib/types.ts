@@ -53,6 +53,33 @@ export interface Devis {
   created_at: string;
 }
 
+export interface Facture {
+  id: string;
+  numero: string;
+  devis_id: string;
+  chantier_id: string;
+  client_id: string;
+  statut: "a_payer" | "payee" | "annulee";
+  lignes: LigneDevis[];
+  total_ht: number;
+  tva_pct: number;
+  total_ttc: number;
+  date_echeance: string | null;
+  created_at: string;
+}
+
+export interface Entreprise {
+  id: string;
+  nom: string;
+  devise: "XPF" | "EUR";
+  libelle_taxe: string;
+  taux_taxe_defaut: number;
+  adresse?: string | null;
+  telephone?: string | null;
+  email?: string | null;
+  numero_identification?: string | null;
+}
+
 export interface ProduitEtancheite {
   id: string;
   reference: string;

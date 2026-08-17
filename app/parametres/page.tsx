@@ -3,6 +3,7 @@ import { getUtilisateurCourant } from "@/lib/supabase/auth";
 import { createClient } from "@/lib/supabase/server";
 import ForfaitCard from "./ForfaitCard";
 import MarcheForm from "./MarcheForm";
+import CoordonneesForm from "./CoordonneesForm";
 
 const labelRole: Record<string, string> = {
   ouvrier: "Ouvrier",
@@ -26,18 +27,23 @@ export default async function ParametresPage() {
     <>
         <TopBar titre="Paramètres" sousTitre="Entreprise, équipe et forfait" />
         <div className="p-4 sm:p-8 grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-4xl">
-          <div className="card p-5">
-            <div className="font-medium text-neige mb-1">Entreprise</div>
-            <p className="text-sm text-neige/50">{entreprise?.nom ?? "—"}</p>
-          </div>
-
           {entrepriseId && entreprise && (
-            <MarcheForm
-              entrepriseId={entrepriseId}
-              devise={entreprise.devise}
-              libelleTaxe={entreprise.libelle_taxe}
-              tauxTaxeDefaut={Number(entreprise.taux_taxe_defaut)}
-            />
+            <>
+              <CoordonneesForm
+                entrepriseId={entrepriseId}
+                nom={entreprise.nom}
+                adresse={entreprise.adresse}
+                telephone={entreprise.telephone}
+                email={entreprise.email}
+                numeroIdentification={entreprise.numero_identification}
+              />
+              <MarcheForm
+                entrepriseId={entrepriseId}
+                devise={entreprise.devise}
+                libelleTaxe={entreprise.libelle_taxe}
+                tauxTaxeDefaut={Number(entreprise.taux_taxe_defaut)}
+              />
+            </>
           )}
 
           <div className="card p-5">

@@ -9,6 +9,7 @@ const links = [
   { href: "/dashboard", label: "Tableau de bord", icon: "▦" },
   { href: "/chantiers", label: "Chantiers", icon: "◧" },
   { href: "/devis", label: "Devis", icon: "▤" },
+  { href: "/factures", label: "Factures", icon: "▧" },
   { href: "/clients", label: "Clients", icon: "◍" },
   { href: "/calculateur", label: "Calculateur", icon: "∑" },
   { href: "/catalogue", label: "Catalogue", icon: "▥" },
@@ -29,7 +30,7 @@ export default function Sidebar() {
         />
       )}
       <aside
-        className={`w-52 md:w-64 shrink-0 bg-ardoise text-white min-h-screen flex flex-col justify-between fixed md:static inset-y-0 left-0 z-50 transition-transform duration-200 ease-out ${
+        className={`print:hidden w-52 md:w-64 shrink-0 bg-ardoise text-white min-h-screen flex flex-col justify-between fixed md:static inset-y-0 left-0 z-50 transition-transform duration-200 ease-out ${
           ouvert ? "translate-x-0" : "-translate-x-full"
         } md:translate-x-0`}
       >
