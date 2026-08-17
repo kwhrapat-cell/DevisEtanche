@@ -146,7 +146,7 @@ export default function NouveauDevisPage() {
   return (
     <>
         <TopBar titre="Nouveau devis" sousTitre="Ajoutez les lignes puis enregistrez en brouillon" />
-        <div className="p-8 max-w-2xl">
+        <div className="p-4 sm:p-8 max-w-2xl">
           <form onSubmit={enregistrer} className="card p-6 flex flex-col gap-5">
             {erreur && <div className="text-sm text-[#FF8A80] bg-[#3B1418] rounded-lg px-3 py-2">{erreur}</div>}
 

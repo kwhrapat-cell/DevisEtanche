@@ -51,7 +51,7 @@ export default function NouveauClientPage() {
   return (
     <>
         <TopBar titre="Nouveau client" sousTitre="Syndic, entreprise ou particulier" />
-        <div className="p-8 max-w-lg">
+        <div className="p-4 sm:p-8 max-w-lg">
           <form onSubmit={enregistrer} className="card p-6 flex flex-col gap-4">
             {erreur && <div className="text-sm text-[#FF8A80] bg-[#3B1418] rounded-lg px-3 py-2">{erreur}</div>}
 

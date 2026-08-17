@@ -24,7 +24,7 @@ export default async function ChantierDetailPage({ params }: { params: Promise<{
     return (
       <>
           <TopBar titre="Chantier introuvable" />
-          <div className="p-8 text-sm text-neige/50">Ce chantier n'existe pas ou vous n'y avez pas accès.</div>
+          <div className="p-4 sm:p-8 text-sm text-neige/50">Ce chantier n'existe pas ou vous n'y avez pas accès.</div>
       </>
     );
   }
@@ -32,7 +32,7 @@ export default async function ChantierDetailPage({ params }: { params: Promise<{
   return (
     <>
         <TopBar titre={chantier.nom} sousTitre={`${chantier.ville ?? ""} · ${chantier.clients?.nom ?? "Sans client"}`} />
-        <div className="p-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="p-4 sm:p-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 card p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="font-display font-semibold text-neige">Zones</h2>

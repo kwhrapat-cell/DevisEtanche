@@ -17,7 +17,7 @@ export default async function CataloguePage() {
           titre="Catalogue produits"
           sousTitre={`${produits?.length ?? 0} produits — Soprema, Sika, Axter`}
         />
-        <div className="p-8">
+        <div className="p-4 sm:p-8">
           {!produits || produits.length === 0 ? (
             <div className="card p-10 text-center">
               <div className="font-display font-semibold text-neige mb-2">Catalogue vide</div>

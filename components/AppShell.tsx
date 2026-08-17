@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import Sidebar from "./Sidebar";
+import { SidebarProvider } from "./SidebarContext";
 import React from "react";
 
 const ROUTES_SANS_SIDEBAR = ["/", "/login","/signup", "/espace-client"];
@@ -18,9 +19,11 @@ export default function AppShell({ children }: {children: React.ReactNode }) {
   }
 
   return (
-    <div className="flex">
-      <Sidebar />
-      <main className="flex-1">{children}</main>
-    </div> 
+    <SidebarProvider>
+      <div className="flex">
+        <Sidebar />
+        <main className="flex-1 min-w-0">{children}</main>
+      </div>
+    </SidebarProvider>
   );
 }

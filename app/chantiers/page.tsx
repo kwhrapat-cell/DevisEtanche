@@ -25,7 +25,7 @@ export default async function ChantiersPage() {
   return (
     <>
         <TopBar titre="Chantiers" sousTitre={`${chantiers?.length ?? 0} chantiers`} />
-        <div className="p-8">
+        <div className="p-4 sm:p-8">
           <div className="mb-5">
             <Link href="/chantiers/nouveau" className="inline-flex items-center gap-2 bg-rouille text-white text-sm font-semibold px-4 py-2 rounded-lg">
               + Nouveau chantier
@@ -41,6 +41,7 @@ export default async function ChantiersPage() {
             </div>
           ) : (
             <div className="card overflow-hidden">
+              <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="text-left text-xs text-neige/50 border-b border-ligne">
@@ -75,6 +76,7 @@ export default async function ChantiersPage() {
                   ))}
                 </tbody>
               </table>
+              </div>
             </div>
           )}
         </div>

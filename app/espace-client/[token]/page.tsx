@@ -54,10 +54,10 @@ export default async function EspaceClientPage({ params }: { params: Promise<{ t
             <div className="font-medium text-neige mb-3">Zones</div>
             <div className="flex flex-col divide-y divide-ligne">
               {zones.map((z: any, i: number) => (
-                <div key={i} className="flex items-center justify-between py-2 text-sm">
+                <div key={i} className="flex flex-wrap items-center justify-between gap-2 py-2 text-sm">
                   <span className="text-neige">{z.nom}</span>
                   <div className="flex items-center gap-2">
-                    <div className="w-28 h-2 bg-sable rounded-full overflow-hidden">
+                    <div className="w-16 sm:w-28 h-2 bg-sable rounded-full overflow-hidden">
                       <div className="h-full bg-vert" style={{ width: `${z.avancement_pct}%` }} />
                     </div>
                     <span className="font-mono text-xs w-10 text-right">{z.avancement_pct}%</span>

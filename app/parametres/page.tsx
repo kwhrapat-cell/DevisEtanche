@@ -24,7 +24,7 @@ export default async function ParametresPage() {
   return (
     <>
         <TopBar titre="Paramètres" sousTitre="Entreprise, équipe et forfait" />
-        <div className="p-8 grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-4xl">
+        <div className="p-4 sm:p-8 grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-4xl">
           <div className="card p-5">
             <div className="font-medium text-neige mb-1">Entreprise</div>
             <p className="text-sm text-neige/50">{entreprise?.nom ?? "—"}</p>

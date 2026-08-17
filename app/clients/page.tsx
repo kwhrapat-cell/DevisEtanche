@@ -18,7 +18,7 @@ export default async function ClientsPage() {
   return (
     <>
         <TopBar titre="Clients" sousTitre={`${clients?.length ?? 0} clients`} />
-        <div className="p-8">
+        <div className="p-4 sm:p-8">
           <div className="mb-5">
             <Link href="/clients/nouveau" className="btn-like inline-flex items-center gap-2 bg-rouille text-white text-sm font-semibold px-4 py-2 rounded-lg">
               + Nouveau client

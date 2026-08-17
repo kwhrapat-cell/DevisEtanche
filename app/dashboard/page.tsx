@@ -84,7 +84,7 @@ export default async function DashboardPage() {
   return (
     <>
         <TopBar titre={`Bonjour ${nom} 👋`} sousTitre="Voici ce qui se passe aujourd'hui sur vos chantiers." />
-        <div className="p-8">
+        <div className="p-4 sm:p-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
             <StatCard
               label="Chantiers en cours"
@@ -115,16 +115,18 @@ export default async function DashboardPage() {
               ) : (
                 <div className="flex flex-col divide-y divide-ligne">
                   {chantiers.map((c) => (
-                    <Link key={c.id} href={`/chantiers/${c.id}`} className="flex items-center justify-between py-3 hover:bg-sable/30 -mx-2 px-2 rounded-lg">
-                      <div>
+                    <Link key={c.id} href={`/chantiers/${c.id}`} className="flex flex-wrap items-center gap-y-2 gap-x-3 py-3 hover:bg-sable/30 -mx-2 px-2 rounded-lg">
+                      <div className="flex-1 min-w-[140px]">
                         <div className="font-medium text-sm text-neige">{c.nom}</div>
                         <div className="text-xs text-neige/50">{c.ville}</div>
                       </div>
                       <span className={`badge badge-${c.statut}`}>{labelStatut[c.statut] ?? c.statut}</span>
-                      <div className="w-40 h-2 bg-sable rounded-full overflow-hidden">
-                        <div className="h-full bg-vert" style={{ width: `${c.avancement_pct}%` }} />
+                      <div className="flex items-center gap-2 ml-auto sm:ml-0">
+                        <div className="w-16 sm:w-40 h-2 bg-sable rounded-full overflow-hidden">
+                          <div className="h-full bg-vert" style={{ width: `${c.avancement_pct}%` }} />
+                        </div>
+                        <span className="font-mono text-xs text-neige/60 w-10 text-right">{c.avancement_pct}%</span>
                       </div>
-                      <span className="font-mono text-xs text-neige/60 w-10 text-right">{c.avancement_pct}%</span>
                     </Link>
                   ))}
                 </div>

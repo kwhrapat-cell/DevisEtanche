@@ -90,7 +90,7 @@ export default function CalculateurPage() {
   return (
     <>
         <TopBar titre="Calculateur" sousTitre="Estimation des quantités — à valider selon le DTU applicable au projet" />
-        <div className="p-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="p-4 sm:p-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="card p-6 flex flex-col gap-4">
             <div>
               <label className="text-xs font-mono text-neige/60 block mb-1">SURFACE DE TOITURE (M²)</label>
