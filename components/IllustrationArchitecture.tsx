@@ -35,16 +35,27 @@ const grilleToit = grilleQuad(TOIT[0], TOIT[1], TOIT[2], 9, 4);
 const grilleGauche = grilleQuad(TOIT[2], FRONT, BAS_GAUCHE, 5, 3);
 const grilleDroite = grilleQuad(FRONT, TOIT[1], BAS_FRONT, 5, 3);
 
-export default function IllustrationArchitecture() {
+export default function IllustrationArchitecture({ compact = false }: { compact?: boolean }) {
   return (
     <svg
       viewBox="0 0 900 480"
-      preserveAspectRatio="xMidYMin slice"
-      className="absolute inset-x-0 top-0 w-full h-[480px] pointer-events-none select-none"
-      style={{
-        maskImage: "linear-gradient(to bottom, black 0%, black 45%, transparent 88%)",
-        WebkitMaskImage: "linear-gradient(to bottom, black 0%, black 45%, transparent 88%)",
-      }}
+      preserveAspectRatio={compact ? "xMidYMin meet" : "xMidYMin slice"}
+      className={
+        compact
+          ? "absolute inset-x-0 top-0 w-full h-56 pointer-events-none select-none"
+          : "absolute inset-x-0 top-0 w-full h-[480px] pointer-events-none select-none"
+      }
+      style={
+        compact
+          ? {
+              maskImage: "linear-gradient(to bottom, black 0%, black 60%, transparent 100%)",
+              WebkitMaskImage: "linear-gradient(to bottom, black 0%, black 60%, transparent 100%)",
+            }
+          : {
+              maskImage: "linear-gradient(to bottom, black 0%, black 45%, transparent 88%)",
+              WebkitMaskImage: "linear-gradient(to bottom, black 0%, black 45%, transparent 88%)",
+            }
+      }
       aria-hidden="true"
     >
       <defs>

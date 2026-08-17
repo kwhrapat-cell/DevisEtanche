@@ -34,7 +34,7 @@ export default function Sidebar() {
           ouvert ? "translate-x-0" : "-translate-x-full"
         } md:translate-x-0`}
       >
-        <IllustrationArchitecture />
+        <IllustrationArchitecture compact />
         <div className="relative">
           <div className="px-6 py-6 flex items-start justify-between">
             <div>
