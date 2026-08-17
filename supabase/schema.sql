@@ -7,6 +7,11 @@ create table entreprises (
   id uuid primary key default uuid_generate_v4(),
   nom text not null,
   forfait text check (forfait in ('decouverte','artisan','pro','entreprise')) default 'decouverte',
+  -- Marché de l'entreprise : conditionne la devise et le libellé de taxe affichés
+  -- sur les devis (XPF/TGC en Nouvelle-Calédonie, EUR/TVA en France).
+  devise text not null check (devise in ('XPF', 'EUR')) default 'XPF',
+  libelle_taxe text not null default 'TGC',
+  taux_taxe_defaut numeric not null default 11,
   stripe_customer_id text,
   stripe_subscription_id text,
   created_at timestamptz default now()

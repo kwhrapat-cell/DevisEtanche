@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import ImprimerButton from "./ImprimerButton";
 import type { LigneDevis } from "@/lib/types";
+import { formatMontant } from "@/lib/devise";
 
 export default async function DevisDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -8,7 +9,7 @@ export default async function DevisDetailPage({ params }: { params: Promise<{ id
 
   const { data: devis } = await supabase
     .from("devis")
-    .select("*, chantiers(nom, ville), clients(nom, ville)")
+    .select("*, chantiers(nom, ville), clients(nom, ville), entreprises(devise, libelle_taxe)")
     .eq("id", id)
     .single();
 
@@ -17,6 +18,8 @@ export default async function DevisDetailPage({ params }: { params: Promise<{ id
   }
 
   const lignes = (devis.lignes ?? []) as LigneDevis[];
+  const devise = devis.entreprises?.devise ?? "XPF";
+  const libelleTaxe = devis.entreprises?.libelle_taxe ?? "TGC";
 
   return (
     <div className="max-w-3xl mx-auto py-10 px-6">
@@ -57,8 +60,8 @@ export default async function DevisDetailPage({ params }: { params: Promise<{ id
               <td className="py-2">{l.designation}</td>
               <td className="py-2 text-right font-mono">{l.quantite}</td>
               <td className="py-2 text-right">{l.unite}</td>
-              <td className="py-2 text-right font-mono">{l.prix_unitaire.toFixed(2)} €</td>
-              <td className="py-2 text-right font-mono">{(l.quantite * l.prix_unitaire).toFixed(2)} €</td>
+              <td className="py-2 text-right font-mono">{formatMontant(l.prix_unitaire, devise)}</td>
+              <td className="py-2 text-right font-mono">{formatMontant(l.quantite * l.prix_unitaire, devise)}</td>
             </tr>
           ))}
         </tbody>
@@ -66,9 +69,9 @@ export default async function DevisDetailPage({ params }: { params: Promise<{ id
 
       <div className="flex justify-end">
         <div className="w-56 text-sm">
-          <div className="flex justify-between py-1"><span className="text-neige/50">Total HT</span><span className="font-mono">{Number(devis.total_ht).toFixed(2)} €</span></div>
-          <div className="flex justify-between py-1"><span className="text-neige/50">TVA ({devis.tva_pct}%)</span><span className="font-mono">{(Number(devis.total_ttc) - Number(devis.total_ht)).toFixed(2)} €</span></div>
-          <div className="flex justify-between py-2 border-t border-ardoise mt-1 font-semibold text-neige"><span>Total TTC</span><span className="font-mono">{Number(devis.total_ttc).toFixed(2)} €</span></div>
+          <div className="flex justify-between py-1"><span className="text-neige/50">Total HT</span><span className="font-mono">{formatMontant(Number(devis.total_ht), devise)}</span></div>
+          <div className="flex justify-between py-1"><span className="text-neige/50">{libelleTaxe} ({devis.tva_pct}%)</span><span className="font-mono">{formatMontant(Number(devis.total_ttc) - Number(devis.total_ht), devise)}</span></div>
+          <div className="flex justify-between py-2 border-t border-ardoise mt-1 font-semibold text-neige"><span>Total TTC</span><span className="font-mono">{formatMontant(Number(devis.total_ttc), devise)}</span></div>
         </div>
       </div>
     </div>

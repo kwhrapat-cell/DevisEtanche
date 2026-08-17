@@ -2,6 +2,7 @@ import Link from "next/link";
 import TopBar from "@/components/TopBar";
 import { getUtilisateurCourant } from "@/lib/supabase/auth";
 import { createClient } from "@/lib/supabase/server";
+import { formatMontant } from "@/lib/devise";
 
 const styleStatut: Record<string, string> = {
   brouillon: "bg-sable text-neige/60",
@@ -55,7 +56,7 @@ export default async function DevisPage() {
                         <Link href={`/devis/${d.id}`} className="hover:text-rouille">{d.numero}</Link>
                       </td>
                       <td className="px-5 py-4 font-medium text-neige">{d.chantiers?.nom ?? "—"}</td>
-                      <td className="px-5 py-4 font-mono">{Number(d.total_ttc).toLocaleString("fr-FR")} €</td>
+                      <td className="px-5 py-4 font-mono">{formatMontant(Number(d.total_ttc), session?.entreprise?.devise)}</td>
                       <td className="px-5 py-4">
                         <span className={`badge ${styleStatut[d.statut]}`}>{d.statut}</span>
                       </td>

@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 import type { LigneDevis, ProduitEtancheite } from "@/lib/types";
 import { prixMoyen } from "@/lib/catalogue";
 import { calculerConsommationLiquide, calculerRouleaux, verifierCompatibiliteMarque } from "@/lib/produits-aide";
+import { formatMontant, type Devise } from "@/lib/devise";
 
 interface ChantierOption { id: string; nom: string; client_id: string | null; }
 
@@ -40,6 +41,8 @@ export default function NouveauDevisPage() {
     return [{ designation: "Membrane bitumineuse", quantite: 0, unite: "m²", prix_unitaire: 15.5 }];
   });
   const [tva, setTva] = useState(11);
+  const [devise, setDevise] = useState<Devise>("XPF");
+  const [libelleTaxe, setLibelleTaxe] = useState("TGC");
   const [erreur, setErreur] = useState<string | null>(null);
   const [chargement, setChargement] = useState(false);
   const router = useRouter();
@@ -52,6 +55,16 @@ export default function NouveauDevisPage() {
       if (!profile) return;
       const { data } = await supabase.from("chantiers").select("id, nom, client_id").eq("entreprise_id", profile.entreprise_id).order("nom");
       setChantiersList(data ?? []);
+      const { data: entreprise } = await supabase
+        .from("entreprises")
+        .select("devise, libelle_taxe, taux_taxe_defaut")
+        .eq("id", profile.entreprise_id)
+        .single();
+      if (entreprise) {
+        setDevise(entreprise.devise);
+        setLibelleTaxe(entreprise.libelle_taxe);
+        setTva(entreprise.taux_taxe_defaut);
+      }
     })();
     (async () => {
       const { data } = await supabase.from("produits_etancheite").select("*").order("fabricant").order("nom");
@@ -237,14 +250,14 @@ export default function NouveauDevisPage() {
             </div>
 
             <div className="flex items-center gap-3">
-              <label className="text-xs font-mono text-neige/60">TVA (%)</label>
+              <label className="text-xs font-mono text-neige/60">{libelleTaxe} (%)</label>
               <input type="number" value={tva} onChange={(e) => setTva(parseFloat(e.target.value) || 0)} className="border border-ligne rounded-lg px-2 py-1.5 text-sm w-20" />
             </div>
 
             <div className="bg-ardoise text-white rounded-xl p-4 flex justify-between items-center">
               <div>
-                <div className="text-xs text-white/50">Total HT {totalHt.toFixed(2)} € · TVA {tva}%</div>
-                <div className="font-mono text-xl font-semibold">{totalTtc.toFixed(2)} € TTC</div>
+                <div className="text-xs text-white/50">Total HT {formatMontant(totalHt, devise)} · {libelleTaxe} {tva}%</div>
+                <div className="font-mono text-xl font-semibold">{formatMontant(totalTtc, devise)} TTC</div>
               </div>
               <button disabled={chargement} className="bg-rouille text-white font-semibold rounded-lg px-5 py-2.5 disabled:opacity-60">
                 {chargement ? "Enregistrement…" : "Enregistrer le devis"}

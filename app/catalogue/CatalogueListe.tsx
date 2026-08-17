@@ -91,7 +91,7 @@ function ProduitCard({ produit: p }: { produit: ProduitEtancheite }) {
         {p.surface_couverte_m2 != null && <div>Surface couverte : {p.surface_couverte_m2} m²/unité</div>}
         {p.poids_kg != null && <div>Poids : {p.poids_kg} kg</div>}
         {conso && <div>Consommation : {conso}</div>}
-        <div>Prix indicatif : {prix ?? "non renseigné"}</div>
+        <div>Prix référence métropole (€) : {prix ?? "non renseigné"}</div>
       </div>
     </div>
   );
