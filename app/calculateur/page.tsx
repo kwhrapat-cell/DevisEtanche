@@ -1,10 +1,13 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Sidebar from "@/components/Sidebar";
 import TopBar from "@/components/TopBar";
 import { calculerEtancheite, type Systeme } from "@/lib/calc/etancheite";
+import { createClient } from "@/lib/supabase/client";
+import type { ProduitEtancheite } from "@/lib/types";
+import { GAMME_PAR_SYSTEME, prixMoyen } from "@/lib/catalogue";
 
 export default function CalculateurPage() {
   const router = useRouter();
@@ -14,6 +17,29 @@ export default function CalculateurPage() {
   const [isolation, setIsolation] = useState(true);
   const [epaisseurIsolant, setEpaisseurIsolant] = useState(100);
   const [protectionLourde, setProtectionLourde] = useState(false);
+  const [catalogue, setCatalogue] = useState<ProduitEtancheite[]>([]);
+  const [fabricant, setFabricant] = useState("");
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase
+      .from("produits_etancheite")
+      .select("*")
+      .then(({ data }) => setCatalogue((data ?? []) as ProduitEtancheite[]));
+  }, []);
+
+  const fabricantsDisponibles = useMemo(() => {
+    const gammeCible = GAMME_PAR_SYSTEME[systeme];
+    return Array.from(new Set<string>(catalogue.filter((p) => p.gamme === gammeCible).map((p) => p.fabricant))).sort();
+  }, [catalogue, systeme]);
+
+  useEffect(() => {
+    if (fabricantsDisponibles.length === 0) {
+      setFabricant("");
+    } else if (!fabricantsDisponibles.includes(fabricant)) {
+      setFabricant(fabricantsDisponibles[0]);
+    }
+  }, [fabricantsDisponibles, fabricant]);
 
   const resultat = useMemo(
     () =>
@@ -29,10 +55,24 @@ export default function CalculateurPage() {
   );
 
   function genererDevis() {
+    const gammeCible = GAMME_PAR_SYSTEME[systeme];
+    const usageMembrane = systeme === "resine" ? "resine_liquide" : "finition";
+    const produitMembrane = catalogue.find(
+      (p) => p.fabricant === fabricant && p.gamme === gammeCible && p.usage_type === usageMembrane
+    );
+    const produitPrimaire = catalogue.find((p) => p.fabricant === fabricant && p.usage_type === "primaire");
+
+    const designationMembrane = produitMembrane
+      ? `${produitMembrane.fabricant} — ${produitMembrane.nom} (${produitMembrane.reference})`
+      : `${resultat.detailsSysteme.nom} — membrane/résine`;
+    const designationPrimaire = produitPrimaire
+      ? `${produitPrimaire.fabricant} — ${produitPrimaire.nom} (${produitPrimaire.reference})`
+      : "Primaire d'accrochage";
+
     const lignes = [
-      { designation: `${resultat.detailsSysteme.nom} — membrane/résine`, quantite: resultat.surfaceMembrane, unite: "m²", prix_unitaire: 15.5 },
+      { designation: designationMembrane, quantite: resultat.surfaceMembrane, unite: "m²", prix_unitaire: (produitMembrane && prixMoyen(produitMembrane)) ?? 15.5 },
       { designation: "Relevés d'étanchéité", quantite: resultat.surfaceReleves, unite: "m²", prix_unitaire: 22 },
-      { designation: "Primaire d'accrochage", quantite: resultat.primaireAccrochage, unite: "L", prix_unitaire: 8.5 },
+      { designation: designationPrimaire, quantite: resultat.primaireAccrochage, unite: "L", prix_unitaire: (produitPrimaire && prixMoyen(produitPrimaire)) ?? 8.5 },
       { designation: "Évacuations eaux pluviales", quantite: resultat.evacuationsEP, unite: "u.", prix_unitaire: 65 },
       ...(resultat.fixationsMecaniques > 0
         ? [{ designation: "Fixations mécaniques", quantite: resultat.fixationsMecaniques, unite: "u.", prix_unitaire: 0.8 }]
@@ -88,6 +128,21 @@ export default function CalculateurPage() {
                 <option value="resine">Résine liquide — SEL (NF DTU 43.6)</option>
               </select>
             </div>
+
+            {fabricantsDisponibles.length > 0 && (
+              <div>
+                <label className="text-xs font-mono text-ardoise/60 block mb-1">FABRICANT</label>
+                <select
+                  value={fabricant}
+                  onChange={(e) => setFabricant(e.target.value)}
+                  className="w-full border border-ligne rounded-lg px-3 py-2"
+                >
+                  {fabricantsDisponibles.map((f) => (
+                    <option key={f} value={f}>{f}</option>
+                  ))}
+                </select>
+              </div>
+            )}
 
             <div className="flex items-center gap-3 pt-1">
               <input

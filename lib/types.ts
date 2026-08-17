@@ -53,6 +53,26 @@ export interface Devis {
   created_at: string;
 }
 
+export interface ProduitEtancheite {
+  id: string;
+  reference: string;
+  fabricant: "Soprema" | "Sika" | "Axter";
+  gamme: "bitumineux" | "synthetique" | "liquide" | "accessoire";
+  nom: string;
+  usage_type: "premiere_couche" | "finition" | "anti_racine" | "renfort" | "primaire" | "resine_liquide";
+  pose: "soudure_chalumeau" | "soudure_air_chaud" | "auto_adhesif" | "froid_sans_flamme" | "collage_froid" | "fixation_mecanique";
+  conditionnement: string | null;
+  surface_couverte_m2: number | null;
+  poids_kg: number | null;
+  consommation_min: number | null;
+  consommation_max: number | null;
+  unite_consommation: string | null;
+  prix_indicatif_min_eur: number | null;
+  prix_indicatif_max_eur: number | null;
+  prix_indicatif_conditionnement: string | null;
+  usage_recommande: string | null;
+}
+
 export interface Profile {
   id: string;
   nom: string;

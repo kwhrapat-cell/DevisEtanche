@@ -5,13 +5,22 @@ import { useRouter } from "next/navigation";
 import Sidebar from "@/components/Sidebar";
 import TopBar from "@/components/TopBar";
 import { createClient } from "@/lib/supabase/client";
-import type { LigneDevis } from "@/lib/types";
+import type { LigneDevis, ProduitEtancheite } from "@/lib/types";
+import { prixMoyen } from "@/lib/catalogue";
 
 interface ChantierOption { id: string; nom: string; client_id: string | null; }
+
+function uniteParDefaut(p: ProduitEtancheite): string {
+  if (p.unite_consommation) return p.unite_consommation.split("/")[0]; // "L/m2" -> "L", "kg/m2" -> "kg"
+  if (p.surface_couverte_m2 != null) return "rouleau";
+  return "u.";
+}
 
 export default function NouveauDevisPage() {
   const [chantiersList, setChantiersList] = useState<ChantierOption[]>([]);
   const [chantierId, setChantierId] = useState("");
+  const [catalogue, setCatalogue] = useState<ProduitEtancheite[]>([]);
+  const [produitChoisi, setProduitChoisi] = useState("");
   const [lignes, setLignes] = useState<LigneDevis[]>(() => {
     if (typeof window !== "undefined") {
       const stocke = sessionStorage.getItem("devisetanche.lignes_calcul");
@@ -41,6 +50,10 @@ export default function NouveauDevisPage() {
       const { data } = await supabase.from("chantiers").select("id, nom, client_id").eq("entreprise_id", profile.entreprise_id).order("nom");
       setChantiersList(data ?? []);
     })();
+    (async () => {
+      const { data } = await supabase.from("produits_etancheite").select("*").order("fabricant").order("nom");
+      setCatalogue((data ?? []) as ProduitEtancheite[]);
+    })();
   }, []);
 
   const totalHt = useMemo(() => lignes.reduce((s, l) => s + l.quantite * l.prix_unitaire, 0), [lignes]);
@@ -51,6 +64,19 @@ export default function NouveauDevisPage() {
   }
   function ajouterLigne() {
     setLignes((prev) => [...prev, { designation: "", quantite: 0, unite: "m²", prix_unitaire: 0 }]);
+  }
+  function ajouterLigneCatalogue() {
+    const p = catalogue.find((c) => c.id === produitChoisi);
+    if (!p) return;
+    setLignes((prev) => [
+      ...prev,
+      {
+        designation: `${p.fabricant} — ${p.nom} (${p.reference})`,
+        quantite: 0,
+        unite: uniteParDefaut(p),
+        prix_unitaire: prixMoyen(p) ?? 0,
+      },
+    ]);
   }
   function retirerLigne(i: number) {
     setLignes((prev) => prev.filter((_, idx) => idx !== i));
@@ -150,7 +176,31 @@ export default function NouveauDevisPage() {
                   </div>
                 ))}
               </div>
-              <button type="button" onClick={ajouterLigne} className="text-sm text-rouille font-medium mt-3">+ Ajouter une ligne</button>
+              <div className="flex flex-wrap items-center gap-2 mt-3">
+                <button type="button" onClick={ajouterLigne} className="text-sm text-rouille font-medium">+ Ajouter une ligne</button>
+                {catalogue.length > 0 && (
+                  <div className="flex items-center gap-2 ml-auto">
+                    <select
+                      value={produitChoisi}
+                      onChange={(e) => setProduitChoisi(e.target.value)}
+                      className="border border-ligne rounded-lg px-2 py-1.5 text-sm max-w-[220px]"
+                    >
+                      <option value="">Depuis le catalogue…</option>
+                      {catalogue.map((p) => (
+                        <option key={p.id} value={p.id}>{p.fabricant} — {p.nom}</option>
+                      ))}
+                    </select>
+                    <button
+                      type="button"
+                      onClick={ajouterLigneCatalogue}
+                      disabled={!produitChoisi}
+                      className="text-sm text-rouille font-medium disabled:opacity-40"
+                    >
+                      + Ajouter
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
 
             <div className="flex items-center gap-3">

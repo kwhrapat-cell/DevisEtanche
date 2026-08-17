@@ -7,6 +7,7 @@ const links = [
   { href: "/devis", label: "Devis", icon: "▤" },
   { href: "/clients", label: "Clients", icon: "◍" },
   { href: "/calculateur", label: "Calculateur", icon: "∑" },
+  { href: "/catalogue", label: "Catalogue", icon: "▥" },
   { href: "/parametres", label: "Paramètres", icon: "⚙" },
 ];
 
