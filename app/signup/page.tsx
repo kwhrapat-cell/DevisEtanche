@@ -80,29 +80,25 @@ export default function SignupPage() {
       return;
     }
 
-    // Crée l'entreprise puis le profil lié — voir supabase/schema.sql pour les policies RLS.
-    const { data: entrepriseData, error: entrepriseError } = await supabase
-      .from("entreprises")
-      .insert({ nom: entreprise })
-      .select()
-      .single();
-
-    if (entrepriseError) {
+    if (!authData.session) {
       setChargement(false);
-      setErreur(entrepriseError.message);
+      setErreur(
+        "Compte créé — vérifiez votre e-mail pour confirmer votre inscription, puis reconnectez-vous pour finaliser la création de votre entreprise."
+      );
       return;
     }
 
-    const { error: profileError } = await supabase.from("profiles").insert({
-      id: authData.user.id,
-      entreprise_id: entrepriseData.id,
-      nom,
-      role: "administrateur",
+    // Crée l'entreprise et le profil dans une même transaction (fonction security definer) :
+    // juste après un insert direct sur entreprises, aucun profil ne relie encore la ligne à
+    // auth.uid(), donc la relire via la policy RLS de lecture échouait. Voir supabase/schema.sql.
+    const { error: rpcError } = await supabase.rpc("creer_entreprise_et_profil", {
+      p_nom_entreprise: entreprise,
+      p_nom_utilisateur: nom,
     });
 
     setChargement(false);
-    if (profileError) {
-      setErreur("Compte créé, mais le profil n'a pas pu être enregistré. Contactez le support.");
+    if (rpcError) {
+      setErreur(rpcError.message || "Le compte a été créé mais l'entreprise n'a pas pu être enregistrée.");
       return;
     }
 

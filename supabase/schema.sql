@@ -124,6 +124,39 @@ create policy "Modification entreprise membres" on entreprises for update
   using (id in (select entreprise_id from profiles where id = auth.uid()));
 create policy "Creation entreprise a l'inscription" on entreprises for insert with check (true);
 
+-- Création de compte : entreprise + profil dans une même transaction, en tant
+-- que propriétaire de la fonction (security definer). Nécessaire car juste
+-- après l'insertion de l'entreprise, aucun profil ne la relie encore à
+-- auth.uid() : la relire via la policy "Lecture entreprise membres" échouerait.
+create or replace function public.creer_entreprise_et_profil(p_nom_entreprise text, p_nom_utilisateur text)
+returns entreprises
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_entreprise entreprises;
+begin
+  if auth.uid() is null then
+    raise exception 'Utilisateur non authentifié.';
+  end if;
+
+  if exists (select 1 from profiles where id = auth.uid()) then
+    raise exception 'Un profil existe déjà pour cet utilisateur.';
+  end if;
+
+  insert into entreprises (nom) values (p_nom_entreprise)
+  returning * into v_entreprise;
+
+  insert into profiles (id, entreprise_id, nom, role)
+  values (auth.uid(), v_entreprise.id, p_nom_utilisateur, 'administrateur');
+
+  return v_entreprise;
+end;
+$$;
+
+grant execute on function public.creer_entreprise_et_profil(text, text) to authenticated;
+
 -- Espace client public : fonction sécurisée exposant uniquement les champs
 -- nécessaires, appelée via un lien contenant le token (aucune authentification
 -- requise côté client). Le token étant un UUID non devinable, seul celui qui
