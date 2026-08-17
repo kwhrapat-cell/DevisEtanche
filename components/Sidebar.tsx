@@ -30,7 +30,7 @@ export default function Sidebar() {
         />
       )}
       <aside
-        className={`relative overflow-hidden w-[15.5rem] md:w-64 shrink-0 bg-ardoise text-white min-h-screen flex flex-col justify-between fixed md:static inset-y-0 left-0 z-50 transition-transform duration-200 ease-out ${
+        className={`relative overflow-hidden w-52 md:w-64 shrink-0 bg-ardoise text-white min-h-screen flex flex-col justify-between fixed md:static inset-y-0 left-0 z-50 transition-transform duration-200 ease-out ${
           ouvert ? "translate-x-0" : "-translate-x-full"
         } md:translate-x-0`}
       >

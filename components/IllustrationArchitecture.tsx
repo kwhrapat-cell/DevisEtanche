@@ -42,7 +42,7 @@ export default function IllustrationArchitecture({ compact = false }: { compact?
       preserveAspectRatio={compact ? "xMidYMin meet" : "xMidYMin slice"}
       className={
         compact
-          ? "absolute inset-x-0 top-0 w-full h-56 pointer-events-none select-none"
+          ? "absolute inset-x-0 top-0 w-full h-32 md:h-40 pointer-events-none select-none"
           : "absolute inset-x-0 top-0 w-full h-[480px] pointer-events-none select-none"
       }
       style={
