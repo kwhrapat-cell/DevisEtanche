@@ -8,6 +8,7 @@ import { createClient } from "@/lib/supabase/client";
 import type { ProduitEtancheite } from "@/lib/types";
 import { GAMME_PAR_SYSTEME, prixMoyen } from "@/lib/catalogue";
 import { calculerRouleaux } from "@/lib/produits-aide";
+import { convertirEurVersDevise, type Devise } from "@/lib/devise";
 
 export default function CalculateurPage() {
   const router = useRouter();
@@ -19,6 +20,7 @@ export default function CalculateurPage() {
   const [protectionLourde, setProtectionLourde] = useState(false);
   const [catalogue, setCatalogue] = useState<ProduitEtancheite[]>([]);
   const [fabricant, setFabricant] = useState("");
+  const [devise, setDevise] = useState<Devise>("XPF");
 
   useEffect(() => {
     const supabase = createClient();
@@ -26,6 +28,14 @@ export default function CalculateurPage() {
       .from("produits_etancheite")
       .select("*")
       .then(({ data }) => setCatalogue((data ?? []) as ProduitEtancheite[]));
+    (async () => {
+      const { data: userData } = await supabase.auth.getUser();
+      if (!userData.user) return;
+      const { data: profile } = await supabase.from("profiles").select("entreprise_id").eq("id", userData.user.id).single();
+      if (!profile?.entreprise_id) return;
+      const { data: entreprise } = await supabase.from("entreprises").select("devise").eq("id", profile.entreprise_id).single();
+      if (entreprise) setDevise(entreprise.devise);
+    })();
   }, []);
 
   const fabricantsDisponibles = useMemo(() => {
@@ -75,28 +85,32 @@ export default function CalculateurPage() {
       ? `${produitPrimaire.fabricant} — ${produitPrimaire.nom} (${produitPrimaire.reference})`
       : "Primaire d'accrochage";
 
-    // Prix par défaut calibré au m² (15.5 €/m²) ; converti au rouleau pour garder un
-    // coût total cohérent quand on bascule d'unité faute de prix catalogue réel.
-    const prixDefautMembrane =
-      rouleauxNecessaires != null && produitMembrane?.surface_couverte_m2
-        ? 15.5 * produitMembrane.surface_couverte_m2
-        : 15.5;
+    // Prix par défaut calibrés en € (ordre de grandeur métropole), convertis dans la
+    // devise de l'entreprise — sans ça, les mêmes chiffres réutilisés tels quels en
+    // XPF donnent un total ~119 fois trop bas (1 € ≈ 119 XPF).
+    const prixDefautMembraneEur = rouleauxNecessaires != null && produitMembrane?.surface_couverte_m2 ? 15.5 * produitMembrane.surface_couverte_m2 : 15.5;
+    const prixMembrane = (produitMembrane && prixMoyen(produitMembrane) != null)
+      ? convertirEurVersDevise(prixMoyen(produitMembrane)!, devise)
+      : convertirEurVersDevise(prixDefautMembraneEur, devise);
+    const prixPrimaire = (produitPrimaire && prixMoyen(produitPrimaire) != null)
+      ? convertirEurVersDevise(prixMoyen(produitPrimaire)!, devise)
+      : convertirEurVersDevise(8.5, devise);
 
     const lignes = [
       rouleauxNecessaires != null
-        ? { designation: designationMembrane, quantite: rouleauxNecessaires, unite: "rouleau", prix_unitaire: (produitMembrane && prixMoyen(produitMembrane)) ?? prixDefautMembrane }
-        : { designation: designationMembrane, quantite: resultat.surfaceMembrane, unite: "m²", prix_unitaire: (produitMembrane && prixMoyen(produitMembrane)) ?? prixDefautMembrane },
-      { designation: "Relevés d'étanchéité", quantite: resultat.surfaceReleves, unite: "m²", prix_unitaire: 22 },
-      { designation: designationPrimaire, quantite: resultat.primaireAccrochage, unite: "L", prix_unitaire: (produitPrimaire && prixMoyen(produitPrimaire)) ?? 8.5 },
-      { designation: "Évacuations eaux pluviales", quantite: resultat.evacuationsEP, unite: "u.", prix_unitaire: 65 },
+        ? { designation: designationMembrane, quantite: rouleauxNecessaires, unite: "rouleau", prix_unitaire: prixMembrane }
+        : { designation: designationMembrane, quantite: resultat.surfaceMembrane, unite: "m²", prix_unitaire: prixMembrane },
+      { designation: "Relevés d'étanchéité", quantite: resultat.surfaceReleves, unite: "m²", prix_unitaire: convertirEurVersDevise(22, devise) },
+      { designation: designationPrimaire, quantite: resultat.primaireAccrochage, unite: "L", prix_unitaire: prixPrimaire },
+      { designation: "Évacuations eaux pluviales", quantite: resultat.evacuationsEP, unite: "u.", prix_unitaire: convertirEurVersDevise(65, devise) },
       ...(resultat.fixationsMecaniques > 0
-        ? [{ designation: "Fixations mécaniques", quantite: resultat.fixationsMecaniques, unite: "u.", prix_unitaire: 0.8 }]
+        ? [{ designation: "Fixations mécaniques", quantite: resultat.fixationsMecaniques, unite: "u.", prix_unitaire: convertirEurVersDevise(0.8, devise) }]
         : []),
       ...(isolation
-        ? [{ designation: `Isolant thermique ${epaisseurIsolant}mm`, quantite: resultat.isolantSurface, unite: "m²", prix_unitaire: 12.8 }]
+        ? [{ designation: `Isolant thermique ${epaisseurIsolant}mm`, quantite: resultat.isolantSurface, unite: "m²", prix_unitaire: convertirEurVersDevise(12.8, devise) }]
         : []),
       ...(protectionLourde
-        ? [{ designation: "Protection gravillon", quantite: resultat.protectionGravillon / 50, unite: "sacs 50kg", prix_unitaire: 6 }]
+        ? [{ designation: "Protection gravillon", quantite: resultat.protectionGravillon / 50, unite: "sacs 50kg", prix_unitaire: convertirEurVersDevise(6, devise) }]
         : []),
     ];
     sessionStorage.setItem("devisetanche.lignes_calcul", JSON.stringify(lignes));

@@ -7,7 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 import type { LigneDevis, ProduitEtancheite } from "@/lib/types";
 import { prixMoyen } from "@/lib/catalogue";
 import { calculerConsommationLiquide, calculerRouleaux, verifierCompatibiliteMarque } from "@/lib/produits-aide";
-import { formatMontant, type Devise } from "@/lib/devise";
+import { convertirEurVersDevise, formatMontant, type Devise } from "@/lib/devise";
 
 interface ChantierOption { id: string; nom: string; client_id: string | null; }
 
@@ -38,7 +38,7 @@ export default function NouveauDevisPage() {
         }
       }
     }
-    return [{ designation: "Membrane bitumineuse", quantite: 0, unite: "m²", prix_unitaire: 15.5 }];
+    return [{ designation: "Membrane bitumineuse", quantite: 0, unite: "m²", prix_unitaire: 0 }];
   });
   const [tva, setTva] = useState(11);
   const [devise, setDevise] = useState<Devise>("XPF");
@@ -102,13 +102,14 @@ export default function NouveauDevisPage() {
         quantite = surfaceVisee;
       }
     }
+    const prixEur = prixMoyen(p);
     setLignes((prev) => [
       ...prev,
       {
         designation: `${p.fabricant} — ${p.nom} (${p.reference})`,
         quantite,
         unite,
-        prix_unitaire: prixMoyen(p) ?? 0,
+        prix_unitaire: prixEur != null ? convertirEurVersDevise(prixEur, devise) : 0,
       },
     ]);
   }
