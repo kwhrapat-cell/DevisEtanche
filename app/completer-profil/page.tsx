@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import IllustrationArchitecture from "@/components/IllustrationArchitecture";
@@ -10,7 +10,29 @@ export default function CompleterProfilPage() {
   const [entreprise, setEntreprise] = useState("");
   const [erreur, setErreur] = useState<string | null>(null);
   const [chargement, setChargement] = useState(false);
+  const [verification, setVerification] = useState(true);
   const router = useRouter();
+
+  useEffect(() => {
+    const supabase = createClient();
+    (async () => {
+      const { data: userData } = await supabase.auth.getUser();
+      if (!userData.user) {
+        router.push("/login");
+        return;
+      }
+      // Vérifie côté client (session potentiellement plus à jour que celle vue
+      // par le middleware) avant d'afficher le formulaire, pour éviter de
+      // redemander l'entreprise à quelqu'un qui l'a déjà configurée.
+      const { data: profile } = await supabase.from("profiles").select("id").eq("id", userData.user.id).single();
+      if (profile) {
+        router.push("/dashboard");
+        router.refresh();
+        return;
+      }
+      setVerification(false);
+    })();
+  }, [router]);
 
   async function completer(e: React.FormEvent) {
     e.preventDefault();
@@ -49,6 +71,10 @@ export default function CompleterProfilPage() {
 
     router.push("/dashboard");
     router.refresh();
+  }
+
+  if (verification) {
+    return <div className="min-h-screen bg-papier" />;
   }
 
   return (
