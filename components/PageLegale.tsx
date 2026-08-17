@@ -42,12 +42,3 @@ export function Section({ titre, children }: { titre: string; children: React.Re
     </section>
   );
 }
-
-/** Encadré signalant une information que l'éditeur doit compléter avant mise en ligne. */
-export function AComplete({ children }: { children: React.ReactNode }) {
-  return (
-    <span className="inline-block rounded px-1.5 py-0.5 text-xs font-mono bg-[#3B2A14] text-[#FBBF24]">
-      {children}
-    </span>
-  );
-}

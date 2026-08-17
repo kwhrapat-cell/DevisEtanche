@@ -1,4 +1,4 @@
-import PageLegale, { Section, AComplete } from "@/components/PageLegale";
+import PageLegale, { Section } from "@/components/PageLegale";
 
 export const metadata = { title: "Politique de confidentialité — DevisEtanche" };
 
@@ -26,8 +26,8 @@ export default function ConfidentialitePage() {
           </li>
         </ul>
         <p>
-          Aucune donnée bancaire n'est stockée par l'application : les paiements d'abonnement éventuels sont
-          traités par Stripe.
+          Aucune donnée bancaire n'est collectée ni stockée : le service n'est pas commercialisé à ce stade et
+          aucun paiement n'est encaissé.
         </p>
       </Section>
 
@@ -54,7 +54,7 @@ export default function ConfidentialitePage() {
         </p>
         <p>
           Seuls les prestataires techniques indispensables y ont accès dans ce cadre : Supabase (hébergement de
-          la base de données), Vercel (hébergement de l'application) et Stripe (paiement des abonnements).
+          la base de données) et Vercel (hébergement de l'application).
         </p>
       </Section>
 
@@ -69,7 +69,7 @@ export default function ConfidentialitePage() {
       <Section titre="Vos droits">
         <p>
           Vous pouvez demander à consulter, corriger, exporter ou supprimer vos données, ainsi que la
-          suppression de votre compte, en écrivant à <AComplete>adresse e-mail de contact à compléter</AComplete>.
+          suppression de votre compte, en écrivant à kwhrapat@gmail.com.
         </p>
       </Section>
 

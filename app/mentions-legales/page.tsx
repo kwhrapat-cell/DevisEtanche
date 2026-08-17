@@ -1,4 +1,4 @@
-import PageLegale, { Section, AComplete } from "@/components/PageLegale";
+import PageLegale, { Section } from "@/components/PageLegale";
 
 export const metadata = { title: "Mentions légales — DevisEtanche" };
 
@@ -7,23 +7,25 @@ export default function MentionsLegalesPage() {
     <PageLegale titre="Mentions légales" misAJour="17 août 2026">
       <Section titre="Éditeur">
         <p>
-          L'application DevisEtanche est éditée par <AComplete>nom ou raison sociale à compléter</AComplete>,
-          dont le siège est situé <AComplete>adresse à compléter</AComplete>, immatriculé sous le numéro{" "}
-          <AComplete>RIDET / SIRET à compléter</AComplete>.
+          L'application DevisEtanche est éditée par Patrice Kouwahara, particulier, à Nouméa
+          (Nouvelle-Calédonie).
         </p>
+        <p>Contact : kwhrapat@gmail.com</p>
+        <p>Directeur de la publication : Patrice Kouwahara</p>
+      </Section>
+
+      <Section titre="Stade du projet">
         <p>
-          Contact : <AComplete>adresse e-mail à compléter</AComplete>
-        </p>
-        <p>
-          Directeur de la publication : <AComplete>nom à compléter</AComplete>
+          DevisEtanche est actuellement un projet personnel en cours de développement, mis à disposition à des
+          fins de test et d'évaluation. Le service n'est pas commercialisé : aucun abonnement n'est facturé et
+          aucun paiement n'est encaissé à ce stade.
         </p>
       </Section>
 
       <Section titre="Hébergement">
         <p>
           L'application est hébergée par Vercel Inc. (États-Unis) — vercel.com. Les données saisies dans
-          l'application sont stockées par Supabase, Inc. — supabase.com, dans la région{" "}
-          <AComplete>région du projet Supabase à compléter</AComplete>.
+          l'application sont stockées par Supabase, Inc. — supabase.com.
         </p>
       </Section>
 
