@@ -1,4 +1,3 @@
-import Sidebar from "@/components/Sidebar";
 import TopBar from "@/components/TopBar";
 import { getUtilisateurCourant } from "@/lib/supabase/auth";
 import { createClient } from "@/lib/supabase/server";
@@ -23,9 +22,7 @@ export default async function ParametresPage() {
     : { data: [] };
 
   return (
-    <div className="flex">
-      <Sidebar />
-      <main className="flex-1">
+    <>
         <TopBar titre="Paramètres" sousTitre="Entreprise, équipe et forfait" />
         <div className="p-8 grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-4xl">
           <div className="card p-5">
@@ -64,7 +61,6 @@ export default async function ParametresPage() {
             <p className="text-sm text-neige/50">Actif — vos modifications se synchronisent automatiquement au retour du réseau.</p>
           </div>
         </div>
-      </main>
-    </div>
+    </>
   );
 }

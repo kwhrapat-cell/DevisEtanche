@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Sidebar from "@/components/Sidebar";
 import TopBar from "@/components/TopBar";
 import { createClient } from "@/lib/supabase/client";
 
@@ -50,9 +49,7 @@ export default function NouveauClientPage() {
   }
 
   return (
-    <div className="flex">
-      <Sidebar />
-      <main className="flex-1">
+    <>
         <TopBar titre="Nouveau client" sousTitre="Syndic, entreprise ou particulier" />
         <div className="p-8 max-w-lg">
           <form onSubmit={enregistrer} className="card p-6 flex flex-col gap-4">
@@ -87,7 +84,6 @@ export default function NouveauClientPage() {
             </button>
           </form>
         </div>
-      </main>
-    </div>
+    </>
   );
 }

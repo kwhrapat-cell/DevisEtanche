@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Sidebar from "@/components/Sidebar";
 import TopBar from "@/components/TopBar";
 import { getUtilisateurCourant } from "@/lib/supabase/auth";
 import { createClient } from "@/lib/supabase/server";
@@ -24,9 +23,7 @@ export default async function DevisPage() {
     : { data: null };
 
   return (
-    <div className="flex">
-      <Sidebar />
-      <main className="flex-1">
+    <>
         <TopBar titre="Devis" sousTitre="Générés depuis le calculateur ou saisis manuellement" />
         <div className="p-8">
           <div className="mb-5">
@@ -68,7 +65,6 @@ export default async function DevisPage() {
             </div>
           )}
         </div>
-      </main>
-    </div>
+    </>
   );
 }

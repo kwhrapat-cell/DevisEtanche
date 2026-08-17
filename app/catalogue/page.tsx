@@ -1,4 +1,3 @@
-import Sidebar from "@/components/Sidebar";
 import TopBar from "@/components/TopBar";
 import { createClient } from "@/lib/supabase/server";
 import type { ProduitEtancheite } from "@/lib/types";
@@ -13,9 +12,7 @@ export default async function CataloguePage() {
     .order("nom");
 
   return (
-    <div className="flex">
-      <Sidebar />
-      <main className="flex-1">
+    <>
         <TopBar
           titre="Catalogue produits"
           sousTitre={`${produits?.length ?? 0} produits — Soprema, Sika, Axter`}
@@ -33,7 +30,6 @@ export default async function CataloguePage() {
             <CatalogueListe produits={produits as ProduitEtancheite[]} />
           )}
         </div>
-      </main>
-    </div>
+    </>
   );
 }

@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Sidebar from "@/components/Sidebar";
 import TopBar from "@/components/TopBar";
 import { getUtilisateurCourant } from "@/lib/supabase/auth";
 import { createClient } from "@/lib/supabase/server";
@@ -24,9 +23,7 @@ export default async function ChantiersPage() {
     : { data: null };
 
   return (
-    <div className="flex">
-      <Sidebar />
-      <main className="flex-1">
+    <>
         <TopBar titre="Chantiers" sousTitre={`${chantiers?.length ?? 0} chantiers`} />
         <div className="p-8">
           <div className="mb-5">
@@ -81,7 +78,6 @@ export default async function ChantiersPage() {
             </div>
           )}
         </div>
-      </main>
-    </div>
+    </>
   );
 }

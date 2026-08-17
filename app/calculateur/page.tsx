@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import Sidebar from "@/components/Sidebar";
 import TopBar from "@/components/TopBar";
 import { calculerEtancheite, type Systeme } from "@/lib/calc/etancheite";
 import { createClient } from "@/lib/supabase/client";
@@ -89,9 +88,7 @@ export default function CalculateurPage() {
   }
 
   return (
-    <div className="flex">
-      <Sidebar />
-      <main className="flex-1">
+    <>
         <TopBar titre="Calculateur" sousTitre="Estimation des quantités — à valider selon le DTU applicable au projet" />
         <div className="p-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="card p-6 flex flex-col gap-4">
@@ -208,8 +205,7 @@ export default function CalculateurPage() {
             </button>
           </div>
         </div>
-      </main>
-    </div>
+    </>
   );
 }
 

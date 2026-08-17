@@ -1,4 +1,3 @@
-import Sidebar from "@/components/Sidebar";
 import TopBar from "@/components/TopBar";
 import { createClient } from "@/lib/supabase/server";
 import AjouterZoneForm from "./AjouterZoneForm";
@@ -23,20 +22,15 @@ export default async function ChantierDetailPage({ params }: { params: Promise<{
 
   if (!chantier) {
     return (
-      <div className="flex">
-        <Sidebar />
-        <main className="flex-1">
+      <>
           <TopBar titre="Chantier introuvable" />
           <div className="p-8 text-sm text-neige/50">Ce chantier n'existe pas ou vous n'y avez pas accès.</div>
-        </main>
-      </div>
+      </>
     );
   }
 
   return (
-    <div className="flex">
-      <Sidebar />
-      <main className="flex-1">
+    <>
         <TopBar titre={chantier.nom} sousTitre={`${chantier.ville ?? ""} · ${chantier.clients?.nom ?? "Sans client"}`} />
         <div className="p-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 card p-6">
@@ -76,7 +70,6 @@ export default async function ChantierDetailPage({ params }: { params: Promise<{
             <PhotosSection chantierId={chantier.id} photosInitiales={photos ?? []} />
           </div>
         </div>
-      </main>
-    </div>
+    </>
   );
 }
