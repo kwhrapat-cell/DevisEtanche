@@ -32,6 +32,13 @@ export default function CompleterProfilPage() {
 
     setChargement(false);
     if (rpcError) {
+      // Un profil existe déjà (ex. double soumission après un retour arrière) :
+      // le compte est en réalité déjà configuré, pas besoin de bloquer l'utilisateur.
+      if (rpcError.message.toLowerCase().includes("existe déjà")) {
+        router.push("/dashboard");
+        router.refresh();
+        return;
+      }
       setErreur(
         rpcError.message.toLowerCase().includes("does not exist")
           ? "La fonction de création n'existe pas encore côté base — exécutez supabase/fix-creation-entreprise.sql dans l'éditeur SQL Supabase, puis réessayez."
