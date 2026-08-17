@@ -109,9 +109,28 @@ create policy "Zones via chantier" on zones for all
 create policy "Photos via chantier" on photos for all
   using (chantier_id in (select id from chantiers where entreprise_id in (select entreprise_id from profiles where id = auth.uid())));
 
+-- entreprise_id_courante() : fonction security definer utilisée par les policies
+-- ci-dessous. Une policy sur "profiles" qui interroge directement "profiles" dans
+-- sa propre sous-requête (comme l'ancienne version de "Lecture equipe entreprise")
+-- déclenche une récursion infinie ("infinite recursion detected in policy for
+-- relation profiles") car Postgres doit réappliquer la RLS de la table à sa
+-- propre sous-requête. En passant par une fonction security definer (qui
+-- s'exécute avec les droits du propriétaire, donc sans RLS), on casse la boucle.
+create or replace function public.entreprise_id_courante()
+returns uuid
+language sql
+security definer
+stable
+set search_path = public
+as $$
+  select entreprise_id from profiles where id = auth.uid();
+$$;
+
+grant execute on function public.entreprise_id_courante() to authenticated;
+
 create policy "Profil propre" on profiles for select using (id = auth.uid());
 create policy "Lecture equipe entreprise" on profiles for select
-  using (entreprise_id in (select entreprise_id from profiles p2 where p2.id = auth.uid()));
+  using (entreprise_id = public.entreprise_id_courante());
 create policy "Creation profil propre" on profiles for insert with check (id = auth.uid());
 
 -- entreprises : lecture/écriture réservées aux membres de l'entreprise.
