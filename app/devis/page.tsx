@@ -5,10 +5,10 @@ import { getUtilisateurCourant } from "@/lib/supabase/auth";
 import { createClient } from "@/lib/supabase/server";
 
 const styleStatut: Record<string, string> = {
-  brouillon: "bg-sable text-ardoise/60",
-  envoye: "bg-[#FCE9DE] text-rouille",
-  accepte: "bg-[#E4F3EA] text-vert",
-  refuse: "bg-[#F6E1DE] text-[#C64A2C]",
+  brouillon: "bg-sable text-neige/60",
+  envoye: "bg-[#1B2C4E] text-[#8FB4FF]",
+  accepte: "bg-[#123024] text-vert",
+  refuse: "bg-[#3B1418] text-[#FF8A80]",
 };
 
 export default async function DevisPage() {
@@ -36,14 +36,14 @@ export default async function DevisPage() {
           </div>
           {!devisListe || devisListe.length === 0 ? (
             <div className="card p-10 text-center">
-              <div className="font-display font-semibold text-ardoise mb-2">Aucun devis pour l'instant</div>
-              <p className="text-sm text-ardoise/50">Créez un devis pour l'un de vos chantiers.</p>
+              <div className="font-display font-semibold text-neige mb-2">Aucun devis pour l'instant</div>
+              <p className="text-sm text-neige/50">Créez un devis pour l'un de vos chantiers.</p>
             </div>
           ) : (
             <div className="card overflow-hidden">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="text-left text-xs text-ardoise/50 border-b border-ligne">
+                  <tr className="text-left text-xs text-neige/50 border-b border-ligne">
                     <th className="px-5 py-3 font-medium">N°</th>
                     <th className="px-5 py-3 font-medium">Chantier</th>
                     <th className="px-5 py-3 font-medium">Montant TTC</th>
@@ -56,7 +56,7 @@ export default async function DevisPage() {
                       <td className="px-5 py-4 font-mono text-xs">
                         <Link href={`/devis/${d.id}`} className="hover:text-rouille">{d.numero}</Link>
                       </td>
-                      <td className="px-5 py-4 font-medium text-ardoise">{d.chantiers?.nom ?? "—"}</td>
+                      <td className="px-5 py-4 font-medium text-neige">{d.chantiers?.nom ?? "—"}</td>
                       <td className="px-5 py-4 font-mono">{Number(d.total_ttc).toLocaleString("fr-FR")} €</td>
                       <td className="px-5 py-4">
                         <span className={`badge ${styleStatut[d.statut]}`}>{d.statut}</span>

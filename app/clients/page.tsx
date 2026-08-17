@@ -29,16 +29,16 @@ export default async function ClientsPage() {
           </div>
           {!clients || clients.length === 0 ? (
             <div className="card p-10 text-center">
-              <div className="font-display font-semibold text-ardoise mb-2">Aucun client pour l'instant</div>
-              <p className="text-sm text-ardoise/50">Ajoutez votre premier client pour pouvoir lui créer un chantier et un devis.</p>
+              <div className="font-display font-semibold text-neige mb-2">Aucun client pour l'instant</div>
+              <p className="text-sm text-neige/50">Ajoutez votre premier client pour pouvoir lui créer un chantier et un devis.</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {clients.map((c) => (
                 <div key={c.id} className="card p-5">
-                  <div className="font-medium text-ardoise mb-1">{c.nom}</div>
-                  <div className="text-xs text-ardoise/50 mb-3">{c.ville}</div>
-                  <span className="badge bg-sable text-ardoise/60">{c.type}</span>
+                  <div className="font-medium text-neige mb-1">{c.nom}</div>
+                  <div className="text-xs text-neige/50 mb-3">{c.ville}</div>
+                  <span className="badge bg-sable text-neige/60">{c.type}</span>
                 </div>
               ))}
             </div>

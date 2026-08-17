@@ -45,11 +45,11 @@ export default async function DashboardPage() {
 
           <div className="card p-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="font-display font-semibold text-ardoise">Mes chantiers</h2>
+              <h2 className="font-display font-semibold text-neige">Mes chantiers</h2>
               <Link href="/chantiers/nouveau" className="text-sm text-rouille font-medium">+ Nouveau chantier</Link>
             </div>
             {!chantiers || chantiers.length === 0 ? (
-              <p className="text-sm text-ardoise/50 py-6 text-center">
+              <p className="text-sm text-neige/50 py-6 text-center">
                 Aucun chantier pour l'instant. <Link href="/chantiers/nouveau" className="text-rouille font-medium">Créer le premier</Link>
               </p>
             ) : (
@@ -57,14 +57,14 @@ export default async function DashboardPage() {
                 {chantiers.map((c) => (
                   <Link key={c.id} href={`/chantiers/${c.id}`} className="flex items-center justify-between py-3 hover:bg-sable/30 -mx-2 px-2 rounded-lg">
                     <div>
-                      <div className="font-medium text-sm text-ardoise">{c.nom}</div>
-                      <div className="text-xs text-ardoise/50">{c.ville}</div>
+                      <div className="font-medium text-sm text-neige">{c.nom}</div>
+                      <div className="text-xs text-neige/50">{c.ville}</div>
                     </div>
                     <span className={`badge badge-${c.statut}`}>{labelStatut[c.statut] ?? c.statut}</span>
                     <div className="w-40 h-2 bg-sable rounded-full overflow-hidden">
                       <div className="h-full bg-vert" style={{ width: `${c.avancement_pct}%` }} />
                     </div>
-                    <span className="font-mono text-xs text-ardoise/60 w-10 text-right">{c.avancement_pct}%</span>
+                    <span className="font-mono text-xs text-neige/60 w-10 text-right">{c.avancement_pct}%</span>
                   </Link>
                 ))}
               </div>

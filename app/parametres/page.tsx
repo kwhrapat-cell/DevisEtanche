@@ -29,20 +29,20 @@ export default async function ParametresPage() {
         <TopBar titre="Paramètres" sousTitre="Entreprise, équipe et forfait" />
         <div className="p-8 grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-4xl">
           <div className="card p-5">
-            <div className="font-medium text-ardoise mb-1">Entreprise</div>
-            <p className="text-sm text-ardoise/50">{entreprise?.nom ?? "—"}</p>
+            <div className="font-medium text-neige mb-1">Entreprise</div>
+            <p className="text-sm text-neige/50">{entreprise?.nom ?? "—"}</p>
           </div>
 
           <div className="card p-5">
-            <div className="font-medium text-ardoise mb-3">Équipe</div>
+            <div className="font-medium text-neige mb-3">Équipe</div>
             {!equipe || equipe.length === 0 ? (
-              <p className="text-sm text-ardoise/50">Aucun membre.</p>
+              <p className="text-sm text-neige/50">Aucun membre.</p>
             ) : (
               <ul className="flex flex-col gap-2">
                 {equipe.map((m) => (
                   <li key={m.id} className="flex justify-between text-sm">
-                    <span className="text-ardoise">{m.nom}</span>
-                    <span className="text-ardoise/50">{labelRole[m.role] ?? m.role}</span>
+                    <span className="text-neige">{m.nom}</span>
+                    <span className="text-neige/50">{labelRole[m.role] ?? m.role}</span>
                   </li>
                 ))}
               </ul>
@@ -50,7 +50,7 @@ export default async function ParametresPage() {
           </div>
 
           <div className="lg:col-span-2">
-            <div className="font-medium text-ardoise mb-3">Forfait</div>
+            <div className="font-medium text-neige mb-3">Forfait</div>
             <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
               <ForfaitCard id="decouverte" nom="Découverte" prix="0 €/mois" actuel={entreprise?.forfait === "decouverte"} />
               <ForfaitCard id="artisan" nom="Artisan" prix="29 €/mois" actuel={entreprise?.forfait === "artisan"} recommande />
@@ -60,8 +60,8 @@ export default async function ParametresPage() {
           </div>
 
           <div className="card p-5">
-            <div className="font-medium text-ardoise mb-1">Mode hors ligne</div>
-            <p className="text-sm text-ardoise/50">Actif — vos modifications se synchronisent automatiquement au retour du réseau.</p>
+            <div className="font-medium text-neige mb-1">Mode hors ligne</div>
+            <p className="text-sm text-neige/50">Actif — vos modifications se synchronisent automatiquement au retour du réseau.</p>
           </div>
         </div>
       </main>

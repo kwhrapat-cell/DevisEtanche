@@ -78,18 +78,18 @@ export default function NouveauChantierPage() {
         <TopBar titre="Nouveau chantier" sousTitre="Renseignez les informations essentielles" />
         <div className="p-8 max-w-lg">
           <form onSubmit={enregistrer} className="card p-6 flex flex-col gap-4">
-            {erreur && <div className="text-sm text-[#C64A2C] bg-[#F6E1DE] rounded-lg px-3 py-2">{erreur}</div>}
+            {erreur && <div className="text-sm text-[#FF8A80] bg-[#3B1418] rounded-lg px-3 py-2">{erreur}</div>}
 
             <div>
-              <label className="text-xs font-mono text-ardoise/60 block mb-1">NOM DU CHANTIER</label>
+              <label className="text-xs font-mono text-neige/60 block mb-1">NOM DU CHANTIER</label>
               <input required value={nom} onChange={(e) => setNom(e.target.value)} className="w-full border border-ligne rounded-lg px-3 py-2" />
             </div>
             <div>
-              <label className="text-xs font-mono text-ardoise/60 block mb-1">VILLE</label>
+              <label className="text-xs font-mono text-neige/60 block mb-1">VILLE</label>
               <input value={ville} onChange={(e) => setVille(e.target.value)} className="w-full border border-ligne rounded-lg px-3 py-2" />
             </div>
             <div>
-              <label className="text-xs font-mono text-ardoise/60 block mb-1">CLIENT (MAÎTRE D'OUVRAGE)</label>
+              <label className="text-xs font-mono text-neige/60 block mb-1">CLIENT (MAÎTRE D'OUVRAGE)</label>
               <select value={clientId} onChange={(e) => setClientId(e.target.value)} className="w-full border border-ligne rounded-lg px-3 py-2">
                 <option value="">— Aucun pour l'instant —</option>
                 {clientsList.map((c) => (
@@ -97,15 +97,15 @@ export default function NouveauChantierPage() {
                 ))}
               </select>
               {clientsList.length === 0 && (
-                <p className="text-xs text-ardoise/40 mt-1">Aucun client enregistré — vous pourrez en associer un plus tard.</p>
+                <p className="text-xs text-neige/40 mt-1">Aucun client enregistré — vous pourrez en associer un plus tard.</p>
               )}
             </div>
             <div>
-              <label className="text-xs font-mono text-ardoise/60 block mb-1">SURFACE TOTALE (M²)</label>
+              <label className="text-xs font-mono text-neige/60 block mb-1">SURFACE TOTALE (M²)</label>
               <input type="number" value={surface} onChange={(e) => setSurface(parseFloat(e.target.value) || 0)} className="w-full border border-ligne rounded-lg px-3 py-2" />
             </div>
             <div>
-              <label className="text-xs font-mono text-ardoise/60 block mb-1">SYSTÈME D'ÉTANCHÉITÉ</label>
+              <label className="text-xs font-mono text-neige/60 block mb-1">SYSTÈME D'ÉTANCHÉITÉ</label>
               <select value={systeme} onChange={(e) => setSysteme(e.target.value as Systeme)} className="w-full border border-ligne rounded-lg px-3 py-2">
                 <option value="bicouche">Bicouche bitumineuse</option>
                 <option value="pvc">Membrane PVC monocouche</option>
@@ -113,7 +113,7 @@ export default function NouveauChantierPage() {
               </select>
             </div>
             <div>
-              <label className="text-xs font-mono text-ardoise/60 block mb-1">DATE DE DÉBUT</label>
+              <label className="text-xs font-mono text-neige/60 block mb-1">DATE DE DÉBUT</label>
               <input type="date" value={dateDebut} onChange={(e) => setDateDebut(e.target.value)} className="w-full border border-ligne rounded-lg px-3 py-2" />
             </div>
             <button disabled={chargement} className="bg-rouille text-white font-semibold rounded-lg py-2.5 disabled:opacity-60">

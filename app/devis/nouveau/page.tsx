@@ -151,10 +151,10 @@ export default function NouveauDevisPage() {
         <TopBar titre="Nouveau devis" sousTitre="Ajoutez les lignes puis enregistrez en brouillon" />
         <div className="p-8 max-w-2xl">
           <form onSubmit={enregistrer} className="card p-6 flex flex-col gap-5">
-            {erreur && <div className="text-sm text-[#C64A2C] bg-[#F6E1DE] rounded-lg px-3 py-2">{erreur}</div>}
+            {erreur && <div className="text-sm text-[#FF8A80] bg-[#3B1418] rounded-lg px-3 py-2">{erreur}</div>}
 
             <div>
-              <label className="text-xs font-mono text-ardoise/60 block mb-1">CHANTIER</label>
+              <label className="text-xs font-mono text-neige/60 block mb-1">CHANTIER</label>
               <select required value={chantierId} onChange={(e) => setChantierId(e.target.value)} className="w-full border border-ligne rounded-lg px-3 py-2">
                 <option value="">— Choisir —</option>
                 {chantiersList.map((c) => (
@@ -164,7 +164,7 @@ export default function NouveauDevisPage() {
             </div>
 
             <div>
-              <label className="text-xs font-mono text-ardoise/60 block mb-2">LIGNES DU DEVIS</label>
+              <label className="text-xs font-mono text-neige/60 block mb-2">LIGNES DU DEVIS</label>
               <div className="flex flex-col gap-2">
                 {lignes.map((l, i) => (
                   <div key={i} className="flex gap-2 items-center">
@@ -194,7 +194,7 @@ export default function NouveauDevisPage() {
                       onChange={(e) => majLigne(i, "prix_unitaire", parseFloat(e.target.value) || 0)}
                       className="border border-ligne rounded-lg px-2 py-1.5 text-sm w-24"
                     />
-                    <button type="button" onClick={() => retirerLigne(i)} className="text-ardoise/40 hover:text-[#C64A2C] px-1">✕</button>
+                    <button type="button" onClick={() => retirerLigne(i)} className="text-neige/40 hover:text-[#FF8A80] px-1">✕</button>
                   </div>
                 ))}
               </div>
@@ -233,14 +233,14 @@ export default function NouveauDevisPage() {
                 )}
               </div>
               {!compatibilite.compatible && (
-                <div className="text-xs text-[#C64A2C] bg-[#F6E1DE] rounded-lg px-3 py-2 mt-3">
+                <div className="text-xs text-[#FF8A80] bg-[#3B1418] rounded-lg px-3 py-2 mt-3">
                   {compatibilite.message}
                 </div>
               )}
             </div>
 
             <div className="flex items-center gap-3">
-              <label className="text-xs font-mono text-ardoise/60">TVA (%)</label>
+              <label className="text-xs font-mono text-neige/60">TVA (%)</label>
               <input type="number" value={tva} onChange={(e) => setTva(parseFloat(e.target.value) || 0)} className="border border-ligne rounded-lg px-2 py-1.5 text-sm w-20" />
             </div>
 

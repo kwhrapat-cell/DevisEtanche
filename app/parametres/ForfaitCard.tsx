@@ -32,8 +32,8 @@ export default function ForfaitCard({
 
   return (
     <div className={`card p-4 flex flex-col ${recommande ? "border-rouille border-2" : ""}`}>
-      <div className="font-medium text-ardoise text-sm">{nom}</div>
-      <div className="font-mono text-lg text-ardoise mt-1 mb-3">{prix}</div>
+      <div className="font-medium text-neige text-sm">{nom}</div>
+      <div className="font-mono text-lg text-neige mt-1 mb-3">{prix}</div>
       {actuel ? (
         <span className="text-xs text-vert font-mono mt-auto">Forfait actuel</span>
       ) : (

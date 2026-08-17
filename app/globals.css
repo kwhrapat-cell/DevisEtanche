@@ -5,14 +5,16 @@
 @import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap");
 
 body {
-  background: #F7F4EC;
-  color: #1B2230;
+  background: #070C16;
+  background: radial-gradient(ellipse 1200px 700px at 50% -10%, #102145 0%, #070C16 55%, #04070D 100%) fixed;
+  color: #EAF0FB;
   font-family: "IBM Plex Sans", sans-serif;
+  min-height: 100vh;
 }
 
 .card {
-  background: #fff;
-  border: 1px solid #DDD5C2;
+  background: #0D1526;
+  border: 1px solid #1E2A44;
   border-radius: 16px;
 }
 
@@ -23,12 +25,24 @@ body {
   border-radius: 100px;
   font-weight: 600;
 }
-.badge-en_cours { background: #FCE9DE; color: #E2622C; }
-.badge-termine { background: #E4F3EA; color: #2F9E5B; }
-.badge-en_attente { background: #F2EDDD; color: #D9A441; }
-.badge-en_preparation { background: #ECEAF6; color: #6B5FB0; }
+.badge-en_cours { background: rgba(255, 173, 122, 0.14); color: #FFAD7A; }
+.badge-termine { background: rgba(110, 231, 160, 0.14); color: #6EE7A0; }
+.badge-en_attente { background: rgba(251, 191, 36, 0.16); color: #FBBF24; }
+.badge-en_preparation { background: rgba(185, 169, 245, 0.16); color: #B9A9F5; }
+
+input:not([type="checkbox"]):not([type="radio"]),
+select,
+textarea {
+  background: #0B1220;
+  color: #EAF0FB;
+}
+input::placeholder,
+textarea::placeholder {
+  color: rgba(234, 240, 251, 0.35);
+}
 
 @media print {
-  body { background: #fff; }
+  body, .card { background: #fff !important; }
+  * { color: #1B2230 !important; }
   .print\:hidden { display: none !important; }
 }

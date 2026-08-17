@@ -57,15 +57,15 @@ export default function PhotosSection({ chantierId, photosInitiales }: { chantie
   return (
     <div className="card p-6 mt-6">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="font-display font-semibold text-ardoise">Photos</h2>
+        <h2 className="font-display font-semibold text-neige">Photos</h2>
         <label className="text-sm text-rouille font-medium cursor-pointer">
           {envoi ? "Envoi…" : "+ Ajouter une photo"}
           <input type="file" accept="image/*" capture="environment" onChange={surSelection} className="hidden" disabled={envoi} />
         </label>
       </div>
-      {erreur && <div className="text-sm text-[#C64A2C] bg-[#F6E1DE] rounded-lg px-3 py-2 mb-3">{erreur}</div>}
+      {erreur && <div className="text-sm text-[#FF8A80] bg-[#3B1418] rounded-lg px-3 py-2 mb-3">{erreur}</div>}
       {photos.length === 0 ? (
-        <p className="text-sm text-ardoise/50">Aucune photo pour l'instant.</p>
+        <p className="text-sm text-neige/50">Aucune photo pour l'instant.</p>
       ) : (
         <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
           {photos.map((p) => (

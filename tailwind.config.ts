@@ -5,14 +5,18 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        ardoise: { DEFAULT: "#0E2038", 2: "#152B4A" },
-        bitume: "#12141A",
-        rouille: { DEFAULT: "#E2622B", 2: "#1D4ED8" },
-        papier: "#F7F4EC",
-        sable: "#EDE7DA",
-        vert: "#2F9E5B",
-        ambre: "#D9A441",
-        ligne: "#DDD5C2",
+        // Thème sombre bleu marine — ardoise reste réservée aux surfaces foncées
+        // (sidebar, panneaux d'accent) toujours utilisées avec du texte clair ;
+        // le texte courant utilise "neige" sur les fonds "papier"/"sable"/.card.
+        ardoise: { DEFAULT: "#0B1830", 2: "#132A4C" },
+        bitume: "#050810",
+        rouille: { DEFAULT: "#2E6BEE", 2: "#5B9DFF" },
+        papier: "#070C16",
+        sable: "#101B30",
+        vert: "#34D399",
+        ambre: "#FBBF24",
+        ligne: "#1E2A44",
+        neige: "#EAF0FB",
       },
       fontFamily: {
         display: ["'Space Grotesk'", "sans-serif"],

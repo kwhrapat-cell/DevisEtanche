@@ -62,9 +62,9 @@ export default function NouveauDevisForm({ entrepriseId, chantiers }: Props) {
 
   return (
     <form onSubmit={creerDevis} className="card p-5 flex flex-col sm:flex-row gap-3 items-end">
-      {erreur && <div className="text-sm text-[#C64A2C]">{erreur}</div>}
+      {erreur && <div className="text-sm text-[#FF8A80]">{erreur}</div>}
       <div className="flex-1 w-full">
-        <label className="text-xs font-mono text-ardoise/60 block mb-1">CHANTIER</label>
+        <label className="text-xs font-mono text-neige/60 block mb-1">CHANTIER</label>
         <select value={chantierId} onChange={(e) => setChantierId(e.target.value)} className="w-full border border-ligne rounded-lg px-3 py-2">
           {chantiers.length === 0 && <option value="">Aucun chantier — créez-en un d'abord</option>}
           {chantiers.map((c) => (
@@ -73,7 +73,7 @@ export default function NouveauDevisForm({ entrepriseId, chantiers }: Props) {
         </select>
       </div>
       <div className="w-full sm:w-44">
-        <label className="text-xs font-mono text-ardoise/60 block mb-1">MONTANT HT</label>
+        <label className="text-xs font-mono text-neige/60 block mb-1">MONTANT HT</label>
         <input
           type="number"
           min={0}

@@ -96,7 +96,7 @@ export default function CalculateurPage() {
         <div className="p-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="card p-6 flex flex-col gap-4">
             <div>
-              <label className="text-xs font-mono text-ardoise/60 block mb-1">SURFACE DE TOITURE (M²)</label>
+              <label className="text-xs font-mono text-neige/60 block mb-1">SURFACE DE TOITURE (M²)</label>
               <input
                 type="number"
                 value={surface}
@@ -105,7 +105,7 @@ export default function CalculateurPage() {
               />
             </div>
             <div>
-              <label className="text-xs font-mono text-ardoise/60 block mb-1">
+              <label className="text-xs font-mono text-neige/60 block mb-1">
                 PÉRIMÈTRE (ML) — laisser vide pour estimation automatique
               </label>
               <input
@@ -117,7 +117,7 @@ export default function CalculateurPage() {
               />
             </div>
             <div>
-              <label className="text-xs font-mono text-ardoise/60 block mb-1">SYSTÈME D'ÉTANCHÉITÉ</label>
+              <label className="text-xs font-mono text-neige/60 block mb-1">SYSTÈME D'ÉTANCHÉITÉ</label>
               <select
                 value={systeme}
                 onChange={(e) => setSysteme(e.target.value as Systeme)}
@@ -131,7 +131,7 @@ export default function CalculateurPage() {
 
             {fabricantsDisponibles.length > 0 && (
               <div>
-                <label className="text-xs font-mono text-ardoise/60 block mb-1">FABRICANT</label>
+                <label className="text-xs font-mono text-neige/60 block mb-1">FABRICANT</label>
                 <select
                   value={fabricant}
                   onChange={(e) => setFabricant(e.target.value)}
@@ -155,7 +155,7 @@ export default function CalculateurPage() {
             </div>
             {isolation && (
               <div>
-                <label className="text-xs font-mono text-ardoise/60 block mb-1">ÉPAISSEUR ISOLANT (MM)</label>
+                <label className="text-xs font-mono text-neige/60 block mb-1">ÉPAISSEUR ISOLANT (MM)</label>
                 <input
                   type="number"
                   value={epaisseurIsolant}

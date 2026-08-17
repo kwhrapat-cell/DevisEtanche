@@ -36,8 +36,8 @@ export default async function ChantiersPage() {
           </div>
           {!chantiers || chantiers.length === 0 ? (
             <div className="card p-10 text-center">
-              <div className="font-display font-semibold text-ardoise mb-2">Aucun chantier pour l'instant</div>
-              <p className="text-sm text-ardoise/50 mb-5 max-w-sm mx-auto">
+              <div className="font-display font-semibold text-neige mb-2">Aucun chantier pour l'instant</div>
+              <p className="text-sm text-neige/50 mb-5 max-w-sm mx-auto">
                 Créez votre premier chantier depuis Supabase (table <code>chantiers</code>) ou exécutez{" "}
                 <code>supabase/seed.sql</code> pour charger des données de démonstration.
               </p>
@@ -46,7 +46,7 @@ export default async function ChantiersPage() {
             <div className="card overflow-hidden">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="text-left text-xs text-ardoise/50 border-b border-ligne">
+                  <tr className="text-left text-xs text-neige/50 border-b border-ligne">
                     <th className="px-5 py-3 font-medium">Chantier</th>
                     <th className="px-5 py-3 font-medium">Statut</th>
                     <th className="px-5 py-3 font-medium">Surface</th>
@@ -57,10 +57,10 @@ export default async function ChantiersPage() {
                   {chantiers.map((c) => (
                     <tr key={c.id} className="border-b border-ligne last:border-0 hover:bg-sable/40">
                       <td className="px-5 py-4">
-                        <Link href={`/chantiers/${c.id}`} className="font-medium text-ardoise hover:text-rouille">
+                        <Link href={`/chantiers/${c.id}`} className="font-medium text-neige hover:text-rouille">
                           {c.nom}
                         </Link>
-                        <div className="text-xs text-ardoise/50">{c.ville}</div>
+                        <div className="text-xs text-neige/50">{c.ville}</div>
                       </td>
                       <td className="px-5 py-4">
                         <span className={`badge badge-${c.statut}`}>{labelStatut[c.statut] ?? c.statut}</span>

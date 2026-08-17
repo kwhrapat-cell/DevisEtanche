@@ -23,8 +23,8 @@ export default async function CataloguePage() {
         <div className="p-8">
           {!produits || produits.length === 0 ? (
             <div className="card p-10 text-center">
-              <div className="font-display font-semibold text-ardoise mb-2">Catalogue vide</div>
-              <p className="text-sm text-ardoise/50 max-w-md mx-auto">
+              <div className="font-display font-semibold text-neige mb-2">Catalogue vide</div>
+              <p className="text-sm text-neige/50 max-w-md mx-auto">
                 Exécutez <code className="font-mono">supabase/produits-etancheite.sql</code> dans l'éditeur
                 SQL de votre projet Supabase pour charger le catalogue de référence.
               </p>

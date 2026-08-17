@@ -13,7 +13,7 @@ export default function LienClientButton({ token }: { token: string }) {
   }
 
   return (
-    <button onClick={copier} className="w-full text-xs bg-ardoise/5 text-ardoise rounded-lg py-2 mt-2 hover:bg-ardoise/10">
+    <button onClick={copier} className="w-full text-xs bg-ardoise/5 text-neige rounded-lg py-2 mt-2 hover:bg-ardoise/10">
       {copie ? "Lien copié ✓" : "Copier le lien de suivi client"}
     </button>
   );

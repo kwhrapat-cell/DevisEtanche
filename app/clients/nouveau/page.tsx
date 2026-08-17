@@ -56,14 +56,14 @@ export default function NouveauClientPage() {
         <TopBar titre="Nouveau client" sousTitre="Syndic, entreprise ou particulier" />
         <div className="p-8 max-w-lg">
           <form onSubmit={enregistrer} className="card p-6 flex flex-col gap-4">
-            {erreur && <div className="text-sm text-[#C64A2C] bg-[#F6E1DE] rounded-lg px-3 py-2">{erreur}</div>}
+            {erreur && <div className="text-sm text-[#FF8A80] bg-[#3B1418] rounded-lg px-3 py-2">{erreur}</div>}
 
             <div>
-              <label className="text-xs font-mono text-ardoise/60 block mb-1">NOM</label>
+              <label className="text-xs font-mono text-neige/60 block mb-1">NOM</label>
               <input required value={nom} onChange={(e) => setNom(e.target.value)} className="w-full border border-ligne rounded-lg px-3 py-2" />
             </div>
             <div>
-              <label className="text-xs font-mono text-ardoise/60 block mb-1">TYPE</label>
+              <label className="text-xs font-mono text-neige/60 block mb-1">TYPE</label>
               <select value={type} onChange={(e) => setType(e.target.value as any)} className="w-full border border-ligne rounded-lg px-3 py-2">
                 <option value="particulier">Particulier</option>
                 <option value="syndic">Syndic</option>
@@ -71,15 +71,15 @@ export default function NouveauClientPage() {
               </select>
             </div>
             <div>
-              <label className="text-xs font-mono text-ardoise/60 block mb-1">VILLE</label>
+              <label className="text-xs font-mono text-neige/60 block mb-1">VILLE</label>
               <input value={ville} onChange={(e) => setVille(e.target.value)} className="w-full border border-ligne rounded-lg px-3 py-2" />
             </div>
             <div>
-              <label className="text-xs font-mono text-ardoise/60 block mb-1">E-MAIL (optionnel)</label>
+              <label className="text-xs font-mono text-neige/60 block mb-1">E-MAIL (optionnel)</label>
               <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full border border-ligne rounded-lg px-3 py-2" />
             </div>
             <div>
-              <label className="text-xs font-mono text-ardoise/60 block mb-1">TÉLÉPHONE (optionnel)</label>
+              <label className="text-xs font-mono text-neige/60 block mb-1">TÉLÉPHONE (optionnel)</label>
               <input value={telephone} onChange={(e) => setTelephone(e.target.value)} className="w-full border border-ligne rounded-lg px-3 py-2" />
             </div>
             <button disabled={chargement} className="bg-rouille text-white font-semibold rounded-lg py-2.5 disabled:opacity-60">

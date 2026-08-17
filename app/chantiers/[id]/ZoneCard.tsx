@@ -8,8 +8,8 @@ import { createClient } from "@/lib/supabase/client";
 const couleurStatut: Record<string, string> = {
   termine: "bg-vert",
   en_cours: "bg-ambre",
-  en_attente: "bg-ardoise/20",
-  probleme: "bg[#C64A2C]",
+  en_attente: "bg-[#3A4A63]",
+  probleme: "bg-[#C64A2C]",
 };
 
 const labelStatut: Record<string, string> = {
@@ -53,12 +53,12 @@ export default function ZoneCard({ zone }: {zone: any }) {
    </button>
 
    {ouvert && (
-    <div className="absolute z-10 top-full left-0 mt-1 w-full bg-white rounded-lg shadow-lg border border-ligne overflow-hidden">
+    <div className="absolute z-10 top-full left-0 mt-1 w-full bg-[#0D1526] rounded-lg shadow-lg border border-ligne overflow-hidden">
     {ordreStatuts.map((s) => (
       <button
         key={s}
         onClick={() => changerStatut(s)}
-        className="block w-full text-left px-3 py-2 text-sm text-ardoise hover:bg-sable/40"
+        className="block w-full text-left px-3 py-2 text-sm text-neige hover:bg-sable/40"
       >
 
         {labelStatut[s]}

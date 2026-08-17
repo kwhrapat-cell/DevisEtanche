@@ -30,7 +30,7 @@ export default function OfflineBanner() {
   if (!horsLigne && enAttente === 0) return null;
 
   return (
-    <div className={`text-xs text-center py-1.5 font-mono ${horsLigne ? "bg-ambre text-ardoise" : "bg-vert text-white"}`}>
+    <div className={`text-xs text-center py-1.5 font-mono ${horsLigne ? "bg-ambre text-[#1B2230]" : "bg-vert text-[#052014]"}`}>
       {horsLigne
         ? "Hors connexion — vos modifications seront synchronisées automatiquement."
         : `Synchronisation de ${enAttente} modification(s) en attente…`}

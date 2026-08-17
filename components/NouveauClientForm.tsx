@@ -44,13 +44,13 @@ export default function NouveauClientForm({ entrepriseId }: { entrepriseId: stri
 
   return (
     <form onSubmit={ajouterClient} className="card p-5 flex flex-col sm:flex-row gap-3 items-end">
-      {erreur && <div className="text-sm text-[#C64A2C]">{erreur}</div>}
+      {erreur && <div className="text-sm text-[#FF8A80]">{erreur}</div>}
       <div className="flex-1 w-full">
-        <label className="text-xs font-mono text-ardoise/60 block mb-1">NOM</label>
+        <label className="text-xs font-mono text-neige/60 block mb-1">NOM</label>
         <input required value={nom} onChange={(e) => setNom(e.target.value)} className="w-full border border-ligne rounded-lg px-3 py-2" />
       </div>
       <div className="w-full sm:w-40">
-        <label className="text-xs font-mono text-ardoise/60 block mb-1">TYPE</label>
+        <label className="text-xs font-mono text-neige/60 block mb-1">TYPE</label>
         <select value={type} onChange={(e) => setType(e.target.value as typeof type)} className="w-full border border-ligne rounded-lg px-3 py-2">
           <option value="particulier">Particulier</option>
           <option value="syndic">Syndic</option>
@@ -58,7 +58,7 @@ export default function NouveauClientForm({ entrepriseId }: { entrepriseId: stri
         </select>
       </div>
       <div className="w-full sm:w-40">
-        <label className="text-xs font-mono text-ardoise/60 block mb-1">VILLE</label>
+        <label className="text-xs font-mono text-neige/60 block mb-1">VILLE</label>
         <input value={ville} onChange={(e) => setVille(e.target.value)} className="w-full border border-ligne rounded-lg px-3 py-2" />
       </div>
       <button type="submit" disabled={chargement} className="bg-rouille text-white text-sm font-semibold rounded-lg px-4 py-2.5 disabled:opacity-60">
