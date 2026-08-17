@@ -202,6 +202,11 @@ export default function SignupPage() {
         <p className="text-xs text-neige/50 text-center mt-5">
           Déjà un compte ? <Link href="/login" className="text-rouille font-medium">Se connecter</Link>
         </p>
+        <p className="text-[11px] text-neige/35 text-center mt-4 leading-relaxed">
+          En créant un compte, vous acceptez nos{" "}
+          <Link href="/mentions-legales" className="underline hover:text-neige/60">mentions légales</Link> et notre{" "}
+          <Link href="/confidentialite" className="underline hover:text-neige/60">politique de confidentialité</Link>.
+        </p>
       </form>
     </div>
   );

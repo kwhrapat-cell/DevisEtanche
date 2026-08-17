@@ -5,7 +5,15 @@ import Sidebar from "./Sidebar";
 import { SidebarProvider } from "./SidebarContext";
 import React from "react";
 
-const ROUTES_SANS_SIDEBAR = ["/", "/login", "/signup", "/espace-client", "/completer-profil"];
+const ROUTES_SANS_SIDEBAR = [
+  "/",
+  "/login",
+  "/signup",
+  "/espace-client",
+  "/completer-profil",
+  "/mentions-legales",
+  "/confidentialite",
+];
 
 export default function AppShell({ children }: {children: React.ReactNode }) {
   const pathname = usePathname();

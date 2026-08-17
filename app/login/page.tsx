@@ -97,6 +97,11 @@ function LoginForm() {
         <p className="text-xs text-neige/50 text-center mt-5">
           Pas encore de compte ? <Link href="/signup" className="text-rouille font-medium">Créer un compte</Link>
         </p>
+        <p className="text-[11px] text-neige/35 text-center mt-4">
+          <Link href="/mentions-legales" className="hover:text-neige/60">Mentions légales</Link>
+          <span className="mx-2">·</span>
+          <Link href="/confidentialite" className="hover:text-neige/60">Confidentialité</Link>
+        </p>
       </form>
     </div>
   );
