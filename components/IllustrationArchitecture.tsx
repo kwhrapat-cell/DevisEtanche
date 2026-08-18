@@ -82,14 +82,14 @@ export default function IllustrationArchitecture({ compact = false }: { compact?
       </g>
 
       {/* lignes de connexion façon schéma technique */}
-      <g stroke="#5B9DFF" strokeOpacity="0.35" strokeWidth="1">
+      <g className="ia-trace ia-trace-connexions" stroke="#5B9DFF" strokeOpacity="0.35" strokeWidth="1">
         <line x1={TOIT[2][0]} y1={TOIT[2][1]} x2="20" y2="115" />
         <line x1={TOIT[0][0]} y1={TOIT[0][1]} x2="450" y2="25" />
         <line x1={TOIT[1][0]} y1={TOIT[1][1]} x2="880" y2="115" />
         <line x1={BAS_GAUCHE[0]} y1={BAS_GAUCHE[1]} x2="15" y2="395" />
         <line x1={BAS_DROIT[0]} y1={BAS_DROIT[1]} x2="885" y2="400" />
       </g>
-      <g fill="#5B9DFF" fillOpacity="0.7">
+      <g className="ia-pulse-decalee" fill="#5B9DFF" fillOpacity="0.7">
         <circle cx="20" cy="115" r="2.5" />
         <circle cx="450" cy="25" r="2.5" />
         <circle cx="880" cy="115" r="2.5" />
@@ -105,7 +105,7 @@ export default function IllustrationArchitecture({ compact = false }: { compact?
       </g>
 
       {/* bâtiment isométrique : arêtes principales, en lueur */}
-      <g stroke="url(#ia-trait)" strokeWidth="1.8" fill="none" strokeOpacity="0.9" filter="url(#ia-lueur)">
+      <g className="ia-trace" stroke="url(#ia-trait)" strokeWidth="1.8" fill="none" strokeOpacity="0.9" filter="url(#ia-lueur)">
         <polygon points={`${TOIT[0].join(",")} ${TOIT[1].join(",")} ${FRONT.join(",")} ${TOIT[2].join(",")}`} />
         <polygon points={`${TOIT[2].join(",")} ${FRONT.join(",")} ${BAS_FRONT.join(",")} ${BAS_GAUCHE.join(",")}`} />
         <polygon points={`${FRONT.join(",")} ${TOIT[1].join(",")} ${BAS_DROIT.join(",")} ${BAS_FRONT.join(",")}`} />
@@ -115,13 +115,13 @@ export default function IllustrationArchitecture({ compact = false }: { compact?
       </g>
 
       {/* petit édicule technique sur le toit */}
-      <g stroke="#8FC1FF" strokeOpacity="0.55" strokeWidth="1.2" fill="none">
+      <g className="ia-pulse-lente" stroke="#8FC1FF" strokeOpacity="0.55" strokeWidth="1.2" fill="none">
         <polygon points="450,178 490,198 450,218 410,198" />
         <line x1="450" y1="178" x2="450" y2="218" strokeOpacity="0.25" />
       </g>
 
       {/* points lumineux d'angle */}
-      <g fill="#8FC1FF">
+      <g className="ia-pulse" fill="#8FC1FF">
         <circle cx={TOIT[0][0]} cy={TOIT[0][1]} r="3" />
         <circle cx={TOIT[1][0]} cy={TOIT[1][1]} r="3" />
         <circle cx={TOIT[2][0]} cy={TOIT[2][1]} r="3" />

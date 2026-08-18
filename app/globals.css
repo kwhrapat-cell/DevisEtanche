@@ -46,3 +46,46 @@ textarea::placeholder {
   * { color: #1B2230 !important; }
   .print\:hidden { display: none !important; }
 }
+
+/* Illustration architecture décorative (fond login/signup/completer-profil) :
+   tracé d'entrée une fois au montage, puis respiration en boucle sur les
+   points lumineux — le dasharray est volontairement large (bien au-delà du
+   périmètre réel des tracés dans le viewBox 900x480), donc pas besoin de
+   mesurer la longueur exacte de chaque arête. */
+.ia-trace {
+  stroke-dasharray: 3000;
+  stroke-dashoffset: 3000;
+  animation: ia-dessiner 1.8s ease-out forwards;
+}
+.ia-trace-connexions {
+  animation-delay: 0.15s;
+}
+.ia-pulse {
+  animation: ia-respirer 4s ease-in-out infinite;
+}
+.ia-pulse-decalee {
+  animation: ia-respirer 4s ease-in-out infinite;
+  animation-delay: 1.6s;
+}
+.ia-pulse-lente {
+  animation: ia-respirer 5.5s ease-in-out infinite;
+  animation-delay: 0.8s;
+}
+
+@keyframes ia-dessiner {
+  to { stroke-dashoffset: 0; }
+}
+@keyframes ia-respirer {
+  0%, 100% { opacity: 0.45; }
+  50% { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ia-trace, .ia-trace-connexions {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+  .ia-pulse, .ia-pulse-decalee, .ia-pulse-lente {
+    animation: none;
+  }
+}
