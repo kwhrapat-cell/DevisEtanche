@@ -1,4 +1,5 @@
 import type { ProduitEtancheite } from "@/lib/types";
+import { convertirEurVersDevise, type Devise } from "@/lib/devise";
 
 export const GAMME_LABELS: Record<ProduitEtancheite["gamme"], string> = {
   bitumineux: "Bitumineux",
@@ -31,6 +32,15 @@ export function prixMoyen(p: ProduitEtancheite): number | null {
   if (p.prix_indicatif_min_eur == null) return p.prix_indicatif_max_eur;
   if (p.prix_indicatif_max_eur == null) return p.prix_indicatif_min_eur;
   return Math.round(((p.prix_indicatif_min_eur + p.prix_indicatif_max_eur) / 2) * 100) / 100;
+}
+
+/**
+ * Prix unitaire d'une ligne de devis, dans la devise de l'entreprise : celui du produit
+ * catalogue s'il en a un renseigné, sinon un repli en euros converti dans la devise cible.
+ */
+export function prixLigneOuDefaut(produit: ProduitEtancheite | undefined, fallbackEur: number, devise: Devise | string): number {
+  const prix = produit ? prixMoyen(produit) : null;
+  return convertirEurVersDevise(prix ?? fallbackEur, devise);
 }
 
 /** Gamme catalogue correspondant à un système d'étanchéité du calculateur/chantier. */

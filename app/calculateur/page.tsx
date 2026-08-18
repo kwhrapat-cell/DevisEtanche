@@ -6,9 +6,9 @@ import TopBar from "@/components/TopBar";
 import { calculerEtancheite, type Systeme } from "@/lib/calc/etancheite";
 import { createClient } from "@/lib/supabase/client";
 import type { ProduitEtancheite } from "@/lib/types";
-import { GAMME_PAR_SYSTEME, prixMoyen } from "@/lib/catalogue";
+import { GAMME_PAR_SYSTEME, prixLigneOuDefaut } from "@/lib/catalogue";
 import { calculerRouleaux } from "@/lib/produits-aide";
-import { convertirEurVersDevise, type Devise } from "@/lib/devise";
+import type { Devise } from "@/lib/devise";
 
 export default function CalculateurPage() {
   const router = useRouter();
@@ -85,32 +85,36 @@ export default function CalculateurPage() {
       ? `${produitPrimaire.fabricant} — ${produitPrimaire.nom} (${produitPrimaire.reference})`
       : "Primaire d'accrochage";
 
-    // Prix par défaut calibrés en € (ordre de grandeur métropole), convertis dans la
-    // devise de l'entreprise — sans ça, les mêmes chiffres réutilisés tels quels en
-    // XPF donnent un total ~119 fois trop bas (1 € ≈ 119 XPF).
+    // Prix de repli calibrés en € (ordre de grandeur métropole), utilisés quand aucun
+    // produit catalogue ne correspond — prixLigneOuDefaut les convertit dans la devise
+    // de l'entreprise (sans ça, réutilisés tels quels en XPF ils donnent un total
+    // ~119 fois trop bas, 1 € ≈ 119 XPF).
     const prixDefautMembraneEur = rouleauxNecessaires != null && produitMembrane?.surface_couverte_m2 ? 15.5 * produitMembrane.surface_couverte_m2 : 15.5;
-    const prixMembrane = (produitMembrane && prixMoyen(produitMembrane) != null)
-      ? convertirEurVersDevise(prixMoyen(produitMembrane)!, devise)
-      : convertirEurVersDevise(prixDefautMembraneEur, devise);
-    const prixPrimaire = (produitPrimaire && prixMoyen(produitPrimaire) != null)
-      ? convertirEurVersDevise(prixMoyen(produitPrimaire)!, devise)
-      : convertirEurVersDevise(8.5, devise);
+    const prixMembrane = prixLigneOuDefaut(produitMembrane, prixDefautMembraneEur, devise);
+    // Prix au m² de la même membrane, pour la ligne relevés — quand la ligne membrane est
+    // facturée au rouleau, prixMembrane est un prix par rouleau : il faut le ramener au m²
+    // (sinon le prix du rouleau serait appliqué tel quel à une quantité en m²).
+    const prixMembraneParM2 = rouleauxNecessaires != null && produitMembrane?.surface_couverte_m2
+      ? prixMembrane / produitMembrane.surface_couverte_m2
+      : prixMembrane;
+    const prixPrimaire = prixLigneOuDefaut(produitPrimaire, 8.5, devise);
 
     const lignes = [
       rouleauxNecessaires != null
         ? { designation: designationMembrane, quantite: rouleauxNecessaires, unite: "rouleau", prix_unitaire: prixMembrane, produit_id: produitMembrane?.id }
         : { designation: designationMembrane, quantite: resultat.surfaceMembrane, unite: "m²", prix_unitaire: prixMembrane, produit_id: produitMembrane?.id },
-      { designation: "Relevés d'étanchéité", quantite: resultat.surfaceReleves, unite: "m²", prix_unitaire: convertirEurVersDevise(22, devise) },
+      // Même membrane de finition, posée verticalement en about de relevé : même prix au m² que la ligne membrane.
+      { designation: "Relevés d'étanchéité", quantite: resultat.surfaceReleves, unite: "m²", prix_unitaire: prixMembraneParM2, produit_id: produitMembrane?.id },
       { designation: designationPrimaire, quantite: resultat.primaireAccrochage, unite: "L", prix_unitaire: prixPrimaire, produit_id: produitPrimaire?.id },
-      { designation: "Évacuations eaux pluviales", quantite: resultat.evacuationsEP, unite: "u.", prix_unitaire: convertirEurVersDevise(65, devise) },
+      { designation: "Évacuations eaux pluviales", quantite: resultat.evacuationsEP, unite: "u.", prix_unitaire: prixLigneOuDefaut(undefined, 65, devise) },
       ...(resultat.fixationsMecaniques > 0
-        ? [{ designation: "Fixations mécaniques", quantite: resultat.fixationsMecaniques, unite: "u.", prix_unitaire: convertirEurVersDevise(0.8, devise) }]
+        ? [{ designation: "Fixations mécaniques", quantite: resultat.fixationsMecaniques, unite: "u.", prix_unitaire: prixLigneOuDefaut(undefined, 0.8, devise) }]
         : []),
       ...(isolation
-        ? [{ designation: `Isolant thermique ${epaisseurIsolant}mm`, quantite: resultat.isolantSurface, unite: "m²", prix_unitaire: convertirEurVersDevise(12.8, devise) }]
+        ? [{ designation: `Isolant thermique ${epaisseurIsolant}mm`, quantite: resultat.isolantSurface, unite: "m²", prix_unitaire: prixLigneOuDefaut(undefined, 12.8, devise) }]
         : []),
       ...(protectionLourde
-        ? [{ designation: "Protection gravillon", quantite: resultat.protectionGravillon / 50, unite: "sacs 50kg", prix_unitaire: convertirEurVersDevise(6, devise) }]
+        ? [{ designation: "Protection gravillon", quantite: resultat.protectionGravillon / 50, unite: "sacs 50kg", prix_unitaire: prixLigneOuDefaut(undefined, 6, devise) }]
         : []),
     ];
     sessionStorage.setItem("devisetanche.lignes_calcul", JSON.stringify(lignes));
