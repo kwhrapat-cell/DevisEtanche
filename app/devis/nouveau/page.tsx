@@ -110,6 +110,7 @@ export default function NouveauDevisPage() {
         quantite,
         unite,
         prix_unitaire: prixEur != null ? convertirEurVersDevise(prixEur, devise) : 0,
+        produit_id: p.id,
       },
     ]);
   }
@@ -178,34 +179,38 @@ export default function NouveauDevisPage() {
               <label className="text-xs font-mono text-neige/60 block mb-2">LIGNES DU DEVIS</label>
               <div className="flex flex-col gap-2">
                 {lignes.map((l, i) => (
-                  <div key={i} className="flex gap-2 items-center">
-                    <input
-                      placeholder="Désignation"
-                      value={l.designation}
-                      onChange={(e) => majLigne(i, "designation", e.target.value)}
-                      className="border border-ligne rounded-lg px-2 py-1.5 text-sm flex-1"
-                    />
-                    <input
-                      type="number"
-                      placeholder="Qté"
-                      value={l.quantite}
-                      onChange={(e) => majLigne(i, "quantite", parseFloat(e.target.value) || 0)}
-                      className="border border-ligne rounded-lg px-2 py-1.5 text-sm w-20"
-                    />
-                    <input
-                      placeholder="Unité"
-                      value={l.unite}
-                      onChange={(e) => majLigne(i, "unite", e.target.value)}
-                      className="border border-ligne rounded-lg px-2 py-1.5 text-sm w-16"
-                    />
-                    <input
-                      type="number"
-                      placeholder="Prix U."
-                      value={l.prix_unitaire}
-                      onChange={(e) => majLigne(i, "prix_unitaire", parseFloat(e.target.value) || 0)}
-                      className="border border-ligne rounded-lg px-2 py-1.5 text-sm w-24"
-                    />
-                    <button type="button" onClick={() => retirerLigne(i)} className="text-neige/40 hover:text-[#FF8A80] px-1">✕</button>
+                  <div key={i} className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                    <div className="flex gap-2 items-center sm:contents">
+                      <input
+                        placeholder="Désignation"
+                        value={l.designation}
+                        onChange={(e) => majLigne(i, "designation", e.target.value)}
+                        className="border border-ligne rounded-lg px-2 py-1.5 text-sm flex-1 min-w-0 sm:flex-1"
+                      />
+                      <button type="button" onClick={() => retirerLigne(i)} className="text-neige/40 hover:text-[#FF8A80] px-1 shrink-0 sm:order-last">✕</button>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2 sm:contents">
+                      <input
+                        type="number"
+                        placeholder="Qté"
+                        value={l.quantite}
+                        onChange={(e) => majLigne(i, "quantite", parseFloat(e.target.value) || 0)}
+                        className="border border-ligne rounded-lg px-2 py-1.5 text-sm w-full sm:w-20"
+                      />
+                      <input
+                        placeholder="Unité"
+                        value={l.unite}
+                        onChange={(e) => majLigne(i, "unite", e.target.value)}
+                        className="border border-ligne rounded-lg px-2 py-1.5 text-sm w-full sm:w-16"
+                      />
+                      <input
+                        type="number"
+                        placeholder="Prix U."
+                        value={l.prix_unitaire}
+                        onChange={(e) => majLigne(i, "prix_unitaire", parseFloat(e.target.value) || 0)}
+                        className="border border-ligne rounded-lg px-2 py-1.5 text-sm w-full sm:w-24"
+                      />
+                    </div>
                   </div>
                 ))}
               </div>

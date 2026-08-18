@@ -38,6 +38,8 @@ export interface LigneDevis {
   quantite: number;
   unite: string;
   prix_unitaire: number;
+  /** Référence vers produits_etancheite.id — traçabilité uniquement, le prix reste figé sur la ligne. */
+  produit_id?: string;
 }
 
 export interface Devis {
