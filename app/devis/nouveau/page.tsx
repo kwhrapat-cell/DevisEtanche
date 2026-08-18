@@ -110,6 +110,7 @@ export default function NouveauDevisPage() {
         quantite,
         unite,
         prix_unitaire: prixEur != null ? convertirEurVersDevise(prixEur, devise) : 0,
+        produit_id: p.id,
       },
     ]);
   }

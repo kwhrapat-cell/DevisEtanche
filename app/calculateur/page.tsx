@@ -98,10 +98,10 @@ export default function CalculateurPage() {
 
     const lignes = [
       rouleauxNecessaires != null
-        ? { designation: designationMembrane, quantite: rouleauxNecessaires, unite: "rouleau", prix_unitaire: prixMembrane }
-        : { designation: designationMembrane, quantite: resultat.surfaceMembrane, unite: "m²", prix_unitaire: prixMembrane },
+        ? { designation: designationMembrane, quantite: rouleauxNecessaires, unite: "rouleau", prix_unitaire: prixMembrane, produit_id: produitMembrane?.id }
+        : { designation: designationMembrane, quantite: resultat.surfaceMembrane, unite: "m²", prix_unitaire: prixMembrane, produit_id: produitMembrane?.id },
       { designation: "Relevés d'étanchéité", quantite: resultat.surfaceReleves, unite: "m²", prix_unitaire: convertirEurVersDevise(22, devise) },
-      { designation: designationPrimaire, quantite: resultat.primaireAccrochage, unite: "L", prix_unitaire: prixPrimaire },
+      { designation: designationPrimaire, quantite: resultat.primaireAccrochage, unite: "L", prix_unitaire: prixPrimaire, produit_id: produitPrimaire?.id },
       { designation: "Évacuations eaux pluviales", quantite: resultat.evacuationsEP, unite: "u.", prix_unitaire: convertirEurVersDevise(65, devise) },
       ...(resultat.fixationsMecaniques > 0
         ? [{ designation: "Fixations mécaniques", quantite: resultat.fixationsMecaniques, unite: "u.", prix_unitaire: convertirEurVersDevise(0.8, devise) }]
