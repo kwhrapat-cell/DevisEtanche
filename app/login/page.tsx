@@ -27,6 +27,7 @@ function LoginForm() {
   const [chargement, setChargement] = useState(false);
   const router = useRouter();
   const params = useSearchParams();
+  const message = params.get("message");
 
   async function seConnecter(e: React.FormEvent) {
     e.preventDefault();
@@ -60,6 +61,11 @@ function LoginForm() {
         <p className="text-sm text-neige/50 mb-6">Connexion à votre espace</p>
 
         {erreur && <div className="text-sm text-[#FF8A80] bg-[#3B1418] rounded-lg px-3 py-2 mb-4">{erreur}</div>}
+        {!erreur && message && (
+          <div className="text-sm rounded-lg px-3 py-2 mb-4" style={{ color: "#6EE7A0", background: "rgba(110,231,160,0.12)" }}>
+            {message}
+          </div>
+        )}
 
         <label className="text-xs font-mono text-neige/60 block mb-1">E-MAIL</label>
         <input
@@ -70,7 +76,7 @@ function LoginForm() {
           className="w-full border border-ligne rounded-lg px-3 py-2 mb-4"
         />
         <label className="text-xs font-mono text-neige/60 block mb-1">MOT DE PASSE</label>
-        <div className="relative mb-6">
+        <div className="relative mb-2">
           <input
             type={motDePasseVisible ? "text" : "password"}
             required
@@ -87,6 +93,9 @@ function LoginForm() {
             <IconeOeil visible={motDePasseVisible} />
           </button>
         </div>
+        <p className="text-right mb-6">
+          <Link href="/mot-de-passe-oublie" className="text-xs text-neige/50 hover:text-neige/70">Mot de passe oublié ?</Link>
+        </p>
         <button
           type="submit"
           disabled={chargement}
