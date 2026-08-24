@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import IllustrationArchitecture from "@/components/IllustrationArchitecture";
 
@@ -100,6 +101,10 @@ export default function CompleterProfilPage() {
         <button type="submit" disabled={chargement} className="w-full bg-rouille text-white font-semibold rounded-lg py-2.5 disabled:opacity-60">
           {chargement ? "Enregistrement…" : "Continuer"}
         </button>
+        <p className="text-xs text-neige/50 text-center mt-5">
+          Vous avez été invité par une entreprise ?{" "}
+          <Link href="/rejoindre-chantier" className="text-rouille font-medium">Rejoindre un chantier avec un code</Link>
+        </p>
       </form>
     </div>
   );

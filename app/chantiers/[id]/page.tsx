@@ -1,9 +1,11 @@
 import TopBar from "@/components/TopBar";
 import { createClient } from "@/lib/supabase/server";
+import { getUtilisateurCourant } from "@/lib/supabase/auth";
 import AjouterZoneForm from "./AjouterZoneForm";
 import PhotosSection from "./PhotosSection";
 import LienClientButton from "./LienClientButton";
 import ZoneCard from "./ZoneCard";
+import InvitationsSection from "./InvitationsSection";
 
 const couleurStatut: Record<string, string> = {
   termine: "bg-vert",
@@ -15,10 +17,20 @@ const couleurStatut: Record<string, string> = {
 export default async function ChantierDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const supabase = await createClient();
+  const session = await getUtilisateurCourant();
 
   const { data: chantier } = await supabase.from("chantiers").select("*, clients(nom)").eq("id", id).single();
   const { data: zones } = await supabase.from("zones").select("*").eq("chantier_id", id).order("created_at");
   const { data: photos } = await supabase.from("photos").select("*").eq("chantier_id", id).order("created_at", { ascending: false });
+
+  const estAdministrateur = session?.profile?.role === "administrateur" && !session.profile.chantier_assigne_id;
+  const { data: invitations } = estAdministrateur
+    ? await supabase
+        .from("invitations_soustraitance")
+        .select("*")
+        .eq("chantier_id", id)
+        .order("created_at", { ascending: false })
+    : { data: [] };
 
   if (!chantier) {
     return (
@@ -64,6 +76,14 @@ export default async function ChantierDetailPage({ params }: { params: Promise<{
               <span className={`badge badge-${chantier.statut}`}>{chantier.statut?.replace(/_/g, " ")}</span>
               <LienClientButton token={chantier.token_public} />
             </div>
+            {estAdministrateur && (
+              <InvitationsSection
+                chantierId={chantier.id}
+                entrepriseId={chantier.entreprise_id}
+                chantierTermine={chantier.statut === "termine"}
+                invitationsInitiales={invitations ?? []}
+              />
+            )}
           </div>
 
           <div className="lg:col-span-3">

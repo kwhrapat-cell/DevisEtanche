@@ -1,9 +1,11 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import BoutonDeconnexion from "@/components/BoutonDeconnexion";
 import { useSidebar } from "@/components/SidebarContext";
+import { createClient } from "@/lib/supabase/client";
 
 const links = [
   { href: "/dashboard", label: "Tableau de bord", icon: "▦" },
@@ -16,9 +18,28 @@ const links = [
   { href: "/parametres", label: "Paramètres", icon: "⚙" },
 ];
 
+// Un sous-traitant restreint (chantier_assigne_id renseigné) n'a pas accès aux
+// devis/factures (marges), aux clients, ni aux paramètres de l'entreprise —
+// voir les policies RLS dans supabase/schema.sql. On masque ces liens plutôt
+// que de laisser des pages vides/confuses.
+const LIENS_MASQUES_SOUSTRAITANT = ["/devis", "/factures", "/clients", "/parametres"];
+
 export default function Sidebar() {
   const pathname = usePathname();
   const { ouvert, setOuvert } = useSidebar();
+  const [restreint, setRestreint] = useState(false);
+
+  useEffect(() => {
+    const supabase = createClient();
+    (async () => {
+      const { data: userData } = await supabase.auth.getUser();
+      if (!userData.user) return;
+      const { data } = await supabase.from("profiles").select("chantier_assigne_id").eq("id", userData.user.id).single();
+      setRestreint(!!data?.chantier_assigne_id);
+    })();
+  }, []);
+
+  const liensVisibles = restreint ? links.filter((l) => !LIENS_MASQUES_SOUSTRAITANT.includes(l.href)) : links;
 
   return (
     <>
@@ -54,7 +75,7 @@ export default function Sidebar() {
             </button>
           </div>
           <nav className="mt-2 flex flex-col gap-1 px-3">
-            {links.map((l) => {
+            {liensVisibles.map((l) => {
               const actif = pathname === l.href || pathname?.startsWith(`${l.href}/`);
               return (
                 <Link
