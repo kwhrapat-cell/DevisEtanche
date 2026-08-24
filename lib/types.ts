@@ -107,4 +107,20 @@ export interface Profile {
   nom: string;
   role: "ouvrier" | "chef_de_chantier" | "conducteur_de_travaux" | "administrateur" | "client";
   entreprise_id: string;
+  /** Non nul pour un sous-traitant ayant rejoint via un code d'invitation : restreint son accès à ce chantier. */
+  chantier_assigne_id?: string | null;
+}
+
+export type RoleSousTraitance = "ouvrier" | "chef_de_chantier" | "conducteur_de_travaux";
+
+export interface InvitationSoustraitance {
+  id: string;
+  code: string;
+  chantier_id: string;
+  entreprise_id: string;
+  role_autorise: RoleSousTraitance;
+  date_expiration: string;
+  utilise: boolean;
+  revoquee: boolean;
+  created_at: string;
 }

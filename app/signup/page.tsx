@@ -202,6 +202,10 @@ export default function SignupPage() {
         <p className="text-xs text-neige/50 text-center mt-5">
           Déjà un compte ? <Link href="/login" className="text-rouille font-medium">Se connecter</Link>
         </p>
+        <p className="text-xs text-neige/50 text-center mt-2">
+          Vous avez été invité par une entreprise ?{" "}
+          <Link href="/rejoindre-chantier" className="text-rouille font-medium">Rejoindre un chantier avec un code</Link>
+        </p>
       </form>
     </div>
   );
