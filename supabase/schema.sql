@@ -325,7 +325,7 @@ create policy "Creation invitation administrateur" on invitations_soustraitance 
 
 -- Lecture/révocation de la liste des codes : réservée aux administrateurs de
 -- l'entreprise (pas de listing possible pour un sous-traitant, qui ne peut
--- valider un code que via la fonction invitation_par_code ci-dessous).
+-- valider un code que via la fonction rejoindre_chantier_via_code ci-dessous).
 create policy "Lecture invitations entreprise" on invitations_soustraitance for select
   using (
     entreprise_id = public.entreprise_id_courante()
@@ -339,43 +339,33 @@ create policy "Revocation invitation administrateur" on invitations_soustraitanc
   )
   with check (entreprise_id = public.entreprise_id_courante());
 
--- Validation d'un code par un sous-traitant : une policy RLS classique sur la
--- table ne peut pas distinguer "je connais le code" de "je liste toutes les
--- lignes valides" (RLS filtre des lignes, pas la forme de la requête) — un
--- utilisateur pourrait donc énumérer tous les codes valides de toutes les
--- entreprises. On expose donc la lecture par code via une fonction security
--- definer (même principe que espace_client_chantier ci-dessus) : seul celui
--- qui connaît déjà le code exact obtient un résultat.
-create or replace function public.invitation_par_code(p_code text)
-returns json
-language sql
-security definer
-stable
-set search_path = public
-as $$
-  select json_build_object(
-    'chantier_id', i.chantier_id,
-    'chantier_nom', c.nom,
-    'entreprise_nom', e.nom,
-    'role_autorise', i.role_autorise
-  )
-  from invitations_soustraitance i
-  join chantiers c on c.id = i.chantier_id
-  join entreprises e on e.id = i.entreprise_id
-  where i.code = upper(trim(p_code))
-    and not i.utilise
-    and not i.revoquee
-    and i.date_expiration > now()
-    and c.statut <> 'termine';
-$$;
+-- Anti brute-force sur la validation de code (voir rejoindre_chantier_via_code
+-- ci-dessous) : une ligne par tentative, jamais accessible directement (RLS
+-- activée sans aucune policy) — seule la fonction security definer y écrit et
+-- y lit, avec les droits du propriétaire.
+create table if not exists tentatives_code_invitation (
+  id bigint generated always as identity primary key,
+  utilisateur_id uuid not null references auth.users(id) on delete cascade,
+  tentee_at timestamptz not null default now()
+);
 
-grant execute on function public.invitation_par_code(text) to authenticated;
+create index if not exists idx_tentatives_code_invitation_utilisateur
+  on tentatives_code_invitation (utilisateur_id, tentee_at);
+
+alter table tentatives_code_invitation enable row level security;
 
 -- Validation + rattachement effectif : transaction atomique (verrou de ligne
 -- via "for update") pour éviter qu'un même code soit consommé deux fois en cas
 -- de double soumission. Un chantier passé au statut "termine" invalide le code
 -- même s'il n'est pas expiré : la vérification se fait ici au moment de l'usage
 -- plutôt que via un déclencheur, pour toujours refléter le statut réel du chantier.
+--
+-- Anti brute-force : un compte authentifié sans profil peut appeler cette
+-- fonction en boucle (échouer ne coûte rien d'autre qu'un compte gratuit) —
+-- on limite donc à 5 tentatives par compte sur une fenêtre glissante de 15
+-- minutes, quel que soit le code essayé. Ça ne couvre pas un attaquant créant
+-- un nouveau compte à chaque blocage, mais élimine le brute-force "gratuit"
+-- en boucle serrée depuis un seul compte.
 create or replace function public.rejoindre_chantier_via_code(p_code text, p_nom text)
 returns json
 language plpgsql
@@ -385,6 +375,7 @@ as $$
 declare
   v_invitation invitations_soustraitance;
   v_chantier chantiers;
+  v_tentatives_recentes int;
 begin
   if auth.uid() is null then
     raise exception 'Utilisateur non authentifié.';
@@ -393,6 +384,16 @@ begin
   if exists (select 1 from profiles where id = auth.uid()) then
     raise exception 'Un profil existe déjà pour ce compte.';
   end if;
+
+  select count(*) into v_tentatives_recentes
+    from tentatives_code_invitation
+    where utilisateur_id = auth.uid() and tentee_at > now() - interval '15 minutes';
+
+  if v_tentatives_recentes >= 5 then
+    raise exception 'Trop de tentatives — réessayez dans quelques minutes.';
+  end if;
+
+  insert into tentatives_code_invitation (utilisateur_id) values (auth.uid());
 
   select * into v_invitation from invitations_soustraitance
     where code = upper(trim(p_code)) for update;

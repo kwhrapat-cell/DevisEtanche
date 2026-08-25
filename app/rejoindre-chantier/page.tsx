@@ -21,6 +21,7 @@ function EnTete() {
 
 function mapErreurRpc(message: string): string {
   const m = message.toLowerCase();
+  if (m.includes("trop de tentatives")) return "Trop de tentatives — réessayez dans quelques minutes.";
   if (m.includes("code invalide")) return "Ce code d'invitation est invalide.";
   if (m.includes("déjà été utilisé")) return "Ce code a déjà été utilisé.";
   if (m.includes("annulé")) return "Ce code a été annulé par l'entreprise.";
