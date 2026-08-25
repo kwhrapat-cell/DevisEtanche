@@ -28,18 +28,50 @@ export default function AjouterElementForm({ zoneId }: { zoneId: string }) {
     const [catalogue, setCatalogue] = useState<ProduitEtancheite[]>([]);
     const router = useRouter();
 
+    // Calcul interne (non visible client) : temps × taux horaire + prix matériaux
+    // = un prix suggéré, que l'utilisateur peut ensuite ajuster librement.
+    const [calcOuvert, setCalcOuvert] = useState(false);
+    const [entrepriseId, setEntrepriseId] = useState<string | null>(null);
+    const [tempsEstime, setTempsEstime] = useState("");
+    const [tauxHoraire, setTauxHoraire] = useState("");
+    const [prixMateriaux, setPrixMateriaux] = useState("");
+    const [prixFinal, setPrixFinal] = useState("");
+    const [prixFinalModifie, setPrixFinalModifie] = useState(false);
+
     const uniteActuelle = TYPES.find((t) => t.value === type)?.unite ?? "unite";
 
     useEffect(() => {
       if (!ouvert) return;
       const supabase = createClient();
       supabase.from("produits_etancheite").select("*").then(({ data }) => setCatalogue((data ?? []) as ProduitEtancheite[]));
+      (async () => {
+        const { data: userData } = await supabase.auth.getUser();
+        const { data: profile } = await supabase.from("profiles").select("entreprise_id").eq("id", userData.user?.id).single();
+        if (!profile) return;
+        setEntrepriseId(profile.entreprise_id);
+        const { data: entreprise } = await supabase
+          .from("entreprises")
+          .select("dernier_taux_horaire_interne")
+          .eq("id", profile.entreprise_id)
+          .single();
+        if (entreprise?.dernier_taux_horaire_interne != null) {
+          setTauxHoraire(String(entreprise.dernier_taux_horaire_interne));
+        }
+      })();
     }, [ouvert]);
 
     const suggestions = useMemo(
       () => suggererProduits(catalogue, TYPE_ELEMENT_CATALOGUE[type] ?? "point_singulier"),
       [catalogue, type]
     );
+
+    const totalMainOeuvre = (Number(tempsEstime) || 0) * (Number(tauxHoraire) || 0);
+    const prixSuggere = totalMainOeuvre + (Number(prixMateriaux) || 0);
+
+    useEffect(() => {
+      if (!prixFinalModifie) setPrixFinal(prixSuggere ? String(prixSuggere) : "");
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [prixSuggere, prixFinalModifie]);
 
     async function ajouter() {
         setEnvoi(true);
@@ -50,11 +82,23 @@ export default function AjouterElementForm({ zoneId }: { zoneId: string }) {
             description: description || null,
             quantite: Number(quantite) || 1,
             unite: uniteActuelle,
+            temps_estime_heures: tempsEstime ? Number(tempsEstime) : null,
+            taux_horaire_interne: tauxHoraire ? Number(tauxHoraire) : null,
+            prix_materiaux: prixMateriaux ? Number(prixMateriaux) : null,
+            prix_final: prixFinal ? Number(prixFinal) : null,
           });
+          if (entrepriseId && tauxHoraire) {
+            await supabase.from("entreprises").update({ dernier_taux_horaire_interne: Number(tauxHoraire) }).eq("id", entrepriseId);
+          }
           setEnvoi(false);
           setOuvert(false);
           setDescription("");
           setQuantite("1");
+          setCalcOuvert(false);
+          setTempsEstime("");
+          setPrixMateriaux("");
+          setPrixFinal("");
+          setPrixFinalModifie(false);
           router.refresh();
         }
 
@@ -102,6 +146,73 @@ export default function AjouterElementForm({ zoneId }: { zoneId: string }) {
                 </ul>
               </div>
             )}
+
+            <div className="border border-ligne rounded">
+              <button
+                type="button"
+                onClick={() => setCalcOuvert(!calcOuvert)}
+                className="w-full text-left text-xs font-mono text-neige/60 px-2 py-1.5 hover:bg-sable/40"
+              >
+                {calcOuvert ? "▾" : "▸"} Calcul interne (non visible client)
+              </button>
+              {calcOuvert && (
+                <div className="p-2 pt-0 flex flex-col gap-2">
+                  <div className="grid grid-cols-2 gap-2">
+                    <label className="flex flex-col gap-1">
+                      <span className="text-xs text-neige/40">Temps estimé (heures)</span>
+                      <input
+                        type="number"
+                        min="0"
+                        step="0.25"
+                        value={tempsEstime}
+                        onChange={(e) => setTempsEstime(e.target.value)}
+                        className="text-sm border border-ligne rounded px-2 py-1"
+                      />
+                    </label>
+                    <label className="flex flex-col gap-1">
+                      <span className="text-xs text-neige/40">Taux horaire interne (F CFP/heure)</span>
+                      <input
+                        type="number"
+                        min="0"
+                        step="1"
+                        value={tauxHoraire}
+                        onChange={(e) => setTauxHoraire(e.target.value)}
+                        className="text-sm border border-ligne rounded px-2 py-1"
+                      />
+                    </label>
+                  </div>
+                  <label className="flex flex-col gap-1">
+                    <span className="text-xs text-neige/40">Prix matériaux (F CFP)</span>
+                    <input
+                      type="number"
+                      min="0"
+                      step="1"
+                      value={prixMateriaux}
+                      onChange={(e) => setPrixMateriaux(e.target.value)}
+                      className="text-sm border border-ligne rounded px-2 py-1"
+                    />
+                  </label>
+                  <div className="text-xs text-neige/50 font-mono">
+                    Main d'œuvre : {totalMainOeuvre.toLocaleString("fr-FR")} F CFP · Prix suggéré : {prixSuggere.toLocaleString("fr-FR")} F CFP
+                  </div>
+                  <label className="flex flex-col gap-1">
+                    <span className="text-xs text-neige/40">Prix final (F CFP)</span>
+                    <input
+                      type="number"
+                      min="0"
+                      step="1"
+                      value={prixFinal}
+                      onChange={(e) => {
+                        setPrixFinal(e.target.value);
+                        setPrixFinalModifie(true);
+                      }}
+                      className="text-sm border border-ligne rounded px-2 py-1"
+                    />
+                  </label>
+                </div>
+              )}
+            </div>
+
             <div className="flex gap-2">
             <button onClick={ajouter} disabled={envoi} className="text-sm bg-rouille text-white rounded px-3 py-1 disabled:opacity-60">
               {envoi ? "..." : "Ajouter"}
