@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { stripe, PRIX_STRIPE } from "@/lib/stripe/client";
 import { getUtilisateurCourant } from "@/lib/supabase/auth";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 export async function POST(request: Request) {
   const { forfait } = await request.json();
@@ -30,7 +31,12 @@ export async function POST(request: Request) {
       metadata: { entreprise_id: session.profile.entreprise_id },
     });
     customerId = customer.id;
-    await supabase.from("entreprises").update({ stripe_customer_id: customerId }).eq("id", session.profile.entreprise_id);
+    // stripe_customer_id n'est plus modifiable par une session utilisateur normale
+    // (voir supabase/migration-securite-entreprises.sql) : ce endpoint a déjà vérifié
+    // la session et dérivé entreprise_id côté serveur, l'écriture via service_role
+    // ici est donc sûre — contrairement à un accès direct au client.
+    const supabaseAdmin = createAdminClient();
+    await supabaseAdmin.from("entreprises").update({ stripe_customer_id: customerId }).eq("id", session.profile.entreprise_id);
   }
 
   const origine = request.headers.get("origin") ?? process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
