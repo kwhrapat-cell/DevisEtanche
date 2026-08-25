@@ -3,6 +3,13 @@
 -- matériaux) qui ne doit jamais apparaître sur un devis exporté ni dans l'espace
 -- client public — seul le prix final par ligne y est visible, comme aujourd'hui.
 -- À exécuter dans l'éditeur SQL de Supabase (Project > SQL Editor).
+--
+-- Le même calcul est aussi disponible ligne par ligne dans le formulaire "Nouveau
+-- devis" (app/devis/nouveau) : temps_estime_heures/taux_horaire_interne y sont
+-- stockés directement dans le champ jsonb devis.lignes (pas de colonne dédiée
+-- nécessaire), et déjà protégés par les policies "Lecture/Ecriture devis
+-- entreprise" existantes. dernier_taux_horaire_interne (ci-dessous) sert de
+-- valeur par défaut aux deux formulaires.
 
 alter table elements_zone
   add column if not exists temps_estime_heures numeric,
