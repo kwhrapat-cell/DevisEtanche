@@ -47,6 +47,12 @@ export default function NouveauDevisPage() {
   const [chargement, setChargement] = useState(false);
   const router = useRouter();
 
+  // Calcul interne (non visible client) : temps × taux horaire par ligne, jamais
+  // envoyé sur le devis exporté (voir app/devis/[id]/page.tsx, qui ne lit que
+  // designation/quantite/unite/prix_unitaire sur chaque ligne).
+  const [tauxHoraireDefaut, setTauxHoraireDefaut] = useState<number | null>(null);
+  const [calcOuvert, setCalcOuvert] = useState<boolean[]>([]);
+
   useEffect(() => {
     const supabase = createClient();
     (async () => {
@@ -57,13 +63,14 @@ export default function NouveauDevisPage() {
       setChantiersList(data ?? []);
       const { data: entreprise } = await supabase
         .from("entreprises")
-        .select("devise, libelle_taxe, taux_taxe_defaut")
+        .select("devise, libelle_taxe, taux_taxe_defaut, dernier_taux_horaire_interne")
         .eq("id", profile.entreprise_id)
         .single();
       if (entreprise) {
         setDevise(entreprise.devise);
         setLibelleTaxe(entreprise.libelle_taxe);
         setTva(entreprise.taux_taxe_defaut);
+        setTauxHoraireDefaut(entreprise.dernier_taux_horaire_interne ?? null);
       }
     })();
     (async () => {
@@ -86,6 +93,25 @@ export default function NouveauDevisPage() {
   }
   function ajouterLigne() {
     setLignes((prev) => [...prev, { designation: "", quantite: 0, unite: "m²", prix_unitaire: 0 }]);
+    setCalcOuvert((prev) => [...prev, false]);
+  }
+  function basculerCalc(i: number) {
+    setCalcOuvert((prev) => {
+      const suivant = [...prev];
+      suivant[i] = !suivant[i];
+      return suivant;
+    });
+    // Pré-remplit le taux horaire à l'ouverture, sans écraser une valeur déjà saisie.
+    if (!calcOuvert[i] && lignes[i]?.taux_horaire_interne == null && tauxHoraireDefaut != null) {
+      majLigne(i, "taux_horaire_interne", tauxHoraireDefaut);
+    }
+  }
+  function totalMainOeuvre(l: LigneDevis): number {
+    return (l.temps_estime_heures || 0) * (l.taux_horaire_interne || 0);
+  }
+  function appliquerPrixSuggere(i: number) {
+    const l = lignes[i];
+    majLigne(i, "prix_unitaire", Math.round((l.prix_unitaire + totalMainOeuvre(l)) * 100) / 100);
   }
   function ajouterLigneCatalogue() {
     const p = catalogue.find((c) => c.id === produitChoisi);
@@ -113,9 +139,11 @@ export default function NouveauDevisPage() {
         produit_id: p.id,
       },
     ]);
+    setCalcOuvert((prev) => [...prev, false]);
   }
   function retirerLigne(i: number) {
     setLignes((prev) => prev.filter((_, idx) => idx !== i));
+    setCalcOuvert((prev) => prev.filter((_, idx) => idx !== i));
   }
 
   async function enregistrer(e: React.FormEvent) {
@@ -149,6 +177,11 @@ export default function NouveauDevisPage() {
       total_ttc: Math.round(totalTtc * 100) / 100,
     });
 
+    const dernierTaux = [...lignes].reverse().find((l) => l.taux_horaire_interne != null)?.taux_horaire_interne;
+    if (dernierTaux != null) {
+      await supabase.from("entreprises").update({ dernier_taux_horaire_interne: dernierTaux }).eq("id", profile.entreprise_id);
+    }
+
     setChargement(false);
     if (error) {
       setErreur("Le devis n'a pas pu être enregistré.");
@@ -179,37 +212,87 @@ export default function NouveauDevisPage() {
               <label className="text-xs font-mono text-neige/60 block mb-2">LIGNES DU DEVIS</label>
               <div className="flex flex-col gap-2">
                 {lignes.map((l, i) => (
-                  <div key={i} className="flex flex-col gap-2 sm:flex-row sm:items-center">
-                    <div className="flex gap-2 items-center sm:contents">
-                      <input
-                        placeholder="Désignation"
-                        value={l.designation}
-                        onChange={(e) => majLigne(i, "designation", e.target.value)}
-                        className="border border-ligne rounded-lg px-2 py-1.5 text-sm flex-1 min-w-0 sm:flex-1"
-                      />
-                      <button type="button" onClick={() => retirerLigne(i)} className="text-neige/40 hover:text-[#FF8A80] px-1 shrink-0 sm:order-last">✕</button>
+                  <div key={i} className="flex flex-col gap-2 border-b border-ligne pb-2 last:border-b-0 last:pb-0">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                      <div className="flex gap-2 items-center sm:contents">
+                        <input
+                          placeholder="Désignation"
+                          value={l.designation}
+                          onChange={(e) => majLigne(i, "designation", e.target.value)}
+                          className="border border-ligne rounded-lg px-2 py-1.5 text-sm flex-1 min-w-0 sm:flex-1"
+                        />
+                        <button type="button" onClick={() => retirerLigne(i)} className="text-neige/40 hover:text-[#FF8A80] px-1 shrink-0 sm:order-last">✕</button>
+                      </div>
+                      <div className="grid grid-cols-3 gap-2 sm:contents">
+                        <input
+                          type="number"
+                          placeholder="Qté"
+                          value={l.quantite}
+                          onChange={(e) => majLigne(i, "quantite", parseFloat(e.target.value) || 0)}
+                          className="border border-ligne rounded-lg px-2 py-1.5 text-sm w-full sm:w-20"
+                        />
+                        <input
+                          placeholder="Unité"
+                          value={l.unite}
+                          onChange={(e) => majLigne(i, "unite", e.target.value)}
+                          className="border border-ligne rounded-lg px-2 py-1.5 text-sm w-full sm:w-16"
+                        />
+                        <input
+                          type="number"
+                          placeholder="Prix U."
+                          value={l.prix_unitaire}
+                          onChange={(e) => majLigne(i, "prix_unitaire", parseFloat(e.target.value) || 0)}
+                          className="border border-ligne rounded-lg px-2 py-1.5 text-sm w-full sm:w-24"
+                        />
+                      </div>
                     </div>
-                    <div className="grid grid-cols-3 gap-2 sm:contents">
-                      <input
-                        type="number"
-                        placeholder="Qté"
-                        value={l.quantite}
-                        onChange={(e) => majLigne(i, "quantite", parseFloat(e.target.value) || 0)}
-                        className="border border-ligne rounded-lg px-2 py-1.5 text-sm w-full sm:w-20"
-                      />
-                      <input
-                        placeholder="Unité"
-                        value={l.unite}
-                        onChange={(e) => majLigne(i, "unite", e.target.value)}
-                        className="border border-ligne rounded-lg px-2 py-1.5 text-sm w-full sm:w-16"
-                      />
-                      <input
-                        type="number"
-                        placeholder="Prix U."
-                        value={l.prix_unitaire}
-                        onChange={(e) => majLigne(i, "prix_unitaire", parseFloat(e.target.value) || 0)}
-                        className="border border-ligne rounded-lg px-2 py-1.5 text-sm w-full sm:w-24"
-                      />
+
+                    <div className="border border-ligne rounded-lg">
+                      <button
+                        type="button"
+                        onClick={() => basculerCalc(i)}
+                        className="w-full text-left text-xs font-mono text-neige/60 px-2 py-1.5 hover:bg-sable/40"
+                      >
+                        {calcOuvert[i] ? "▾" : "▸"} Calcul interne (non visible client)
+                      </button>
+                      {calcOuvert[i] && (
+                        <div className="p-2 pt-0 flex flex-col gap-2">
+                          <div className="grid grid-cols-2 gap-2">
+                            <label className="flex flex-col gap-1">
+                              <span className="text-xs text-neige/40">Temps estimé (heures)</span>
+                              <input
+                                type="number"
+                                min="0"
+                                step="0.25"
+                                value={l.temps_estime_heures ?? ""}
+                                onChange={(e) => majLigne(i, "temps_estime_heures", parseFloat(e.target.value) || 0)}
+                                className="border border-ligne rounded-lg px-2 py-1.5 text-sm"
+                              />
+                            </label>
+                            <label className="flex flex-col gap-1">
+                              <span className="text-xs text-neige/40">Taux horaire interne ({devise}/heure)</span>
+                              <input
+                                type="number"
+                                min="0"
+                                step="1"
+                                value={l.taux_horaire_interne ?? ""}
+                                onChange={(e) => majLigne(i, "taux_horaire_interne", parseFloat(e.target.value) || 0)}
+                                className="border border-ligne rounded-lg px-2 py-1.5 text-sm"
+                              />
+                            </label>
+                          </div>
+                          <div className="text-xs text-neige/50 font-mono">
+                            Main d'œuvre : {formatMontant(totalMainOeuvre(l), devise)} · Prix suggéré (matériaux + main d'œuvre) : {formatMontant(l.prix_unitaire + totalMainOeuvre(l), devise)}
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => appliquerPrixSuggere(i)}
+                            className="text-xs text-rouille font-medium self-start"
+                          >
+                            Appliquer au Prix U.
+                          </button>
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}

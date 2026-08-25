@@ -40,6 +40,13 @@ export interface LigneDevis {
   prix_unitaire: number;
   /** Référence vers produits_etancheite.id — traçabilité uniquement, le prix reste figé sur la ligne. */
   produit_id?: string;
+  /**
+   * Calcul interne (temps × taux horaire) utilisé pour proposer prix_unitaire — jamais
+   * affiché sur le devis exporté ni sur la facture : ces vues ne lisent que designation/
+   * quantite/unite/prix_unitaire, jamais ces deux champs.
+   */
+  temps_estime_heures?: number;
+  taux_horaire_interne?: number;
 }
 
 export interface Devis {
