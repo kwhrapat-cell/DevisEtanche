@@ -23,3 +23,6 @@ export const dureesValidite = [
   { heures: 72, label: "72 heures" },
   { heures: 24 * 7, label: "7 jours" },
 ] as const;
+
+/** Valeur sélectionnée pour la 5e option "Durée personnalisée" du sélecteur de durée. */
+export const DUREE_PERSONNALISEE = "personnalisee";
