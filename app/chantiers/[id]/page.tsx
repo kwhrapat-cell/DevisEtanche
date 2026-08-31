@@ -24,6 +24,7 @@ export default async function ChantierDetailPage({ params }: { params: Promise<{
   const { data: photos } = await supabase.from("photos").select("*").eq("chantier_id", id).order("created_at", { ascending: false });
 
   const estAdministrateur = session?.profile?.role === "administrateur" && !session.profile.chantier_assigne_id;
+  const estDonneurOrdre = session?.profile?.role === "donneur_ordre";
   const { data: invitations } = estAdministrateur
     ? await supabase
         .from("invitations_soustraitance")
@@ -54,7 +55,7 @@ export default async function ChantierDetailPage({ params }: { params: Promise<{
             ) : (
               <div className="grid grid-cols-2 gap-3 mb-6">
                 {zones.map((z) => (
-                  <ZoneCard key={z.id} zone={z} />
+                  <ZoneCard key={z.id} zone={z} lectureSeule={estDonneurOrdre} />
                 ))}
           </div>
            )}
@@ -87,7 +88,7 @@ export default async function ChantierDetailPage({ params }: { params: Promise<{
           </div>
 
           <div className="lg:col-span-3">
-            <PhotosSection chantierId={chantier.id} photosInitiales={photos ?? []} />
+            <PhotosSection chantierId={chantier.id} photosInitiales={photos ?? []} lectureSeule={estDonneurOrdre} />
           </div>
         </div>
     </>

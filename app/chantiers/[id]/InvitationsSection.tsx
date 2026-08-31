@@ -3,13 +3,18 @@
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { genererCodeInvitation, labelRoleSousTraitance, dureesValidite } from "@/lib/invitations";
-import type { InvitationSoustraitance, RoleSousTraitance } from "@/lib/types";
+import type { InvitationSoustraitance, RoleSousTraitance, TypeEmetteurInvitation } from "@/lib/types";
 
 interface Props {
   chantierId: string;
   entrepriseId: string;
   chantierTermine: boolean;
   invitationsInitiales: InvitationSoustraitance[];
+  /**
+   * "entreprise" (défaut) : invitation d'un sous-traitant avec un rôle restreint à ce chantier.
+   * "donneur_ordre" : code rattachant une entreprise exécutante entière (rôle_autorise nul).
+   */
+  typeEmetteur?: TypeEmetteurInvitation;
 }
 
 function estActive(inv: InvitationSoustraitance): boolean {
@@ -23,7 +28,8 @@ function statutInvitation(inv: InvitationSoustraitance): { label: string; classe
   return { label: "Active", classe: "text-ambre" };
 }
 
-export default function InvitationsSection({ chantierId, entrepriseId, chantierTermine, invitationsInitiales }: Props) {
+export default function InvitationsSection({ chantierId, entrepriseId, chantierTermine, invitationsInitiales, typeEmetteur = "entreprise" }: Props) {
+  const estDonneurOrdre = typeEmetteur === "donneur_ordre";
   const [ouvert, setOuvert] = useState(false);
   const [role, setRole] = useState<RoleSousTraitance>("ouvrier");
   const [dureeHeures, setDureeHeures] = useState(48);
@@ -48,7 +54,8 @@ export default function InvitationsSection({ chantierId, entrepriseId, chantierT
           code: genererCodeInvitation(),
           chantier_id: chantierId,
           entreprise_id: entrepriseId,
-          role_autorise: role,
+          role_autorise: estDonneurOrdre ? null : role,
+          type_emetteur: typeEmetteur,
           date_expiration: dateExpiration,
         })
         .select()
@@ -91,14 +98,14 @@ export default function InvitationsSection({ chantierId, entrepriseId, chantierT
   return (
     <div className="card p-5">
       <div className="flex items-center justify-between mb-2">
-        <div className="font-medium text-neige">Sous-traitance</div>
+        <div className="font-medium text-neige">{estDonneurOrdre ? "Rattacher une entreprise" : "Sous-traitance"}</div>
         {!ouvert && (
           <button
             onClick={() => setOuvert(true)}
             disabled={chantierTermine}
             className="text-xs bg-rouille text-white font-semibold rounded-lg px-3 py-1.5 disabled:opacity-40"
           >
-            Inviter un sous-traitant
+            {estDonneurOrdre ? "Générer un code" : "Inviter un sous-traitant"}
           </button>
         )}
       </div>
@@ -109,18 +116,20 @@ export default function InvitationsSection({ chantierId, entrepriseId, chantierT
 
       {ouvert && !chantierTermine && (
         <form onSubmit={genererInvitation} className="flex flex-col gap-3 my-3 bg-sable/40 rounded-lg p-3">
-          <div>
-            <label className="text-xs font-mono text-neige/60 block mb-1">RÔLE AUTORISÉ</label>
-            <select
-              value={role}
-              onChange={(e) => setRole(e.target.value as RoleSousTraitance)}
-              className="w-full border border-ligne rounded-lg px-3 py-2 text-sm"
-            >
-              {Object.entries(labelRoleSousTraitance).map(([valeur, label]) => (
-                <option key={valeur} value={valeur}>{label}</option>
-              ))}
-            </select>
-          </div>
+          {!estDonneurOrdre && (
+            <div>
+              <label className="text-xs font-mono text-neige/60 block mb-1">RÔLE AUTORISÉ</label>
+              <select
+                value={role}
+                onChange={(e) => setRole(e.target.value as RoleSousTraitance)}
+                className="w-full border border-ligne rounded-lg px-3 py-2 text-sm"
+              >
+                {Object.entries(labelRoleSousTraitance).map(([valeur, label]) => (
+                  <option key={valeur} value={valeur}>{label}</option>
+                ))}
+              </select>
+            </div>
+          )}
           <div>
             <label className="text-xs font-mono text-neige/60 block mb-1">DURÉE DE VALIDITÉ</label>
             <select
@@ -159,7 +168,8 @@ export default function InvitationsSection({ chantierId, entrepriseId, chantierT
                     <span className={`text-xs ${statut.classe}`}>{statut.label}</span>
                   </div>
                   <div className="text-xs text-neige/45">
-                    {labelRoleSousTraitance[inv.role_autorise]} · expire le {new Date(inv.date_expiration).toLocaleString("fr-FR")}
+                    {inv.role_autorise ? labelRoleSousTraitance[inv.role_autorise] : "Rattachement entreprise complète"} · expire le{" "}
+                    {new Date(inv.date_expiration).toLocaleString("fr-FR")}
                   </div>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
