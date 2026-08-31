@@ -28,7 +28,7 @@ create table profiles (
   id uuid primary key references auth.users(id) on delete cascade,
   entreprise_id uuid references entreprises(id) on delete cascade,
   nom text not null,
-  role text not null check (role in ('ouvrier','chef_de_chantier','conducteur_de_travaux','administrateur','client')),
+  role text not null check (role in ('ouvrier','chef_de_chantier','conducteur_de_travaux','administrateur','client','donneur_ordre')),
   created_at timestamptz default now()
 );
 
@@ -56,6 +56,12 @@ create table chantiers (
   date_debut date,
   date_fin_prevue date,
   token_public uuid unique default uuid_generate_v4(),
+  -- Rattachement optionnel à un maître d'ouvrage (compte "donneur_ordre") qui
+  -- suit ce chantier en lecture seule. entreprise_id (ci-dessus) reste la
+  -- colonne "propriétaire" (entreprise exécutante) : elle est NULL tant
+  -- qu'aucune entreprise n'a rejoint un chantier créé par un donneur d'ordre
+  -- (voir rejoindre_chantier_via_code plus bas).
+  donneur_ordre_id uuid references profiles(id),
   created_at timestamptz default now()
 );
 
@@ -171,6 +177,23 @@ create policy "Lecture entreprise" on chantiers for select
 create policy "Ecriture entreprise" on chantiers for all
   using (entreprise_id = public.entreprise_id_courante() and public.chantier_assigne_courant() is null);
 
+-- Donneur d'ordre (maître d'ouvrage) : crée un chantier minimal (entreprise_id
+-- encore NULL — la policy "Ecriture entreprise" ci-dessus l'interdirait) et le
+-- suit ensuite en lecture seule, jamais en écriture. Isolation inter-
+-- entreprises garantie par construction : ces policies ne portent que sur
+-- donneur_ordre_id, jamais sur entreprise_id, donc n'accordent jamais l'accès
+-- à l'entreprise exécutante elle-même ni à une autre entreprise du même
+-- donneur d'ordre (voir "Lecture entreprise"/"Ecriture entreprise" ci-dessus,
+-- inchangées).
+create policy "Creation chantier donneur d'ordre" on chantiers for insert
+  with check (
+    donneur_ordre_id = auth.uid()
+    and entreprise_id is null
+    and exists (select 1 from profiles where id = auth.uid() and role = 'donneur_ordre')
+  );
+create policy "Lecture chantiers donneur d'ordre" on chantiers for select
+  using (donneur_ordre_id = auth.uid());
+
 -- clients : un sous-traitant restreint ne voit que le client du chantier qui lui
 -- est assigné (utile pour l'adresse/le contact chantier), jamais les autres.
 create policy "Lecture clients entreprise" on clients for select
@@ -214,6 +237,16 @@ create policy "Photos via chantier" on photos for all
     )
   );
 
+-- Donneur d'ordre : lecture seule des zones/photos de son propre portefeuille.
+-- Policies "for select" additives (OR'd avec les policies "for all"
+-- ci-dessus, seules à autoriser l'écriture) — jamais de policy équivalente
+-- sur devis/factures, qui restent hors de portée du donneur d'ordre.
+create policy "Lecture zones donneur d'ordre" on zones for select
+  using (chantier_id in (select id from chantiers where donneur_ordre_id = auth.uid()));
+
+create policy "Lecture photos donneur d'ordre" on photos for select
+  using (chantier_id in (select id from chantiers where donneur_ordre_id = auth.uid()));
+
 create policy "Profil propre" on profiles for select using (id = auth.uid());
 create policy "Lecture equipe entreprise" on profiles for select
   using (entreprise_id = public.entreprise_id_courante());
@@ -233,7 +266,15 @@ create policy "Creation entreprise a l'inscription" on entreprises for insert wi
 -- que propriétaire de la fonction (security definer). Nécessaire car juste
 -- après l'insertion de l'entreprise, aucun profil ne la relie encore à
 -- auth.uid() : la relire via la policy "Lecture entreprise membres" échouerait.
-create or replace function public.creer_entreprise_et_profil(p_nom_entreprise text, p_nom_utilisateur text)
+-- p_role accepte 'administrateur' (entreprise exécutante, cas par défaut) ou
+-- 'donneur_ordre' (maître d'ouvrage — portefeuille en lecture + codes,
+-- jamais de devis) : les deux réutilisent la même entreprise "conteneur" et
+-- la même transaction, seul le rôle stocké sur le profil diffère.
+create or replace function public.creer_entreprise_et_profil(
+  p_nom_entreprise text,
+  p_nom_utilisateur text,
+  p_role text default 'administrateur'
+)
 returns entreprises
 language plpgsql
 security definer
@@ -246,6 +287,10 @@ begin
     raise exception 'Utilisateur non authentifié.';
   end if;
 
+  if p_role not in ('administrateur', 'donneur_ordre') then
+    raise exception 'Rôle invalide.';
+  end if;
+
   if exists (select 1 from profiles where id = auth.uid()) then
     raise exception 'Un profil existe déjà pour cet utilisateur.';
   end if;
@@ -254,13 +299,13 @@ begin
   returning * into v_entreprise;
 
   insert into profiles (id, entreprise_id, nom, role)
-  values (auth.uid(), v_entreprise.id, p_nom_utilisateur, 'administrateur');
+  values (auth.uid(), v_entreprise.id, p_nom_utilisateur, p_role);
 
   return v_entreprise;
 end;
 $$;
 
-grant execute on function public.creer_entreprise_et_profil(text, text) to authenticated;
+grant execute on function public.creer_entreprise_et_profil(text, text, text) to authenticated;
 
 -- Espace client public : fonction sécurisée exposant uniquement les champs
 -- nécessaires, appelée via un lien contenant le token (aucune authentification
@@ -303,7 +348,13 @@ create table invitations_soustraitance (
   code text not null unique,
   chantier_id uuid not null references chantiers(id) on delete cascade,
   entreprise_id uuid not null references entreprises(id) on delete cascade,
-  role_autorise text not null check (role_autorise in ('ouvrier','chef_de_chantier','conducteur_de_travaux')) default 'ouvrier',
+  -- Uniquement pour type_emetteur = 'entreprise' (accès restreint à un rôle) :
+  -- un code émis par un donneur d'ordre rattache l'entreprise entière avec un
+  -- accès complet, donc n'a pas de rôle associé (null).
+  role_autorise text check (role_autorise is null or role_autorise in ('ouvrier','chef_de_chantier','conducteur_de_travaux')) default 'ouvrier',
+  -- 'entreprise' (cas existant, compte Administrateur -> sous-traitant) ou
+  -- 'donneur_ordre' (maître d'ouvrage -> entreprise exécutante existante).
+  type_emetteur text not null check (type_emetteur in ('entreprise', 'donneur_ordre')) default 'entreprise',
   date_expiration timestamptz not null,
   utilise boolean not null default false,
   -- Annulation manuelle par l'entreprise (bouton "Annuler l'invitation"), distincte
@@ -323,19 +374,33 @@ create policy "Creation invitation administrateur" on invitations_soustraitance 
     and exists (select 1 from profiles where id = auth.uid() and role = 'administrateur')
   );
 
--- Lecture/révocation de la liste des codes : réservée aux administrateurs de
--- l'entreprise (pas de listing possible pour un sous-traitant, qui ne peut
--- valider un code que via la fonction invitation_par_code ci-dessous).
+-- Création : un donneur d'ordre peut émettre un code pour un chantier de son
+-- propre portefeuille (jamais pour celui d'un autre donneur d'ordre).
+-- entreprise_id porte alors l'entreprise du donneur d'ordre lui-même (qui
+-- émet le code), pas celle qui l'utilisera ensuite.
+create policy "Creation invitation donneur d'ordre" on invitations_soustraitance for insert
+  with check (
+    type_emetteur = 'donneur_ordre'
+    and role_autorise is null
+    and entreprise_id = public.entreprise_id_courante()
+    and chantier_id in (select id from chantiers where donneur_ordre_id = auth.uid())
+    and exists (select 1 from profiles where id = auth.uid() and role = 'donneur_ordre')
+  );
+
+-- Lecture/révocation de la liste des codes : réservée aux administrateurs et
+-- donneurs d'ordre, chacun sur les codes de sa propre entreprise/portefeuille
+-- (pas de listing possible pour un sous-traitant, qui ne peut valider un code
+-- que via la fonction invitation_par_code ci-dessous).
 create policy "Lecture invitations entreprise" on invitations_soustraitance for select
   using (
     entreprise_id = public.entreprise_id_courante()
-    and exists (select 1 from profiles where id = auth.uid() and role = 'administrateur')
+    and exists (select 1 from profiles where id = auth.uid() and role in ('administrateur', 'donneur_ordre'))
   );
 
 create policy "Revocation invitation administrateur" on invitations_soustraitance for update
   using (
     entreprise_id = public.entreprise_id_courante()
-    and exists (select 1 from profiles where id = auth.uid() and role = 'administrateur')
+    and exists (select 1 from profiles where id = auth.uid() and role in ('administrateur', 'donneur_ordre'))
   )
   with check (entreprise_id = public.entreprise_id_courante());
 
@@ -376,6 +441,12 @@ grant execute on function public.invitation_par_code(text) to authenticated;
 -- de double soumission. Un chantier passé au statut "termine" invalide le code
 -- même s'il n'est pas expiré : la vérification se fait ici au moment de l'usage
 -- plutôt que via un déclencheur, pour toujours refléter le statut réel du chantier.
+-- Généralise rejoindre_chantier_via_code() : un code émis par un donneur
+-- d'ordre est validé par un compte administrateur DÉJÀ EXISTANT (à
+-- l'inverse du cas sous-traitant, où le compte est justement créé à la
+-- volée par cette même fonction) et transfère la propriété du chantier
+-- (entreprise_id) à son entreprise, sans jamais toucher à donneur_ordre_id
+-- ni à l'historique du chantier (zones, photos, statut, token_public).
 create or replace function public.rejoindre_chantier_via_code(p_code text, p_nom text)
 returns json
 language plpgsql
@@ -385,13 +456,10 @@ as $$
 declare
   v_invitation invitations_soustraitance;
   v_chantier chantiers;
+  v_profil_existant profiles;
 begin
   if auth.uid() is null then
     raise exception 'Utilisateur non authentifié.';
-  end if;
-
-  if exists (select 1 from profiles where id = auth.uid()) then
-    raise exception 'Un profil existe déjà pour ce compte.';
   end if;
 
   select * into v_invitation from invitations_soustraitance
@@ -417,6 +485,31 @@ begin
 
   if v_chantier.statut = 'termine' then
     raise exception 'Ce chantier est terminé, le code n''est plus valide.';
+  end if;
+
+  select * into v_profil_existant from profiles where id = auth.uid();
+
+  if v_invitation.type_emetteur = 'donneur_ordre' then
+    if v_profil_existant is null then
+      raise exception 'Connectez-vous avec le compte administrateur de votre entreprise avant de saisir ce code.';
+    end if;
+    if v_profil_existant.role <> 'administrateur' then
+      raise exception 'Seul un compte administrateur peut rattacher son entreprise à ce chantier.';
+    end if;
+    if v_chantier.entreprise_id is not null then
+      raise exception 'Ce chantier a déjà une entreprise exécutante rattachée.';
+    end if;
+
+    update chantiers set entreprise_id = v_profil_existant.entreprise_id where id = v_chantier.id;
+    update invitations_soustraitance set utilise = true where id = v_invitation.id;
+
+    return json_build_object('chantier_id', v_chantier.id, 'chantier_nom', v_chantier.nom);
+  end if;
+
+  -- Cas existant : sous-traitance, compte créé à la volée avec accès
+  -- restreint à ce seul chantier.
+  if v_profil_existant is not null then
+    raise exception 'Un profil existe déjà pour ce compte.';
   end if;
 
   insert into profiles (id, entreprise_id, nom, role, chantier_assigne_id)

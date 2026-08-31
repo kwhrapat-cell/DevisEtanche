@@ -8,7 +8,7 @@ import IllustrationArchitecture from "@/components/IllustrationArchitecture";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-type Etape = "verification" | "deja_associe" | "compte" | "code";
+type Etape = "verification" | "deja_associe" | "code_administrateur" | "compte" | "code";
 
 function EnTete() {
   return (
@@ -49,8 +49,20 @@ export default function RejoindreChantierPage() {
         setEtape("compte");
         return;
       }
-      const { data: profile } = await supabase.from("profiles").select("id").eq("id", userData.user.id).single();
-      setEtape(profile ? "deja_associe" : "code");
+      const { data: profile } = await supabase.from("profiles").select("id, nom, role").eq("id", userData.user.id).single();
+      if (!profile) {
+        setEtape("code");
+        return;
+      }
+      // Un compte administrateur déjà existant peut saisir un code émis par un
+      // donneur d'ordre pour rattacher son entreprise à un nouveau chantier —
+      // seul ce cas garde la saisie de code ouverte après création du compte.
+      if (profile.role === "administrateur") {
+        setNom(profile.nom);
+        setEtape("code_administrateur");
+        return;
+      }
+      setEtape("deja_associe");
     })();
   }, []);
 
@@ -132,6 +144,40 @@ export default function RejoindreChantierPage() {
             Retour au tableau de bord
           </Link>
         </div>
+      </div>
+    );
+  }
+
+  if (etape === "code_administrateur") {
+    return (
+      <div className="relative min-h-screen overflow-hidden flex items-center justify-center bg-papier px-4">
+        <IllustrationArchitecture />
+        <form onSubmit={rejoindre} className="relative card w-full max-w-sm p-8">
+          <EnTete />
+          <p className="text-sm text-neige/50 mb-6">Rattacher votre entreprise à un chantier</p>
+
+          {erreur && <div className="text-sm text-[#FF8A80] bg-[#3B1418] rounded-lg px-3 py-2 mb-4">{erreur}</div>}
+
+          <p className="text-sm text-neige/70 mb-4">
+            Saisissez le code fourni par le donneur d&apos;ordre pour rattacher votre entreprise à son chantier.
+          </p>
+
+          <label className="text-xs font-mono text-neige/60 block mb-1">CODE D'INVITATION</label>
+          <input
+            required
+            value={code}
+            onChange={(e) => setCode(e.target.value.toUpperCase())}
+            maxLength={8}
+            className="w-full border border-ligne rounded-lg px-3 py-2 mb-6 font-mono tracking-widest uppercase"
+          />
+
+          <button type="submit" disabled={chargement} className="w-full bg-rouille text-white font-semibold rounded-lg py-2.5 disabled:opacity-60">
+            {chargement ? "Validation…" : "Rattacher le chantier"}
+          </button>
+          <Link href="/dashboard" className="inline-block w-full text-center mt-4 text-neige/50 text-sm">
+            Retour au tableau de bord
+          </Link>
+        </form>
       </div>
     );
   }

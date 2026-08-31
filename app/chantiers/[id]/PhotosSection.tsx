@@ -7,7 +7,7 @@ import { queueAction, tenterVidage } from "@/lib/offline/queue";
 
 interface Photo { id: string; url: string; legende: string | null; }
 
-export default function PhotosSection({ chantierId, photosInitiales }: { chantierId: string; photosInitiales: Photo[] }) {
+export default function PhotosSection({ chantierId, photosInitiales, lectureSeule = false }: { chantierId: string; photosInitiales: Photo[]; lectureSeule?: boolean }) {
   const [photos, setPhotos] = useState(photosInitiales);
   const [envoi, setEnvoi] = useState(false);
   const [erreur, setErreur] = useState<string | null>(null);
@@ -58,10 +58,12 @@ export default function PhotosSection({ chantierId, photosInitiales }: { chantie
     <div className="card p-6 mt-6">
       <div className="flex items-center justify-between mb-4">
         <h2 className="font-display font-semibold text-neige">Photos</h2>
-        <label className="text-sm text-rouille font-medium cursor-pointer">
-          {envoi ? "Envoi…" : "+ Ajouter une photo"}
-          <input type="file" accept="image/*" capture="environment" onChange={surSelection} className="hidden" disabled={envoi} />
-        </label>
+        {!lectureSeule && (
+          <label className="text-sm text-rouille font-medium cursor-pointer">
+            {envoi ? "Envoi…" : "+ Ajouter une photo"}
+            <input type="file" accept="image/*" capture="environment" onChange={surSelection} className="hidden" disabled={envoi} />
+          </label>
+        )}
       </div>
       {erreur && <div className="text-sm text-[#FF8A80] bg-[#3B1418] rounded-lg px-3 py-2 mb-3">{erreur}</div>}
       {photos.length === 0 ? (

@@ -10,6 +10,7 @@ const labelRole: Record<string, string> = {
   conducteur_de_travaux: "Conducteur de travaux",
   administrateur: "Administrateur",
   client: "Client",
+  donneur_ordre: "Donneur d'ordre",
 };
 
 export default function TopBar({ titre, sousTitre }: { titre: string; sousTitre?: string }) {

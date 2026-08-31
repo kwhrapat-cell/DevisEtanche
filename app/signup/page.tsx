@@ -46,8 +46,11 @@ function IconeOeil({ visible }: { visible: boolean }) {
   );
 }
 
+type RoleCompte = "administrateur" | "donneur_ordre";
+
 export default function SignupPage() {
   const [nom, setNom] = useState("");
+  const [role, setRole] = useState<RoleCompte>("administrateur");
   const [entreprise, setEntreprise] = useState("");
   const [email, setEmail] = useState("");
   const [motDePasse, setMotDePasse] = useState("");
@@ -95,6 +98,7 @@ export default function SignupPage() {
     const { error: rpcError } = await supabase.rpc("creer_entreprise_et_profil", {
       p_nom_entreprise: entreprise,
       p_nom_utilisateur: nom,
+      p_role: role,
     });
 
     setChargement(false);
@@ -137,7 +141,31 @@ export default function SignupPage() {
           {nom.length > 0 && <span className="absolute right-3 top-1/2 -translate-y-1/2"><Coche ok={nomValide} /></span>}
         </div>
 
-        <label className="text-xs font-mono text-neige/60 block mb-1">NOM DE L'ENTREPRISE</label>
+        <label className="text-xs font-mono text-neige/60 block mb-1">TYPE DE COMPTE</label>
+        <div className="flex gap-2 mb-4">
+          <button
+            type="button"
+            onClick={() => setRole("administrateur")}
+            className={`flex-1 rounded-lg border px-3 py-2 text-sm text-left ${
+              role === "administrateur" ? "border-rouille bg-rouille/10 text-neige" : "border-ligne text-neige/60"
+            }`}
+          >
+            Entreprise exécutante
+          </button>
+          <button
+            type="button"
+            onClick={() => setRole("donneur_ordre")}
+            className={`flex-1 rounded-lg border px-3 py-2 text-sm text-left ${
+              role === "donneur_ordre" ? "border-rouille bg-rouille/10 text-neige" : "border-ligne text-neige/60"
+            }`}
+          >
+            Donneur d'ordre
+          </button>
+        </div>
+
+        <label className="text-xs font-mono text-neige/60 block mb-1">
+          {role === "donneur_ordre" ? "NOM DE VOTRE STRUCTURE" : "NOM DE L'ENTREPRISE"}
+        </label>
         <div className="relative mb-4">
           <input required value={entreprise} onChange={(e) => setEntreprise(e.target.value)} className="w-full border border-ligne rounded-lg px-3 py-2 pr-9" />
           {entreprise.length > 0 && <span className="absolute right-3 top-1/2 -translate-y-1/2"><Coche ok={entrepriseValide} /></span>}

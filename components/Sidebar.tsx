@@ -16,30 +16,44 @@ const links = [
   { href: "/calculateur", label: "Calculateur", icon: "∑" },
   { href: "/catalogue", label: "Catalogue", icon: "▥" },
   { href: "/parametres", label: "Paramètres", icon: "⚙" },
+  { href: "/portefeuille", label: "Portefeuille", icon: "◫" },
 ];
 
 // Un sous-traitant restreint (chantier_assigne_id renseigné) n'a pas accès aux
 // devis/factures (marges), aux clients, ni aux paramètres de l'entreprise —
 // voir les policies RLS dans supabase/schema.sql. On masque ces liens plutôt
 // que de laisser des pages vides/confuses.
-const LIENS_MASQUES_SOUSTRAITANT = ["/devis", "/factures", "/clients", "/parametres"];
+const LIENS_MASQUES_SOUSTRAITANT = ["/devis", "/factures", "/clients", "/parametres", "/portefeuille"];
+
+// Un donneur d'ordre suit son portefeuille de chantiers en lecture seule : il
+// n'a ni devis/factures/marges, ni catalogue produits, ni tableau de bord
+// entreprise (ceux-ci nécessitent entreprise_id_courante() sur SA propre
+// entreprise "donneur d'ordre", jamais sur celle des entreprises exécutantes
+// qu'il suit) — voir les policies RLS dans supabase/migration-donneur-ordre.sql.
+const LIENS_MASQUES_DONNEUR_ORDRE = ["/dashboard", "/chantiers", "/devis", "/factures", "/clients", "/calculateur", "/catalogue"];
 
 export default function Sidebar() {
   const pathname = usePathname();
   const { ouvert, setOuvert } = useSidebar();
   const [restreint, setRestreint] = useState(false);
+  const [estDonneurOrdre, setEstDonneurOrdre] = useState(false);
 
   useEffect(() => {
     const supabase = createClient();
     (async () => {
       const { data: userData } = await supabase.auth.getUser();
       if (!userData.user) return;
-      const { data } = await supabase.from("profiles").select("chantier_assigne_id").eq("id", userData.user.id).single();
+      const { data } = await supabase.from("profiles").select("chantier_assigne_id, role").eq("id", userData.user.id).single();
       setRestreint(!!data?.chantier_assigne_id);
+      setEstDonneurOrdre(data?.role === "donneur_ordre");
     })();
   }, []);
 
-  const liensVisibles = restreint ? links.filter((l) => !LIENS_MASQUES_SOUSTRAITANT.includes(l.href)) : links;
+  const liensVisibles = estDonneurOrdre
+    ? links.filter((l) => !LIENS_MASQUES_DONNEUR_ORDRE.includes(l.href))
+    : restreint
+    ? links.filter((l) => !LIENS_MASQUES_SOUSTRAITANT.includes(l.href))
+    : links.filter((l) => l.href !== "/portefeuille");
 
   return (
     <>

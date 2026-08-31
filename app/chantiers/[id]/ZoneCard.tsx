@@ -21,12 +21,13 @@ const labelStatut: Record<string, string> = {
 
 const ordreStatuts = ["en_attente", "en_cours", "termine", "probleme"];
 
-export default function ZoneCard({ zone }: {zone: any }) {
+export default function ZoneCard({ zone, lectureSeule = false }: { zone: any; lectureSeule?: boolean }) {
   const [ouvert, setOuvert] =useState(false);
   const [statut, setStatut] =useState(zone.statut);
   const router = useRouter();
 
   async function changerStatut(nouveau: string) {
+    if (lectureSeule) return;
     setOuvert(false);
 
     if (!navigator.onLine) {
@@ -43,7 +44,7 @@ export default function ZoneCard({ zone }: {zone: any }) {
   return (
     <div className="relative">
       <button
-      onClick={() => setOuvert(!ouvert)}
+      onClick={() => !lectureSeule && setOuvert(!ouvert)}
       className={`rounded-x1 p-4 text-white flex flex-col justify-end h-32 w-full text-left ${couleurStatut[statut]}`}
     >
       <div className="font-medium text-sm">{zone.nom}</div>
@@ -52,7 +53,7 @@ export default function ZoneCard({ zone }: {zone: any }) {
      </div>
    </button>
 
-   {ouvert && (
+   {ouvert && !lectureSeule && (
     <div className="absolute z-10 top-full left-0 mt-1 w-full bg-[#0D1526] rounded-lg shadow-lg border border-ligne overflow-hidden">
     {ordreStatuts.map((s) => (
       <button

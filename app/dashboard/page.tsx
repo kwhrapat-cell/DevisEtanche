@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import TopBar from "@/components/TopBar";
 import StatCard from "@/components/StatCard";
 import { getUtilisateurCourant } from "@/lib/supabase/auth";
@@ -25,6 +26,13 @@ function tempsEcoule(iso: string): string {
 
 export default async function DashboardPage() {
   const session = await getUtilisateurCourant();
+
+  // Le tableau de bord entreprise (devis/factures/marges) n'a pas de sens pour
+  // un donneur d'ordre, qui suit son propre portefeuille de chantiers.
+  if (session?.profile?.role === "donneur_ordre") {
+    redirect("/portefeuille");
+  }
+
   const supabase = await createClient();
   const entrepriseId = session?.profile?.entreprise_id;
 

@@ -31,6 +31,8 @@ export interface Chantier {
   date_debut: string;
   date_fin_prevue?: string;
   zones?: Zone[];
+  /** Non nul pour un chantier créé par un donneur d'ordre — la propriété passe à entreprise_id une fois une entreprise rattachée. */
+  donneur_ordre_id?: string | null;
 }
 
 export interface LigneDevis {
@@ -112,7 +114,7 @@ export interface ProduitEtancheite {
 export interface Profile {
   id: string;
   nom: string;
-  role: "ouvrier" | "chef_de_chantier" | "conducteur_de_travaux" | "administrateur" | "client";
+  role: "ouvrier" | "chef_de_chantier" | "conducteur_de_travaux" | "administrateur" | "client" | "donneur_ordre";
   entreprise_id: string;
   /** Non nul pour un sous-traitant ayant rejoint via un code d'invitation : restreint son accès à ce chantier. */
   chantier_assigne_id?: string | null;
@@ -120,12 +122,16 @@ export interface Profile {
 
 export type RoleSousTraitance = "ouvrier" | "chef_de_chantier" | "conducteur_de_travaux";
 
+export type TypeEmetteurInvitation = "entreprise" | "donneur_ordre";
+
 export interface InvitationSoustraitance {
   id: string;
   code: string;
   chantier_id: string;
   entreprise_id: string;
-  role_autorise: RoleSousTraitance;
+  /** Nul lorsque type_emetteur = "donneur_ordre" : le code rattache une entreprise entière, pas un rôle individuel. */
+  role_autorise: RoleSousTraitance | null;
+  type_emetteur: TypeEmetteurInvitation;
   date_expiration: string;
   utilise: boolean;
   revoquee: boolean;
