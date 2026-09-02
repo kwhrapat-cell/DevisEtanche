@@ -1,6 +1,7 @@
 import TopBar from "@/components/TopBar";
 import { getUtilisateurCourant } from "@/lib/supabase/auth";
 import { createClient } from "@/lib/supabase/server";
+import { COMPANY_INFO } from "@/lib/company-info";
 import ForfaitCard from "./ForfaitCard";
 import MarcheForm from "./MarcheForm";
 import CoordonneesForm from "./CoordonneesForm";
@@ -36,6 +37,9 @@ export default async function ParametresPage() {
                 telephone={entreprise.telephone}
                 email={entreprise.email}
                 numeroIdentification={entreprise.numero_identification}
+                formeJuridique={entreprise.forme_juridique}
+                conditionsReglement={entreprise.conditions_reglement}
+                validiteDevisJours={entreprise.validite_devis_jours ?? 30}
               />
               <MarcheForm
                 entrepriseId={entrepriseId}
@@ -75,6 +79,26 @@ export default async function ParametresPage() {
           <div className="card p-5">
             <div className="font-medium text-neige mb-1">Mode hors ligne</div>
             <p className="text-sm text-neige/50">Actif — vos modifications se synchronisent automatiquement au retour du réseau.</p>
+          </div>
+
+          <div className="card p-5 lg:col-span-2">
+            <div className="font-medium text-neige mb-1">Confidentialité et données</div>
+            <p className="text-sm text-neige/50 mb-3">
+              Vous pouvez consulter notre{" "}
+              <a href="/confidentialite" className="text-rouille">politique de confidentialité</a> à tout moment.
+              Pour demander la suppression de votre compte et de l'ensemble des données associées (entreprise,
+              chantiers, devis, clients, photos), envoyez une demande à{" "}
+              <a href={`mailto:${COMPANY_INFO.email}?subject=Suppression%20de%20compte`} className="text-rouille">
+                {COMPANY_INFO.email}
+              </a>{" "}
+              depuis l'adresse e-mail de votre compte. La suppression est effectuée manuellement sous 30 jours.
+            </p>
+            <a
+              href={`mailto:${COMPANY_INFO.email}?subject=Suppression%20de%20compte`}
+              className="inline-block text-sm bg-[#3B1418] text-[#FF8A80] font-medium rounded-lg px-4 py-2"
+            >
+              Demander la suppression de mon compte
+            </a>
           </div>
         </div>
     </>

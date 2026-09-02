@@ -87,6 +87,9 @@ export interface Entreprise {
   telephone?: string | null;
   email?: string | null;
   numero_identification?: string | null;
+  forme_juridique?: string | null;
+  conditions_reglement?: string | null;
+  validite_devis_jours?: number;
 }
 
 export interface ProduitEtancheite {

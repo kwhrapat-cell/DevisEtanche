@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import IllustrationArchitecture from "@/components/IllustrationArchitecture";
+import Footer from "@/components/Footer";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -54,6 +55,7 @@ export default function SignupPage() {
   const [motDePasseVisible, setMotDePasseVisible] = useState(false);
   const [erreur, setErreur] = useState<string | null>(null);
   const [chargement, setChargement] = useState(false);
+  const [cguAcceptees, setCguAcceptees] = useState(false);
   const router = useRouter();
 
   const nomValide = nom.trim().length > 1;
@@ -65,11 +67,15 @@ export default function SignupPage() {
   const labelForce = score <= 1 ? "Mot de passe faible" : score <= 2 ? "Mot de passe moyen" : score === 3 ? "Mot de passe bon" : "Mot de passe fort";
   const couleurForce = score <= 1 ? "#FF8A80" : score <= 2 ? "#FBBF24" : "#6EE7A0";
 
-  const formulaireValide = nomValide && entrepriseValide && emailValide && mdpValide;
+  const formulaireValide = nomValide && entrepriseValide && emailValide && mdpValide && cguAcceptees;
   const aCommence = nom.length > 0 || entreprise.length > 0 || email.length > 0 || motDePasse.length > 0;
 
   async function creerCompte(e: React.FormEvent) {
     e.preventDefault();
+    if (!cguAcceptees) {
+      setErreur("Vous devez accepter la politique de confidentialité et les CGV pour créer un compte.");
+      return;
+    }
     setErreur(null);
     setChargement(true);
     const supabase = createClient();
@@ -108,7 +114,7 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="relative min-h-screen overflow-hidden flex items-center justify-center bg-papier px-4 py-10">
+    <div className="relative min-h-screen overflow-hidden flex flex-col items-center justify-center bg-papier px-4 py-10">
       <IllustrationArchitecture />
       <form onSubmit={creerCompte} className="relative card w-full max-w-sm p-8">
         <div className="flex items-center gap-2 font-display font-semibold text-lg text-neige mb-1">
@@ -196,7 +202,23 @@ export default function SignupPage() {
           </ul>
         </div>
 
-        <button type="submit" disabled={chargement} className="w-full bg-rouille text-white font-semibold rounded-lg py-2.5 disabled:opacity-60">
+        <label className="flex items-start gap-2 mb-6 text-xs text-neige/60">
+          <input
+            type="checkbox"
+            required
+            checked={cguAcceptees}
+            onChange={(e) => setCguAcceptees(e.target.checked)}
+            className="mt-0.5"
+          />
+          <span>
+            J'accepte la{" "}
+            <Link href="/confidentialite" target="_blank" className="text-rouille font-medium">politique de confidentialité</Link>{" "}
+            et les{" "}
+            <Link href="/cgv" target="_blank" className="text-rouille font-medium">CGV</Link>
+          </span>
+        </label>
+
+        <button type="submit" disabled={chargement || !cguAcceptees} className="w-full bg-rouille text-white font-semibold rounded-lg py-2.5 disabled:opacity-60">
           {chargement ? "Création…" : "Créer mon compte"}
         </button>
         <p className="text-xs text-neige/50 text-center mt-5">
@@ -207,6 +229,7 @@ export default function SignupPage() {
           <Link href="/rejoindre-chantier" className="text-rouille font-medium">Rejoindre un chantier avec un code</Link>
         </p>
       </form>
+      <Footer />
     </div>
   );
 }

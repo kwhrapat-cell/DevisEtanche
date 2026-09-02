@@ -19,6 +19,11 @@ create table entreprises (
   telephone text,
   email text,
   numero_identification text,
+  -- Mentions obligatoires sur les devis/factures exportés (forme juridique du
+  -- prestataire, conditions de règlement, durée de validité du devis en jours).
+  forme_juridique text,
+  conditions_reglement text,
+  validite_devis_jours integer not null default 30,
   stripe_customer_id text,
   stripe_subscription_id text,
   created_at timestamptz default now()
