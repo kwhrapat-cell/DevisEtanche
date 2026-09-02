@@ -8,7 +8,7 @@ export const COMPANY_INFO = {
   // TODO: remplacer par le numéro définitif une fois l'immatriculation RIDET finalisée
   // (démarche en cours sur guichet-entreprises.nc).
   ridet: "en cours d'attribution",
-  adresse: "Nouvelle-Calédonie",
+  adresse: "Lot 73, Groupe d'habitation Julisa, 98889 Païta, Nouvelle-Calédonie (BP 622, 98889 Païta)",
   email: "contact@devisetanche.nc",
   siteUrl: "https://devisetanche.nc",
   hebergeurApplication: "Vercel Inc., 440 N Barranca Ave #4133, Covina, CA 91723, États-Unis",
