@@ -11,7 +11,7 @@ export default async function DevisDetailPage({ params }: { params: Promise<{ id
   const { data: devis } = await supabase
     .from("devis")
     .select(
-      "*, chantiers(nom, ville), clients(nom, ville, email, telephone), entreprises(nom, adresse, telephone, email, numero_identification, devise, libelle_taxe)"
+      "*, chantiers(nom, ville), clients(nom, ville, email, telephone), entreprises(nom, adresse, telephone, email, numero_identification, devise, libelle_taxe, forme_juridique, conditions_reglement, validite_devis_jours)"
     )
     .eq("id", id)
     .single();
@@ -26,6 +26,10 @@ export default async function DevisDetailPage({ params }: { params: Promise<{ id
   const devise = devis.entreprises?.devise ?? "XPF";
   const libelleTaxe = devis.entreprises?.libelle_taxe ?? "TGC";
   const entrepriseNom = devis.entreprises?.nom ?? "—";
+  const formeJuridique = devis.entreprises?.forme_juridique;
+  const conditionsReglement = devis.entreprises?.conditions_reglement;
+  const validiteJours = devis.entreprises?.validite_devis_jours ?? 30;
+  const dateEmission = devis.created_at ? new Date(devis.created_at).toLocaleDateString("fr-FR") : null;
 
   return (
     <div className="max-w-3xl mx-auto py-10 px-6">
@@ -47,7 +51,10 @@ export default async function DevisDetailPage({ params }: { params: Promise<{ id
 
       <div className="flex justify-between items-start mb-10">
         <div>
-          <div className="font-display font-semibold text-xl text-neige mb-1">{entrepriseNom}</div>
+          <div className="font-display font-semibold text-xl text-neige mb-1">
+            {entrepriseNom}
+            {formeJuridique && <span className="text-neige/50 font-normal"> — {formeJuridique}</span>}
+          </div>
           {devis.entreprises?.adresse && <div className="text-xs text-neige/50">{devis.entreprises.adresse}</div>}
           <div className="text-xs text-neige/50">
             {[devis.entreprises?.telephone, devis.entreprises?.email].filter(Boolean).join(" · ")}
@@ -56,6 +63,8 @@ export default async function DevisDetailPage({ params }: { params: Promise<{ id
             <div className="text-xs text-neige/50">{devis.entreprises.numero_identification}</div>
           )}
           <div className="text-xs text-neige/50 mt-2">Devis n° {devis.numero}</div>
+          {dateEmission && <div className="text-xs text-neige/50">Émis le {dateEmission}</div>}
+          <div className="text-xs text-neige/50">Devis valable {validiteJours} jours à compter de sa date d'émission</div>
         </div>
         <div className="text-right text-sm">
           <div className="font-medium text-neige">{devis.clients?.nom ?? "Client à définir"}</div>
@@ -100,6 +109,13 @@ export default async function DevisDetailPage({ params }: { params: Promise<{ id
           <div className="flex justify-between py-2 border-t border-ardoise mt-1 font-semibold text-neige"><span>Total TTC</span><span className="font-mono">{formatMontant(Number(devis.total_ttc), devise)}</span></div>
         </div>
       </div>
+
+      {conditionsReglement && (
+        <div className="mt-10 pt-4 border-t border-ligne text-xs text-neige/50">
+          <span className="font-medium text-neige/70">Conditions de règlement — </span>
+          {conditionsReglement}
+        </div>
+      )}
     </div>
   );
 }

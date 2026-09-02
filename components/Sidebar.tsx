@@ -93,9 +93,18 @@ export default function Sidebar() {
             })}
           </nav>
         </div>
-        <div className="px-6 py-6 text-xs text-white/40 border-t border-white/10 flex items-center justify-between">
-          <span>MVP · module par module</span>
-          <BoutonDeconnexion />
+        <div className="px-6 py-6 text-xs text-white/40 border-t border-white/10 flex flex-col gap-3">
+          <div className="flex items-center justify-between">
+            <span>MVP · module par module</span>
+            <BoutonDeconnexion />
+          </div>
+          <div className="flex items-center gap-2 flex-wrap">
+            <Link href="/mentions-legales" className="hover:text-white/70">Mentions légales</Link>
+            <span>·</span>
+            <Link href="/cgv" className="hover:text-white/70">CGV</Link>
+            <span>·</span>
+            <Link href="/confidentialite" className="hover:text-white/70">Confidentialité</Link>
+          </div>
         </div>
       </aside>
     </>
