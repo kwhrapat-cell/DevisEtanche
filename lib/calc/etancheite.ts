@@ -109,3 +109,44 @@ export function calculerEtancheite(input: CalculInput): CalculResult {
     detailsSysteme: { nom: sys.nom, reference: sys.reference, pertes: sys.pertes },
   };
 }
+
+export interface RecouvrementResineResult {
+  surface_m2: number;
+  quantite_kg: number;
+}
+
+/**
+ * Recouvrement résine liquide d'un plot (climatiseur, panneau solaire...) : quantité de
+ * résine pour traiter le relevé périphérique du plot. ratio_kg_m2 vient du catalogue produit
+ * (consommation_min/consommation_max de produits_etancheite, ex. Alsan Flashing, Sikalastic
+ * M 640) — voir lib/produits-aide.ts#calculerConsommationLiquide — donc aucune valeur par
+ * défaut ici : le catalogue ne fournit qu'une plage par produit, pas un ratio fixe universel.
+ */
+export function calculerRecouvrementResine(
+  longueur_cm: number,
+  largeur_cm: number,
+  hauteur_releve_cm: number | undefined,
+  ratio_kg_m2: number
+): RecouvrementResineResult {
+  const hauteur = hauteur_releve_cm ?? 15;
+  const perimetre = 2 * (longueur_cm + largeur_cm);
+  const surface_m2 = (perimetre * hauteur) / 10000;
+  const quantite_kg = surface_m2 * ratio_kg_m2;
+  return { surface_m2, quantite_kg };
+}
+
+export interface RecouvrementAluResult {
+  longueur_necessaire_ml: number;
+}
+
+/** Recouvrement alu (bavette/profilé) d'un plot : longueur de rouleau alu nécessaire pour
+ *  couvrir le périmètre du plot, avec une marge de chevauchement aux jonctions. */
+export function calculerRecouvrementAlu(
+  longueur_cm: number,
+  largeur_cm: number,
+  marge_chevauchement_cm: number = 15
+): RecouvrementAluResult {
+  const perimetre = 2 * (longueur_cm + largeur_cm);
+  const longueur_necessaire_ml = (perimetre + marge_chevauchement_cm) / 100;
+  return { longueur_necessaire_ml };
+}
