@@ -2,10 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
-import { queueAction, tenterVidage } from "@/lib/offline/queue";
-
-interface Photo { id: string; url: string; legende: string | null; }
+import { tenterVidage } from "@/lib/offline/queue";
+import { envoyerPhoto, type PhotoChantier as Photo } from "@/lib/photos";
+import { Camera, Image } from "@/components/icons";
+import { classesBouton } from "@/components/ui/Button";
+import { Card, CardHeader } from "@/components/ui/Card";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { cn } from "@/lib/utils";
 
 export default function PhotosSection({ chantierId, photosInitiales, lectureSeule = false }: { chantierId: string; photosInitiales: Photo[]; lectureSeule?: boolean }) {
   const [photos, setPhotos] = useState(photosInitiales);
@@ -22,59 +25,43 @@ export default function PhotosSection({ chantierId, photosInitiales, lectureSeul
     if (!fichier) return;
     setErreur(null);
     setEnvoi(true);
-    const supabase = createClient();
-    const chemin = `${chantierId}/${Date.now()}-${fichier.name}`;
-
-    if (!navigator.onLine) {
-      // Hors connexion : on prévient l'utilisateur, l'upload binaire ne peut pas
-      // être mis en file d'attente aussi simplement qu'une écriture texte.
-      setEnvoi(false);
-      setErreur("Vous êtes hors connexion — reprenez la photo une fois reconnecté.");
-      return;
-    }
-
-    const { error: uploadError } = await supabase.storage.from("photos").upload(chemin, fichier);
-    if (uploadError) {
-      setEnvoi(false);
-      setErreur("L'envoi de la photo a échoué.");
-      return;
-    }
-    const { data: urlData } = supabase.storage.from("photos").getPublicUrl(chemin);
-    const { data: photo, error: dbError } = await supabase
-      .from("photos")
-      .insert({ chantier_id: chantierId, url: urlData.publicUrl })
-      .select()
-      .single();
-
+    const resultat = await envoyerPhoto(chantierId, fichier);
     setEnvoi(false);
-    if (dbError || !photo) {
-      setErreur("Photo envoyée mais non enregistrée.");
+    if ("erreur" in resultat) {
+      setErreur(resultat.erreur);
       return;
     }
-    setPhotos((prev) => [photo, ...prev]);
+    setPhotos((prev) => [resultat.photo, ...prev]);
   }
 
   return (
-    <div className="card p-6 mt-6">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="font-display font-semibold text-neige">Photos</h2>
-        {!lectureSeule && (
-          <label className="text-sm text-rouille font-medium cursor-pointer">
-            {envoi ? "Envoi…" : "+ Ajouter une photo"}
-            <input type="file" accept="image/*" capture="environment" onChange={surSelection} className="hidden" disabled={envoi} />
-          </label>
-        )}
-      </div>
-      {erreur && <div className="text-sm text-[#FF8A80] bg-[#3B1418] rounded-lg px-3 py-2 mb-3">{erreur}</div>}
+    <Card className="p-5">
+      <CardHeader
+        titre="Photos"
+        sousTitre={photos.length > 0 ? `${photos.length} photo${photos.length > 1 ? "s" : ""}` : undefined}
+        action={
+          !lectureSeule && (
+            // <label> plutôt que <Button> : c'est lui qui ouvre l'appareil photo.
+            <label className={cn(classesBouton({ taille: "lg" }), "cursor-pointer", envoi && "pointer-events-none opacity-50")}>
+              <Camera size={20} className="shrink-0" />
+              {envoi ? "Envoi…" : "Prendre une photo"}
+              <input type="file" accept="image/*" capture="environment" onChange={surSelection} className="hidden" disabled={envoi} />
+            </label>
+          )
+        }
+      />
+      {erreur && <div className="mb-3 rounded-lg bg-rouge/10 px-3 py-2 text-sm text-rouge">{erreur}</div>}
       {photos.length === 0 ? (
-        <p className="text-sm text-neige/50">Aucune photo pour l'instant.</p>
+        <EmptyState icone={Image} titre="Aucune photo pour l'instant" texte="Les photos prises sur le chantier apparaîtront ici." />
       ) : (
-        <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+        <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 sm:gap-3 lg:grid-cols-6">
           {photos.map((p) => (
-            <img key={p.id} src={p.url} alt={p.legende ?? "Photo de chantier"} className="w-full h-24 object-cover rounded-lg" />
+            <a key={p.id} href={p.url} target="_blank" rel="noreferrer">
+              <img src={p.url} alt={p.legende ?? "Photo de chantier"} className="aspect-square w-full rounded-lg object-cover" />
+            </a>
           ))}
         </div>
       )}
-    </div>
+    </Card>
   );
 }

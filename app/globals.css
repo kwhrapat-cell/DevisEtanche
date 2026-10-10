@@ -1,48 +1,74 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap");
-
-body {
-  background: #070C16;
-  background: radial-gradient(ellipse 1200px 700px at 50% -10%, #102145 0%, #070C16 55%, #04070D 100%) fixed;
-  color: #EAF0FB;
-  font-family: "IBM Plex Sans", sans-serif;
-  min-height: 100vh;
+/*
+ * Palette DevisEtanche — source unique des couleurs (canaux RVB, utilisés par
+ * tailwind.config.ts). Pour changer une couleur partout, on la change ici.
+ */
+:root {
+  --fond: 244 246 250;
+  --surface: 255 255 255;
+  --sable: 238 242 247;
+  --ligne: 226 232 240;
+  --encre: 15 27 45;
+  --marine: 11 31 58;
+  --marine-2: 21 49 88;
+  --primaire: 31 95 224;
+  --primaire-2: 96 150 245;
+  --accent: 240 124 30;
+  --vert: 22 163 74;
+  --ambre: 245 158 11;
+  --rouge: 220 38 38;
+  color-scheme: light;
 }
 
-.card {
-  background: #0D1526;
-  border: 1px solid #1E2A44;
-  border-radius: 16px;
+@layer base {
+  body {
+    @apply bg-fond text-encre font-body antialiased;
+    min-height: 100vh;
+  }
+
+  input:not([type="checkbox"]):not([type="radio"]),
+  select,
+  textarea {
+    background-color: rgb(var(--surface));
+    color: rgb(var(--encre));
+  }
+  input::placeholder,
+  textarea::placeholder {
+    color: rgb(var(--encre) / 0.4);
+  }
+
+  :focus-visible {
+    outline: 2px solid rgb(var(--primaire));
+    outline-offset: 2px;
+  }
 }
 
-.badge {
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 0.72rem;
-  padding: 4px 9px;
-  border-radius: 100px;
-  font-weight: 600;
-}
-.badge-en_cours { background: rgba(255, 173, 122, 0.14); color: #FFAD7A; }
-.badge-termine { background: rgba(110, 231, 160, 0.14); color: #6EE7A0; }
-.badge-en_attente { background: rgba(251, 191, 36, 0.16); color: #FBBF24; }
-.badge-en_preparation { background: rgba(185, 169, 245, 0.16); color: #B9A9F5; }
+@layer components {
+  /* Dans un layer pour que les utilitaires (bg-marine, p-6…) puissent la surcharger. */
+  .card {
+    @apply bg-surface border border-ligne rounded-2xl shadow-carte;
+  }
 
-input:not([type="checkbox"]):not([type="radio"]),
-select,
-textarea {
-  background: #0B1220;
-  color: #EAF0FB;
-}
-input::placeholder,
-textarea::placeholder {
-  color: rgba(234, 240, 251, 0.35);
+  .badge {
+    @apply inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-medium;
+  }
 }
 
 @media print {
-  body, .card { background: #fff !important; }
-  * { color: #1B2230 !important; }
-  .print\:hidden { display: none !important; }
+  body,
+  .card {
+    background: #fff !important;
+    box-shadow: none !important;
+  }
+  * {
+    color: #1b2230 !important;
+  }
+  .print\:hidden {
+    display: none !important;
+  }
 }

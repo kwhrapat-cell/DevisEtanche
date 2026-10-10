@@ -54,7 +54,7 @@ export default function NouveauDevisForm({ entrepriseId, chantiers }: Props) {
 
   if (!ouvert) {
     return (
-      <button onClick={() => setOuvert(true)} className="self-start bg-rouille text-white text-sm font-semibold rounded-lg px-4 py-2.5">
+      <button onClick={() => setOuvert(true)} className="self-start bg-primaire text-white text-sm font-semibold rounded-lg px-4 py-2.5">
         + Nouveau devis
       </button>
     );
@@ -62,9 +62,9 @@ export default function NouveauDevisForm({ entrepriseId, chantiers }: Props) {
 
   return (
     <form onSubmit={creerDevis} className="card p-5 flex flex-col sm:flex-row gap-3 items-end">
-      {erreur && <div className="text-sm text-[#FF8A80]">{erreur}</div>}
+      {erreur && <div className="text-sm text-rouge">{erreur}</div>}
       <div className="flex-1 w-full">
-        <label className="text-xs font-mono text-neige/60 block mb-1">CHANTIER</label>
+        <label className="text-xs font-mono text-encre/70 block mb-1">CHANTIER</label>
         <select value={chantierId} onChange={(e) => setChantierId(e.target.value)} className="w-full border border-ligne rounded-lg px-3 py-2">
           {chantiers.length === 0 && <option value="">Aucun chantier — créez-en un d'abord</option>}
           {chantiers.map((c) => (
@@ -73,7 +73,7 @@ export default function NouveauDevisForm({ entrepriseId, chantiers }: Props) {
         </select>
       </div>
       <div className="w-full sm:w-44">
-        <label className="text-xs font-mono text-neige/60 block mb-1">MONTANT HT</label>
+        <label className="text-xs font-mono text-encre/70 block mb-1">MONTANT HT</label>
         <input
           type="number"
           min={0}
@@ -82,7 +82,7 @@ export default function NouveauDevisForm({ entrepriseId, chantiers }: Props) {
           className="w-full border border-ligne rounded-lg px-3 py-2"
         />
       </div>
-      <button type="submit" disabled={chargement} className="bg-rouille text-white text-sm font-semibold rounded-lg px-4 py-2.5 disabled:opacity-60">
+      <button type="submit" disabled={chargement} className="bg-primaire text-white text-sm font-semibold rounded-lg px-4 py-2.5 disabled:opacity-60">
         {chargement ? "…" : "Créer le devis"}
       </button>
     </form>

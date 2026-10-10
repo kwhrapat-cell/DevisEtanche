@@ -1,30 +1,40 @@
 import type { Config } from "tailwindcss";
 
+// Les couleurs sont définies une seule fois, en variables CSS dans app/globals.css.
+// Ici on ne fait que les exposer à Tailwind — l'opacité (`text-encre/60`) fonctionne.
+const v = (nom: string) => `rgb(var(--${nom}) / <alpha-value>)`;
+
+const policeTexte = ["Inter", "system-ui", "-apple-system", "Segoe UI", "Roboto", "sans-serif"];
+
 const config: Config = {
-  content: ["./app/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}"],
+  content: ["./app/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}", "./lib/**/*.{ts,tsx}"],
   theme: {
     extend: {
       colors: {
-        // Thème sombre bleu marine — ardoise reste réservée aux surfaces foncées
-        // (sidebar, panneaux d'accent) toujours utilisées avec du texte clair ;
-        // le texte courant utilise "neige" sur les fonds "papier"/"sable"/.card.
-        ardoise: { DEFAULT: "#0B1830", 2: "#132A4C" },
-        bitume: "#050810",
-        rouille: { DEFAULT: "#2E6BEE", 2: "#5B9DFF" },
-        papier: "#070C16",
-        sable: "#101B30",
-        vert: "#34D399",
-        ambre: "#FBBF24",
-        ligne: "#1E2A44",
-        neige: "#EAF0FB",
+        fond: v("fond"), // fond de page (gris très clair)
+        surface: v("surface"), // cartes, panneaux, champs
+        sable: v("sable"), // surface atténuée (survol, pistes de barres)
+        ligne: v("ligne"), // bordures et séparateurs
+        encre: v("encre"), // texte courant
+        marine: { DEFAULT: v("marine"), 2: v("marine-2") }, // sidebar, bandeaux foncés
+        primaire: { DEFAULT: v("primaire"), 2: v("primaire-2") }, // actions principales
+        accent: v("accent"), // orange de la marque
+        vert: v("vert"),
+        ambre: v("ambre"),
+        rouge: v("rouge"),
       },
       fontFamily: {
-        display: ["'Space Grotesk'", "sans-serif"],
-        body: ["'IBM Plex Sans'", "sans-serif"],
-        mono: ["'IBM Plex Mono'", "monospace"],
+        sans: policeTexte,
+        body: policeTexte,
+        display: policeTexte,
+        mono: ["'IBM Plex Mono'", "ui-monospace", "monospace"],
       },
       borderRadius: {
         xl2: "18px",
+      },
+      boxShadow: {
+        carte: "0 1px 2px rgb(15 27 45 / 0.04), 0 1px 3px rgb(15 27 45 / 0.06)",
+        flottant: "0 8px 24px rgb(15 27 45 / 0.14)",
       },
     },
   },

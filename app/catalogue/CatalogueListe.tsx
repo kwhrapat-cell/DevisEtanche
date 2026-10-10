@@ -46,7 +46,7 @@ export default function CatalogueListe({ produits }: { produits: ProduitEtanchei
       </div>
 
       {filtres.length === 0 ? (
-        <div className="card p-8 text-center text-sm text-neige/50">Aucun produit ne correspond à ces filtres.</div>
+        <div className="card p-8 text-center text-sm text-encre/60">Aucun produit ne correspond à ces filtres.</div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {filtres.map((p) => (
@@ -72,21 +72,21 @@ function ProduitCard({ produit: p }: { produit: ProduitEtancheite }) {
     <div className="card p-5 flex flex-col gap-2.5">
       <div className="flex items-start justify-between gap-2">
         <div>
-          <div className="text-xs font-mono text-neige/40">{p.fabricant}</div>
-          <div className="font-display font-semibold text-neige leading-snug">{p.nom}</div>
+          <div className="text-xs font-mono text-encre/60">{p.fabricant}</div>
+          <div className="font-display font-semibold text-encre leading-snug">{p.nom}</div>
         </div>
-        <span className="badge bg-sable text-neige/60 shrink-0">{p.reference}</span>
+        <span className="badge bg-sable text-encre/70 shrink-0">{p.reference}</span>
       </div>
 
       <div className="flex flex-wrap gap-1.5">
-        <span className="badge bg-[#241E42] text-[#B9A9F5]">{GAMME_LABELS[p.gamme]}</span>
-        <span className="badge bg-[#3A2113] text-[#FFAD7A]">{USAGE_LABELS[p.usage_type]}</span>
-        <span className="badge bg-[#123024] text-[#6EE7A0]">{POSE_LABELS[p.pose]}</span>
+        <span className="badge bg-violet-50 text-violet-700">{GAMME_LABELS[p.gamme]}</span>
+        <span className="badge bg-orange-50 text-orange-700">{USAGE_LABELS[p.usage_type]}</span>
+        <span className="badge bg-emerald-50 text-emerald-700">{POSE_LABELS[p.pose]}</span>
       </div>
 
-      {p.usage_recommande && <p className="text-sm text-neige/70 leading-relaxed">{p.usage_recommande}</p>}
+      {p.usage_recommande && <p className="text-sm text-encre/80 leading-relaxed">{p.usage_recommande}</p>}
 
-      <div className="text-xs text-neige/50 flex flex-col gap-1 mt-1 pt-2.5 border-t border-ligne font-mono">
+      <div className="text-xs text-encre/60 flex flex-col gap-1 mt-1 pt-2.5 border-t border-ligne font-mono">
         {p.conditionnement && <div>Conditionnement : {p.conditionnement}</div>}
         {p.surface_couverte_m2 != null && <div>Surface couverte : {p.surface_couverte_m2} m²/unité</div>}
         {p.poids_kg != null && <div>Poids : {p.poids_kg} kg</div>}

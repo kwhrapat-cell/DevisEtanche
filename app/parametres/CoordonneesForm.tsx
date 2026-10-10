@@ -46,39 +46,39 @@ export default function CoordonneesForm({
 
   return (
     <form onSubmit={enregistrer} className="card p-5">
-      <div className="font-medium text-neige mb-1">Coordonnées de l'entreprise</div>
-      <p className="text-xs text-neige/50 mb-3">Affichées sur vos devis et factures exportés, à la place du nom de l'application.</p>
+      <div className="font-medium text-encre mb-1">Coordonnées de l'entreprise</div>
+      <p className="text-xs text-encre/60 mb-3">Affichées sur vos devis et factures exportés, à la place du nom de l'application.</p>
 
       <div className="flex flex-col gap-3">
         <div>
-          <label className="text-xs font-mono text-neige/60 block mb-1">RAISON SOCIALE</label>
+          <label className="text-xs font-mono text-encre/70 block mb-1">RAISON SOCIALE</label>
           <input value={nom} onChange={(e) => setNom(e.target.value)} className="w-full border border-ligne rounded-lg px-3 py-2 text-sm" />
         </div>
         <div>
-          <label className="text-xs font-mono text-neige/60 block mb-1">ADRESSE</label>
+          <label className="text-xs font-mono text-encre/70 block mb-1">ADRESSE</label>
           <input value={adresse} onChange={(e) => setAdresse(e.target.value)} className="w-full border border-ligne rounded-lg px-3 py-2 text-sm" placeholder="Rue, ville, code postal" />
         </div>
         <div className="flex gap-3">
           <div className="flex-1">
-            <label className="text-xs font-mono text-neige/60 block mb-1">TÉLÉPHONE</label>
+            <label className="text-xs font-mono text-encre/70 block mb-1">TÉLÉPHONE</label>
             <input value={telephone} onChange={(e) => setTelephone(e.target.value)} className="w-full border border-ligne rounded-lg px-3 py-2 text-sm" />
           </div>
           <div className="flex-1">
-            <label className="text-xs font-mono text-neige/60 block mb-1">E-MAIL</label>
+            <label className="text-xs font-mono text-encre/70 block mb-1">E-MAIL</label>
             <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full border border-ligne rounded-lg px-3 py-2 text-sm" />
           </div>
         </div>
         <div>
-          <label className="text-xs font-mono text-neige/60 block mb-1">IDENTIFIANT ENTREPRISE (SIRET, RIDET…)</label>
+          <label className="text-xs font-mono text-encre/70 block mb-1">IDENTIFIANT ENTREPRISE (SIRET, RIDET…)</label>
           <input value={numeroIdentification} onChange={(e) => setNumeroIdentification(e.target.value)} className="w-full border border-ligne rounded-lg px-3 py-2 text-sm" />
         </div>
       </div>
 
       <div className="flex items-center gap-3 mt-4">
-        <button type="submit" disabled={chargement} className="text-sm bg-rouille text-white font-semibold rounded-lg px-4 py-2 disabled:opacity-60">
+        <button type="submit" disabled={chargement} className="text-sm bg-primaire text-white font-semibold rounded-lg px-4 py-2 disabled:opacity-60">
           {chargement ? "Enregistrement…" : "Enregistrer"}
         </button>
-        {enregistre && <span className="text-xs text-vert">Enregistré</span>}
+        {enregistre && <span className="text-xs text-emerald-700">Enregistré</span>}
       </div>
     </form>
   );

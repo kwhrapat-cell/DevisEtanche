@@ -5,6 +5,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import IllustrationArchitecture from "@/components/IllustrationArchitecture";
+import Logo from "@/components/Logo";
+import { pageAccueil } from "@/lib/accueil";
 
 function IconeOeil({ visible }: { visible: boolean }) {
   return visible ? (
@@ -34,9 +36,9 @@ function LoginForm() {
     setErreur(null);
     setChargement(true);
     const supabase = createClient();
-    const { error } = await supabase.auth.signInWithPassword({ email, password: motDePasse });
-    setChargement(false);
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password: motDePasse });
     if (error) {
+      setChargement(false);
       if (error.message.toLowerCase().includes("email not confirmed")) {
         setErreur("E-mail non confirmé — vérifiez votre boîte mail, ou contactez l'administrateur si la confirmation reste bloquée.");
       } else if (error.message.toLowerCase().includes("invalid login credentials")) {
@@ -46,28 +48,34 @@ function LoginForm() {
       }
       return;
     }
-    router.push(params.get("suivant") || "/dashboard");
+    // Sans page demandée, chacun arrive sur l'accueil de son rôle (lib/accueil.ts).
+    let destination = params.get("suivant");
+    if (!destination) {
+      const { data: profil } = await supabase.from("profiles").select("role").eq("id", data.user.id).maybeSingle();
+      destination = pageAccueil(profil?.role);
+    }
+    router.push(destination);
     router.refresh();
   }
 
   return (
-    <div className="relative min-h-screen overflow-hidden flex items-center justify-center bg-papier px-4">
+    <div className="relative min-h-screen overflow-hidden flex items-center justify-center bg-fond px-4">
       <IllustrationArchitecture />
       <form onSubmit={seConnecter} className="relative card w-full max-w-sm p-8">
-        <div className="flex items-center gap-2 font-display font-semibold text-lg text-neige mb-1">
-          <span className="w-6 h-6 rounded-md bg-gradient-to-br from-rouille to-ambre inline-block" />
+        <div className="flex items-center gap-2 font-display font-semibold text-lg text-encre mb-1">
+          <Logo avecNom={false} />
           DevisEtanche
         </div>
-        <p className="text-sm text-neige/50 mb-6">Connexion à votre espace</p>
+        <p className="text-sm text-encre/60 mb-6">Connexion à votre espace</p>
 
-        {erreur && <div className="text-sm text-[#FF8A80] bg-[#3B1418] rounded-lg px-3 py-2 mb-4">{erreur}</div>}
+        {erreur && <div className="text-sm text-rouge bg-rouge/10 rounded-lg px-3 py-2 mb-4">{erreur}</div>}
         {!erreur && message && (
-          <div className="text-sm rounded-lg px-3 py-2 mb-4" style={{ color: "#6EE7A0", background: "rgba(110,231,160,0.12)" }}>
+          <div className="text-sm rounded-lg px-3 py-2 mb-4 bg-emerald-50 text-emerald-700">
             {message}
           </div>
         )}
 
-        <label className="text-xs font-mono text-neige/60 block mb-1">E-MAIL</label>
+        <label className="text-xs font-mono text-encre/70 block mb-1">E-MAIL</label>
         <input
           type="email"
           required
@@ -75,7 +83,7 @@ function LoginForm() {
           onChange={(e) => setEmail(e.target.value)}
           className="w-full border border-ligne rounded-lg px-3 py-2 mb-4"
         />
-        <label className="text-xs font-mono text-neige/60 block mb-1">MOT DE PASSE</label>
+        <label className="text-xs font-mono text-encre/70 block mb-1">MOT DE PASSE</label>
         <div className="relative mb-2">
           <input
             type={motDePasseVisible ? "text" : "password"}
@@ -87,24 +95,24 @@ function LoginForm() {
           <button
             type="button"
             onClick={() => setMotDePasseVisible((v) => !v)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-neige/40 hover:text-neige/70"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-encre/60 hover:text-encre/80"
             aria-label={motDePasseVisible ? "Masquer le mot de passe" : "Afficher le mot de passe"}
           >
             <IconeOeil visible={motDePasseVisible} />
           </button>
         </div>
         <p className="text-right mb-6">
-          <Link href="/mot-de-passe-oublie" className="text-xs text-neige/50 hover:text-neige/70">Mot de passe oublié ?</Link>
+          <Link href="/mot-de-passe-oublie" className="text-xs text-encre/60 hover:text-encre/80">Mot de passe oublié ?</Link>
         </p>
         <button
           type="submit"
           disabled={chargement}
-          className="w-full bg-rouille text-white font-semibold rounded-lg py-2.5 disabled:opacity-60"
+          className="w-full bg-primaire text-white font-semibold rounded-lg py-2.5 disabled:opacity-60"
         >
           {chargement ? "Connexion…" : "Se connecter"}
         </button>
-        <p className="text-xs text-neige/50 text-center mt-5">
-          Pas encore de compte ? <Link href="/signup" className="text-rouille font-medium">Créer un compte</Link>
+        <p className="text-xs text-encre/60 text-center mt-5">
+          Pas encore de compte ? <Link href="/signup" className="text-primaire font-medium">Créer un compte</Link>
         </p>
       </form>
     </div>

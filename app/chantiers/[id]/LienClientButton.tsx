@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { CircleCheck } from "@/components/icons";
+import { Button } from "@/components/ui/Button";
 
 export default function LienClientButton({ token }: { token: string }) {
   const [copie, setCopie] = useState(false);
@@ -13,8 +15,8 @@ export default function LienClientButton({ token }: { token: string }) {
   }
 
   return (
-    <button onClick={copier} className="w-full text-xs bg-ardoise/5 text-neige rounded-lg py-2 mt-2 hover:bg-ardoise/10">
-      {copie ? "Lien copié ✓" : "Copier le lien de suivi client"}
-    </button>
+    <Button variante="secondaire" pleineLargeur icone={copie ? CircleCheck : undefined} onClick={copier}>
+      {copie ? "Lien copié" : "Copier le lien de suivi client"}
+    </Button>
   );
 }

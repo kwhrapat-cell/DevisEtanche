@@ -31,16 +31,16 @@ export default function ForfaitCard({
   }
 
   return (
-    <div className={`card p-4 flex flex-col ${recommande ? "border-rouille border-2" : ""}`}>
-      <div className="font-medium text-neige text-sm">{nom}</div>
-      <div className="font-mono text-lg text-neige mt-1 mb-3">{prix}</div>
+    <div className={`card p-4 flex flex-col ${recommande ? "border-primaire border-2" : ""}`}>
+      <div className="font-medium text-encre text-sm">{nom}</div>
+      <div className="font-mono text-lg text-encre mt-1 mb-3">{prix}</div>
       {actuel ? (
-        <span className="text-xs text-vert font-mono mt-auto">Forfait actuel</span>
+        <span className="text-xs text-emerald-700 font-mono mt-auto">Forfait actuel</span>
       ) : (
         <button
           onClick={choisir}
           disabled={chargement}
-          className="mt-auto text-xs bg-ardoise text-white rounded-lg py-2 disabled:opacity-60"
+          className="mt-auto text-xs bg-marine text-white rounded-lg py-2 disabled:opacity-60"
         >
           {chargement ? "…" : id === "entreprise" ? "Nous contacter" : "Choisir"}
         </button>

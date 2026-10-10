@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import IllustrationArchitecture from "@/components/IllustrationArchitecture";
+import Logo from "@/components/Logo";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -12,8 +13,8 @@ type Etape = "verification" | "deja_associe" | "code_administrateur" | "compte" 
 
 function EnTete() {
   return (
-    <div className="flex items-center gap-2 font-display font-semibold text-lg text-neige mb-1">
-      <span className="w-6 h-6 rounded-md bg-gradient-to-br from-rouille to-ambre inline-block" />
+    <div className="flex items-center gap-2 font-display font-semibold text-lg text-encre mb-1">
+      <Logo avecNom={false} />
       DevisEtanche
     </div>
   );
@@ -127,20 +128,20 @@ export default function RejoindreChantierPage() {
   }
 
   if (etape === "verification") {
-    return <div className="min-h-screen bg-papier" />;
+    return <div className="min-h-screen bg-fond" />;
   }
 
   if (etape === "deja_associe") {
     return (
-      <div className="relative min-h-screen overflow-hidden flex items-center justify-center bg-papier px-4">
+      <div className="relative min-h-screen overflow-hidden flex items-center justify-center bg-fond px-4">
         <IllustrationArchitecture />
         <div className="relative card w-full max-w-sm p-8">
           <EnTete />
-          <p className="text-sm text-neige/50 mb-6">Rejoindre un chantier</p>
-          <p className="text-sm text-neige/70">
+          <p className="text-sm text-encre/60 mb-6">Rejoindre un chantier</p>
+          <p className="text-sm text-encre/80">
             Ce compte est déjà associé à une entreprise — un code d&apos;invitation ne peut être utilisé qu&apos;à la création du compte.
           </p>
-          <Link href="/dashboard" className="inline-block mt-6 text-rouille font-medium text-sm">
+          <Link href="/dashboard" className="inline-block mt-6 text-primaire font-medium text-sm">
             Retour au tableau de bord
           </Link>
         </div>
@@ -150,19 +151,19 @@ export default function RejoindreChantierPage() {
 
   if (etape === "code_administrateur") {
     return (
-      <div className="relative min-h-screen overflow-hidden flex items-center justify-center bg-papier px-4">
+      <div className="relative min-h-screen overflow-hidden flex items-center justify-center bg-fond px-4">
         <IllustrationArchitecture />
         <form onSubmit={rejoindre} className="relative card w-full max-w-sm p-8">
           <EnTete />
-          <p className="text-sm text-neige/50 mb-6">Rattacher votre entreprise à un chantier</p>
+          <p className="text-sm text-encre/60 mb-6">Rattacher votre entreprise à un chantier</p>
 
-          {erreur && <div className="text-sm text-[#FF8A80] bg-[#3B1418] rounded-lg px-3 py-2 mb-4">{erreur}</div>}
+          {erreur && <div className="text-sm text-rouge bg-rouge/10 rounded-lg px-3 py-2 mb-4">{erreur}</div>}
 
-          <p className="text-sm text-neige/70 mb-4">
+          <p className="text-sm text-encre/80 mb-4">
             Saisissez le code fourni par le donneur d&apos;ordre pour rattacher votre entreprise à son chantier.
           </p>
 
-          <label className="text-xs font-mono text-neige/60 block mb-1">CODE D'INVITATION</label>
+          <label className="text-xs font-mono text-encre/70 block mb-1">CODE D'INVITATION</label>
           <input
             required
             value={code}
@@ -171,10 +172,10 @@ export default function RejoindreChantierPage() {
             className="w-full border border-ligne rounded-lg px-3 py-2 mb-6 font-mono tracking-widest uppercase"
           />
 
-          <button type="submit" disabled={chargement} className="w-full bg-rouille text-white font-semibold rounded-lg py-2.5 disabled:opacity-60">
+          <button type="submit" disabled={chargement} className="w-full bg-primaire text-white font-semibold rounded-lg py-2.5 disabled:opacity-60">
             {chargement ? "Validation…" : "Rattacher le chantier"}
           </button>
-          <Link href="/dashboard" className="inline-block w-full text-center mt-4 text-neige/50 text-sm">
+          <Link href="/dashboard" className="inline-block w-full text-center mt-4 text-encre/60 text-sm">
             Retour au tableau de bord
           </Link>
         </form>
@@ -184,28 +185,28 @@ export default function RejoindreChantierPage() {
 
   if (etape === "compte") {
     return (
-      <div className="relative min-h-screen overflow-hidden flex items-center justify-center bg-papier px-4 py-10">
+      <div className="relative min-h-screen overflow-hidden flex items-center justify-center bg-fond px-4 py-10">
         <IllustrationArchitecture />
         <form onSubmit={creerCompte} className="relative card w-full max-w-sm p-8">
           <EnTete />
-          <p className="text-sm text-neige/50 mb-6">Rejoindre un chantier avec un code</p>
+          <p className="text-sm text-encre/60 mb-6">Rejoindre un chantier avec un code</p>
 
-          {erreur && <div className="text-sm text-[#FF8A80] bg-[#3B1418] rounded-lg px-3 py-2 mb-4">{erreur}</div>}
+          {erreur && <div className="text-sm text-rouge bg-rouge/10 rounded-lg px-3 py-2 mb-4">{erreur}</div>}
           {info && (
-            <div className="text-sm rounded-lg px-3 py-2 mb-4" style={{ color: "#6EE7A0", background: "rgba(110,231,160,0.12)" }}>
+            <div className="text-sm rounded-lg px-3 py-2 mb-4 bg-emerald-50 text-emerald-700">
               {info}
             </div>
           )}
 
           {!info && (
             <>
-              <label className="text-xs font-mono text-neige/60 block mb-1">VOTRE NOM</label>
+              <label className="text-xs font-mono text-encre/70 block mb-1">VOTRE NOM</label>
               <input required value={nom} onChange={(e) => setNom(e.target.value)} className="w-full border border-ligne rounded-lg px-3 py-2 mb-4" />
 
-              <label className="text-xs font-mono text-neige/60 block mb-1">E-MAIL</label>
+              <label className="text-xs font-mono text-encre/70 block mb-1">E-MAIL</label>
               <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} className="w-full border border-ligne rounded-lg px-3 py-2 mb-4" />
 
-              <label className="text-xs font-mono text-neige/60 block mb-1">MOT DE PASSE</label>
+              <label className="text-xs font-mono text-encre/70 block mb-1">MOT DE PASSE</label>
               <input
                 type="password"
                 required
@@ -215,13 +216,13 @@ export default function RejoindreChantierPage() {
                 className="w-full border border-ligne rounded-lg px-3 py-2 mb-6"
               />
 
-              <button type="submit" disabled={chargement} className="w-full bg-rouille text-white font-semibold rounded-lg py-2.5 disabled:opacity-60">
+              <button type="submit" disabled={chargement} className="w-full bg-primaire text-white font-semibold rounded-lg py-2.5 disabled:opacity-60">
                 {chargement ? "Création…" : "Créer mon accès"}
               </button>
             </>
           )}
-          <p className="text-xs text-neige/50 text-center mt-5">
-            Déjà un compte ? <Link href="/login" className="text-rouille font-medium">Se connecter</Link>
+          <p className="text-xs text-encre/60 text-center mt-5">
+            Déjà un compte ? <Link href="/login" className="text-primaire font-medium">Se connecter</Link>
           </p>
         </form>
       </div>
@@ -229,18 +230,18 @@ export default function RejoindreChantierPage() {
   }
 
   return (
-    <div className="relative min-h-screen overflow-hidden flex items-center justify-center bg-papier px-4">
+    <div className="relative min-h-screen overflow-hidden flex items-center justify-center bg-fond px-4">
       <IllustrationArchitecture />
       <form onSubmit={rejoindre} className="relative card w-full max-w-sm p-8">
         <EnTete />
-        <p className="text-sm text-neige/50 mb-6">Rejoindre un chantier avec un code</p>
+        <p className="text-sm text-encre/60 mb-6">Rejoindre un chantier avec un code</p>
 
-        {erreur && <div className="text-sm text-[#FF8A80] bg-[#3B1418] rounded-lg px-3 py-2 mb-4">{erreur}</div>}
+        {erreur && <div className="text-sm text-rouge bg-rouge/10 rounded-lg px-3 py-2 mb-4">{erreur}</div>}
 
-        <label className="text-xs font-mono text-neige/60 block mb-1">VOTRE NOM</label>
+        <label className="text-xs font-mono text-encre/70 block mb-1">VOTRE NOM</label>
         <input required value={nom} onChange={(e) => setNom(e.target.value)} className="w-full border border-ligne rounded-lg px-3 py-2 mb-4" />
 
-        <label className="text-xs font-mono text-neige/60 block mb-1">CODE D'INVITATION</label>
+        <label className="text-xs font-mono text-encre/70 block mb-1">CODE D'INVITATION</label>
         <input
           required
           value={code}
@@ -249,7 +250,7 @@ export default function RejoindreChantierPage() {
           className="w-full border border-ligne rounded-lg px-3 py-2 mb-6 font-mono tracking-widest uppercase"
         />
 
-        <button type="submit" disabled={chargement} className="w-full bg-rouille text-white font-semibold rounded-lg py-2.5 disabled:opacity-60">
+        <button type="submit" disabled={chargement} className="w-full bg-primaire text-white font-semibold rounded-lg py-2.5 disabled:opacity-60">
           {chargement ? "Validation…" : "Rejoindre le chantier"}
         </button>
       </form>

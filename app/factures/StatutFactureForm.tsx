@@ -29,7 +29,7 @@ export default function StatutFactureForm({ factureId, statutActuel }: { facture
 
   return (
     <div className="print:hidden flex flex-wrap items-center gap-2">
-      <span className="text-xs font-mono text-neige/50">STATUT</span>
+      <span className="text-xs font-mono text-encre/60">STATUT</span>
       {STATUTS.map((s) => (
         <button
           key={s.valeur}
@@ -37,7 +37,7 @@ export default function StatutFactureForm({ factureId, statutActuel }: { facture
           disabled={chargement}
           onClick={() => changerStatut(s.valeur)}
           className={`text-xs font-medium rounded-lg px-3 py-1.5 border transition disabled:opacity-50 ${
-            statut === s.valeur ? "border-rouille bg-rouille/10 text-neige" : "border-ligne text-neige/60"
+            statut === s.valeur ? "border-primaire bg-primaire/10 text-encre" : "border-ligne text-encre/70"
           }`}
         >
           {s.label}

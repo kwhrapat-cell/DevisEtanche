@@ -55,20 +55,20 @@ export default function NouveauChantierPortefeuillePage() {
       <TopBar titre="Nouveau chantier" sousTitre="Créez un chantier à confier à une entreprise exécutante" />
       <div className="p-4 sm:p-8 max-w-lg">
         <form onSubmit={enregistrer} className="card p-6 flex flex-col gap-4">
-          {erreur && <div className="text-sm text-[#FF8A80] bg-[#3B1418] rounded-lg px-3 py-2">{erreur}</div>}
+          {erreur && <div className="text-sm text-rouge bg-rouge/10 rounded-lg px-3 py-2">{erreur}</div>}
 
           <div>
-            <label className="text-xs font-mono text-neige/60 block mb-1">NOM DU CHANTIER</label>
+            <label className="text-xs font-mono text-encre/70 block mb-1">NOM DU CHANTIER</label>
             <input required value={nom} onChange={(e) => setNom(e.target.value)} className="w-full border border-ligne rounded-lg px-3 py-2" />
           </div>
           <div>
-            <label className="text-xs font-mono text-neige/60 block mb-1">VILLE</label>
+            <label className="text-xs font-mono text-encre/70 block mb-1">VILLE</label>
             <input value={ville} onChange={(e) => setVille(e.target.value)} className="w-full border border-ligne rounded-lg px-3 py-2" />
           </div>
-          <p className="text-xs text-neige/40">
+          <p className="text-xs text-encre/60">
             Vous pourrez générer un code de rattachement pour l&apos;entreprise exécutante juste après.
           </p>
-          <button disabled={chargement} className="bg-rouille text-white font-semibold rounded-lg py-2.5 disabled:opacity-60">
+          <button disabled={chargement} className="bg-primaire text-white font-semibold rounded-lg py-2.5 disabled:opacity-60">
             {chargement ? "Création…" : "Créer le chantier"}
           </button>
         </form>

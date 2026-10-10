@@ -4,6 +4,9 @@ import { useEffect, useState } from "react";
 import TopBar from "@/components/TopBar";
 import { createClient } from "@/lib/supabase/client";
 import InvitationsSection from "@/app/chantiers/[id]/InvitationsSection";
+import { KeyRound } from "@/components/icons";
+import { Card } from "@/components/ui/Card";
+import { EmptyState } from "@/components/ui/EmptyState";
 import type { InvitationSoustraitance } from "@/lib/types";
 
 interface ChantierOption { id: string; nom: string; }
@@ -62,23 +65,24 @@ export default function CodePortefeuillePage() {
       <TopBar titre="Générer un code" sousTitre="Rattacher une entreprise exécutante à l'un de vos chantiers" />
       <div className="p-4 sm:p-8 max-w-lg flex flex-col gap-4">
         {chargement ? null : chantiersList.length === 0 ? (
-          <div className="card p-10 text-center">
-            <div className="font-display font-semibold text-neige mb-2">Aucun chantier disponible</div>
-            <p className="text-sm text-neige/50">
-              Tous vos chantiers sont déjà rattachés à une entreprise, ou vous n&apos;en avez pas encore créé.
-            </p>
-          </div>
+          <Card>
+            <EmptyState
+              icone={KeyRound}
+              titre="Aucun chantier disponible"
+              texte="Tous vos chantiers sont déjà rattachés à une entreprise, ou vous n'en avez pas encore créé."
+            />
+          </Card>
         ) : (
           <>
-            <div className="card p-5">
-              <label className="text-xs font-mono text-neige/60 block mb-1">CHANTIER</label>
+            <Card className="p-5">
+              <label className="text-xs font-mono text-encre/70 block mb-1">CHANTIER</label>
               <select value={chantierId} onChange={(e) => setChantierId(e.target.value)} className="w-full border border-ligne rounded-lg px-3 py-2 text-sm">
                 <option value="">— Choisir un chantier —</option>
                 {chantiersList.map((c) => (
                   <option key={c.id} value={c.id}>{c.nom}</option>
                 ))}
               </select>
-            </div>
+            </Card>
 
             {chantierId && entrepriseId && (
               <InvitationsSection

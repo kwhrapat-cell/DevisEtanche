@@ -106,7 +106,7 @@ export default function AjouterElementForm({ zoneId }: { zoneId: string }) {
             return (
                <button
                  onClick={() => setOuvert(true)}
-                 className="text-xs text-left px-3 py-2 text-neige/60 hover:bg-sable/40 w-full"
+                 className="text-xs text-left px-3 py-2 text-encre/70 hover:bg-sable/40 w-full"
                >
                  + Ajouter un élément
                 </button>
@@ -135,13 +135,13 @@ export default function AjouterElementForm({ zoneId }: { zoneId: string }) {
               onChange={(e) => setQuantite(e.target.value)}
               className="text-sm border border-ligne rounded px-2 py-1"
             />
-            <span className="text-xs text-neige/40">Unité : {uniteActuelle}</span>
+            <span className="text-xs text-encre/60">Unité : {uniteActuelle}</span>
             {suggestions.length > 0 && (
-              <div className="text-xs text-neige/50">
+              <div className="text-xs text-encre/60">
                 Produits recommandés :
                 <ul className="list-disc list-inside">
                   {suggestions.map((p) => (
-                    <li key={p.reference}>{p.fabricant} — {p.nom} <span className="text-neige/40">({p.reference})</span></li>
+                    <li key={p.reference}>{p.fabricant} — {p.nom} <span className="text-encre/60">({p.reference})</span></li>
                   ))}
                 </ul>
               </div>
@@ -151,7 +151,7 @@ export default function AjouterElementForm({ zoneId }: { zoneId: string }) {
               <button
                 type="button"
                 onClick={() => setCalcOuvert(!calcOuvert)}
-                className="w-full text-left text-xs font-mono text-neige/60 px-2 py-1.5 hover:bg-sable/40"
+                className="w-full text-left text-xs font-mono text-encre/70 px-2 py-1.5 hover:bg-sable/40"
               >
                 {calcOuvert ? "▾" : "▸"} Calcul interne (non visible client)
               </button>
@@ -159,7 +159,7 @@ export default function AjouterElementForm({ zoneId }: { zoneId: string }) {
                 <div className="p-2 pt-0 flex flex-col gap-2">
                   <div className="grid grid-cols-2 gap-2">
                     <label className="flex flex-col gap-1">
-                      <span className="text-xs text-neige/40">Temps estimé (heures)</span>
+                      <span className="text-xs text-encre/60">Temps estimé (heures)</span>
                       <input
                         type="number"
                         min="0"
@@ -170,7 +170,7 @@ export default function AjouterElementForm({ zoneId }: { zoneId: string }) {
                       />
                     </label>
                     <label className="flex flex-col gap-1">
-                      <span className="text-xs text-neige/40">Taux horaire interne (F CFP/heure)</span>
+                      <span className="text-xs text-encre/60">Taux horaire interne (F CFP/heure)</span>
                       <input
                         type="number"
                         min="0"
@@ -182,7 +182,7 @@ export default function AjouterElementForm({ zoneId }: { zoneId: string }) {
                     </label>
                   </div>
                   <label className="flex flex-col gap-1">
-                    <span className="text-xs text-neige/40">Prix matériaux (F CFP)</span>
+                    <span className="text-xs text-encre/60">Prix matériaux (F CFP)</span>
                     <input
                       type="number"
                       min="0"
@@ -192,11 +192,11 @@ export default function AjouterElementForm({ zoneId }: { zoneId: string }) {
                       className="text-sm border border-ligne rounded px-2 py-1"
                     />
                   </label>
-                  <div className="text-xs text-neige/50 font-mono">
+                  <div className="text-xs text-encre/60 font-mono">
                     Main d'œuvre : {totalMainOeuvre.toLocaleString("fr-FR")} F CFP · Prix suggéré : {prixSuggere.toLocaleString("fr-FR")} F CFP
                   </div>
                   <label className="flex flex-col gap-1">
-                    <span className="text-xs text-neige/40">Prix final (F CFP)</span>
+                    <span className="text-xs text-encre/60">Prix final (F CFP)</span>
                     <input
                       type="number"
                       min="0"
@@ -214,10 +214,10 @@ export default function AjouterElementForm({ zoneId }: { zoneId: string }) {
             </div>
 
             <div className="flex gap-2">
-            <button onClick={ajouter} disabled={envoi} className="text-sm bg-rouille text-white rounded px-3 py-1 disabled:opacity-60">
+            <button onClick={ajouter} disabled={envoi} className="text-sm bg-primaire text-white rounded px-3 py-1 disabled:opacity-60">
               {envoi ? "..." : "Ajouter"}
             </button>
-            <button onClick={() => setOuvert(false)} className="text-sm text-neige/40">
+            <button onClick={() => setOuvert(false)} className="text-sm text-encre/60">
               Annuler
             </button>
           </div>

@@ -127,7 +127,7 @@ export default function CalculateurPage() {
         <div className="p-4 sm:p-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="card p-6 flex flex-col gap-4">
             <div>
-              <label className="text-xs font-mono text-neige/60 block mb-1">SURFACE DE TOITURE (M²)</label>
+              <label className="text-xs font-mono text-encre/70 block mb-1">SURFACE DE TOITURE (M²)</label>
               <input
                 type="number"
                 value={surface}
@@ -136,7 +136,7 @@ export default function CalculateurPage() {
               />
             </div>
             <div>
-              <label className="text-xs font-mono text-neige/60 block mb-1">
+              <label className="text-xs font-mono text-encre/70 block mb-1">
                 PÉRIMÈTRE (ML) — laisser vide pour estimation automatique
               </label>
               <input
@@ -148,7 +148,7 @@ export default function CalculateurPage() {
               />
             </div>
             <div>
-              <label className="text-xs font-mono text-neige/60 block mb-1">SYSTÈME D'ÉTANCHÉITÉ</label>
+              <label className="text-xs font-mono text-encre/70 block mb-1">SYSTÈME D'ÉTANCHÉITÉ</label>
               <select
                 value={systeme}
                 onChange={(e) => setSysteme(e.target.value as Systeme)}
@@ -162,7 +162,7 @@ export default function CalculateurPage() {
 
             {fabricantsDisponibles.length > 0 && (
               <div>
-                <label className="text-xs font-mono text-neige/60 block mb-1">FABRICANT</label>
+                <label className="text-xs font-mono text-encre/70 block mb-1">FABRICANT</label>
                 <select
                   value={fabricant}
                   onChange={(e) => setFabricant(e.target.value)}
@@ -186,7 +186,7 @@ export default function CalculateurPage() {
             </div>
             {isolation && (
               <div>
-                <label className="text-xs font-mono text-neige/60 block mb-1">ÉPAISSEUR ISOLANT (MM)</label>
+                <label className="text-xs font-mono text-encre/70 block mb-1">ÉPAISSEUR ISOLANT (MM)</label>
                 <input
                   type="number"
                   value={epaisseurIsolant}
@@ -206,7 +206,7 @@ export default function CalculateurPage() {
             </div>
           </div>
 
-          <div className="card p-6 bg-ardoise text-white">
+          <div className="card p-6 bg-marine text-white">
             <div className="text-xs font-mono text-white/50 mb-1">SYSTÈME · {resultat.detailsSysteme.reference}</div>
             <div className="font-display font-semibold mb-5">{resultat.detailsSysteme.nom}</div>
             <div className="grid grid-cols-2 gap-3">
@@ -240,7 +240,7 @@ export default function CalculateurPage() {
               de pertes/recouvrement pour ce système). À confirmer par une note de calcul et le DTU applicable au
               support réel avant commande.
             </p>
-            <button onClick={genererDevis} className="w-full bg-rouille text-white font-semibold rounded-lg py-2.5 mt-4">
+            <button onClick={genererDevis} className="w-full bg-primaire text-white font-semibold rounded-lg py-2.5 mt-4">
               Générer un devis à partir de ce calcul
             </button>
           </div>
@@ -252,7 +252,7 @@ export default function CalculateurPage() {
 function Resultat({ label, valeur }: { label: string; valeur: string }) {
   return (
     <div className="bg-white/10 rounded-lg px-3 py-3">
-      <div className="font-mono font-semibold text-rouille-2">{valeur}</div>
+      <div className="font-mono font-semibold text-primaire-2">{valeur}</div>
       <div className="text-xs text-white/55 mt-1">{label}</div>
     </div>
   );

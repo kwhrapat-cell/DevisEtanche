@@ -1,9 +1,10 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import type { ReactNode } from "react";
+import BottomNav from "./BottomNav";
 import Sidebar from "./Sidebar";
 import { SidebarProvider } from "./SidebarContext";
-import React from "react";
 
 const ROUTES_SANS_SIDEBAR = [
   "/",
@@ -16,12 +17,10 @@ const ROUTES_SANS_SIDEBAR = [
   "/rejoindre-chantier",
 ];
 
-export default function AppShell({ children }: {children: React.ReactNode }) {
+export default function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
 
-  const sansSidebar = ROUTES_SANS_SIDEBAR.some( (route) =>
-    route === "/" ? pathname === "/" : pathname?.startsWith(route)
-  );
+  const sansSidebar = ROUTES_SANS_SIDEBAR.some((route) => (route === "/" ? pathname === "/" : pathname?.startsWith(route)));
 
   if (sansSidebar) {
     return <>{children}</>;
@@ -29,10 +28,12 @@ export default function AppShell({ children }: {children: React.ReactNode }) {
 
   return (
     <SidebarProvider>
-      <div className="flex">
+      <div className="flex min-h-screen">
         <Sidebar />
-        <main className="flex-1 min-w-0">{children}</main>
+        {/* pb-24 sur téléphone : laisse la place à la barre du bas. */}
+        <main className="min-w-0 flex-1 pb-24 md:pb-8">{children}</main>
       </div>
+      <BottomNav />
     </SidebarProvider>
   );
 }
