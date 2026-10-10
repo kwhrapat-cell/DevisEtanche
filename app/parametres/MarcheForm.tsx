@@ -53,8 +53,8 @@ export default function MarcheForm({
 
   return (
     <form onSubmit={enregistrer} className="card p-5">
-      <div className="font-medium text-neige mb-1">Marché</div>
-      <p className="text-xs text-neige/50 mb-3">Détermine la devise et la taxe affichées sur vos devis.</p>
+      <div className="font-medium text-encre mb-1">Marché</div>
+      <p className="text-xs text-encre/60 mb-3">Détermine la devise et la taxe affichées sur vos devis.</p>
 
       <div className="flex flex-col gap-2 mb-3">
         {PRESETS.map((p, i) => (
@@ -63,7 +63,7 @@ export default function MarcheForm({
             type="button"
             onClick={() => appliquerPreset(i)}
             className={`text-left text-sm rounded-lg px-3 py-2 border ${
-              preset === i ? "border-rouille bg-rouille/10 text-neige" : "border-ligne text-neige/60"
+              preset === i ? "border-primaire bg-primaire/10 text-encre" : "border-ligne text-encre/70"
             }`}
           >
             {p.label}
@@ -73,11 +73,11 @@ export default function MarcheForm({
 
       <div className="flex gap-3 mb-3">
         <div className="flex-1">
-          <label className="text-xs font-mono text-neige/60 block mb-1">LIBELLÉ TAXE</label>
+          <label className="text-xs font-mono text-encre/70 block mb-1">LIBELLÉ TAXE</label>
           <input value={libelleTaxe} onChange={(e) => setLibelleTaxe(e.target.value)} className="w-full border border-ligne rounded-lg px-3 py-2 text-sm" />
         </div>
         <div className="w-28">
-          <label className="text-xs font-mono text-neige/60 block mb-1">TAUX PAR DÉFAUT (%)</label>
+          <label className="text-xs font-mono text-encre/70 block mb-1">TAUX PAR DÉFAUT (%)</label>
           <input
             type="number"
             value={tauxTaxeDefaut}
@@ -88,10 +88,10 @@ export default function MarcheForm({
       </div>
 
       <div className="flex items-center gap-3">
-        <button type="submit" disabled={chargement} className="text-sm bg-rouille text-white font-semibold rounded-lg px-4 py-2 disabled:opacity-60">
+        <button type="submit" disabled={chargement} className="text-sm bg-primaire text-white font-semibold rounded-lg px-4 py-2 disabled:opacity-60">
           {chargement ? "Enregistrement…" : "Enregistrer"}
         </button>
-        {enregistre && <span className="text-xs text-vert">Enregistré</span>}
+        {enregistre && <span className="text-xs text-emerald-700">Enregistré</span>}
       </div>
     </form>
   );

@@ -3,13 +3,7 @@ import TopBar from "@/components/TopBar";
 import { getUtilisateurCourant } from "@/lib/supabase/auth";
 import { createClient } from "@/lib/supabase/server";
 import { formatMontant } from "@/lib/devise";
-
-const styleStatut: Record<string, string> = {
-  brouillon: "bg-sable text-neige/60",
-  envoye: "bg-[#1B2C4E] text-[#8FB4FF]",
-  accepte: "bg-[#123024] text-vert",
-  refuse: "bg-[#3B1418] text-[#FF8A80]",
-};
+import { StatusBadge } from "@/components/ui/StatusBadge";
 
 export default async function DevisPage() {
   const session = await getUtilisateurCourant();
@@ -28,21 +22,21 @@ export default async function DevisPage() {
         <TopBar titre="Devis" sousTitre="Générés depuis le calculateur ou saisis manuellement" />
         <div className="p-4 sm:p-8">
           <div className="mb-5">
-            <Link href="/devis/nouveau" className="inline-flex items-center gap-2 bg-rouille text-white text-sm font-semibold px-4 py-2 rounded-lg">
+            <Link href="/devis/nouveau" className="inline-flex items-center gap-2 bg-primaire text-white text-sm font-semibold px-4 py-2 rounded-lg">
               + Nouveau devis
             </Link>
           </div>
           {!devisListe || devisListe.length === 0 ? (
             <div className="card p-10 text-center">
-              <div className="font-display font-semibold text-neige mb-2">Aucun devis pour l'instant</div>
-              <p className="text-sm text-neige/50">Créez un devis pour l'un de vos chantiers.</p>
+              <div className="font-display font-semibold text-encre mb-2">Aucun devis pour l'instant</div>
+              <p className="text-sm text-encre/60">Créez un devis pour l'un de vos chantiers.</p>
             </div>
           ) : (
             <div className="card overflow-hidden">
               <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="text-left text-xs text-neige/50 border-b border-ligne">
+                  <tr className="text-left text-xs text-encre/60 border-b border-ligne">
                     <th className="px-5 py-3 font-medium">N°</th>
                     <th className="px-5 py-3 font-medium">Chantier</th>
                     <th className="px-5 py-3 font-medium">Montant TTC</th>
@@ -53,12 +47,12 @@ export default async function DevisPage() {
                   {devisListe.map((d: any) => (
                     <tr key={d.id} className="border-b border-ligne last:border-0 hover:bg-sable/40">
                       <td className="px-5 py-4 font-mono text-xs">
-                        <Link href={`/devis/${d.id}`} className="hover:text-rouille">{d.numero}</Link>
+                        <Link href={`/devis/${d.id}`} className="hover:text-primaire">{d.numero}</Link>
                       </td>
-                      <td className="px-5 py-4 font-medium text-neige">{d.chantiers?.nom ?? "—"}</td>
+                      <td className="px-5 py-4 font-medium text-encre">{d.chantiers?.nom ?? "—"}</td>
                       <td className="px-5 py-4 font-mono">{formatMontant(Number(d.total_ttc), session?.entreprise?.devise)}</td>
                       <td className="px-5 py-4">
-                        <span className={`badge ${styleStatut[d.statut]}`}>{d.statut}</span>
+                        <StatusBadge domaine="devis" statut={d.statut} />
                       </td>
                     </tr>
                   ))}

@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { queueAction } from "@/lib/offline/queue";
+import { Plus } from "@/components/icons";
+import { Button } from "@/components/ui/Button";
 
 export default function AjouterZoneForm({ chantierId }: { chantierId: string }) {
   const [ouvert, setOuvert] = useState(false);
@@ -38,28 +40,28 @@ export default function AjouterZoneForm({ chantierId }: { chantierId: string }) 
   }
 
   if (messageHorsLigne) {
-    return <p className="text-sm text-ambre">Zone enregistrée hors connexion — elle sera synchronisée automatiquement au retour du réseau.</p>;
+    return <p className="text-sm text-amber-700">Zone enregistrée hors connexion — elle sera synchronisée automatiquement au retour du réseau.</p>;
   }
 
   if (!ouvert) {
     return (
-      <button onClick={() => setOuvert(true)} className="text-sm text-rouille font-medium">
-        + Ajouter une zone
-      </button>
+      <Button variante="secondaire" icone={Plus} onClick={() => setOuvert(true)}>
+        Ajouter une zone
+      </Button>
     );
   }
 
   return (
     <form onSubmit={ajouter} className="flex items-end gap-3 flex-wrap">
       <div>
-        <label className="text-xs font-mono text-neige/60 block mb-1">NOM DE LA ZONE</label>
+        <label className="text-xs font-mono text-encre/70 block mb-1">NOM DE LA ZONE</label>
         <input required value={nom} onChange={(e) => setNom(e.target.value)} className="border border-ligne rounded-lg px-3 py-2 w-40" />
       </div>
       <div>
-        <label className="text-xs font-mono text-neige/60 block mb-1">SURFACE (M²)</label>
+        <label className="text-xs font-mono text-encre/70 block mb-1">SURFACE (M²)</label>
         <input type="number" value={surface} onChange={(e) => setSurface(parseFloat(e.target.value) || 0)} className="border border-ligne rounded-lg px-3 py-2 w-28" />
       </div>
-      <button disabled={chargement} className="bg-rouille text-white text-sm font-semibold rounded-lg px-4 py-2 disabled:opacity-60">
+      <button disabled={chargement} className="bg-primaire text-white text-sm font-semibold rounded-lg px-4 py-2 disabled:opacity-60">
         {chargement ? "…" : "Ajouter"}
       </button>
     </form>

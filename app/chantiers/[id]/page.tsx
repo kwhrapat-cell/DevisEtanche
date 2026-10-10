@@ -6,13 +6,11 @@ import PhotosSection from "./PhotosSection";
 import LienClientButton from "./LienClientButton";
 import ZoneCard from "./ZoneCard";
 import InvitationsSection from "./InvitationsSection";
-
-const couleurStatut: Record<string, string> = {
-  termine: "bg-vert",
-  en_cours: "bg-ambre",
-  en_attente: "bg-[#3A4A63]",
-  probleme: "bg-[#C64A2C]",
-};
+import { Card, CardHeader } from "@/components/ui/Card";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { ProgressRing } from "@/components/ui/Progress";
+import { StatusBadge } from "@/components/ui/StatusBadge";
+import { Layers } from "@/components/icons";
 
 export default async function ChantierDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -36,7 +34,7 @@ export default async function ChantierDetailPage({ params }: { params: Promise<{
     return (
       <>
           <TopBar titre="Chantier introuvable" />
-          <div className="p-4 sm:p-8 text-sm text-neige/50">Ce chantier n'existe pas ou vous n'y avez pas accès.</div>
+          <div className="p-4 sm:p-8 text-sm text-encre/60">Ce chantier n'existe pas ou vous n'y avez pas accès.</div>
       </>
     );
   }
@@ -45,35 +43,37 @@ export default async function ChantierDetailPage({ params }: { params: Promise<{
     <>
         <TopBar titre={chantier.nom} sousTitre={`${chantier.ville ?? ""} · ${chantier.clients?.nom ?? "Sans client"}`} />
         <div className="p-4 sm:p-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 card p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="font-display font-semibold text-neige">Zones</h2>
-            </div>
+          <Card className="p-5 lg:col-span-2">
+            <CardHeader titre="Zones" sousTitre="Touchez une zone pour changer son statut." />
             {!zones || zones.length === 0 ? (
-              <p className="text-sm text-neige/50 mb-4">Aucune zone définie pour l'instant.</p>
+              <EmptyState icone={Layers} titre="Aucune zone définie" texte="Découpez le chantier en zones (terrasse, toiture, local technique…) pour suivre l'avancement." />
             ) : (
-              <div className="grid grid-cols-2 gap-3 mb-6">
+              <div className="mb-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
                 {zones.map((z) => (
                   <ZoneCard key={z.id} zone={z} />
                 ))}
-          </div>
-           )}
-</div>
-
+              </div>
+            )}
+            <div className="border-t border-ligne pt-4">
+              <AjouterZoneForm chantierId={chantier.id} />
+            </div>
+          </Card>
 
           <div className="flex flex-col gap-4">
+            <Card className="flex items-center gap-5 p-5">
+              <ProgressRing valeur={chantier.avancement_pct ?? 0} taille={96} epaisseur={9} />
+              <div>
+                <div className="text-sm font-medium text-encre/70">Avancement global</div>
+                <div className="mt-1 text-sm text-encre/60">Surface totale {chantier.surface_totale_m2 ?? "—"} m²</div>
+              </div>
+            </Card>
             <div className="card p-5">
-              <div className="text-xs text-neige/50 mb-2">Avancement global</div>
-              <div className="font-mono text-3xl font-semibold text-neige">{chantier.avancement_pct}%</div>
-              <div className="text-xs text-neige/50 mt-1">Surface totale {chantier.surface_totale_m2} m²</div>
+              <div className="text-xs text-encre/60 mb-2">Système d'étanchéité</div>
+              <div className="font-medium text-encre text-sm capitalize">{chantier.systeme ?? "non défini"}</div>
             </div>
             <div className="card p-5">
-              <div className="text-xs text-neige/50 mb-2">Système d'étanchéité</div>
-              <div className="font-medium text-neige text-sm capitalize">{chantier.systeme ?? "non défini"}</div>
-            </div>
-            <div className="card p-5">
-              <div className="text-xs text-neige/50 mb-2">Statut</div>
-              <span className={`badge badge-${chantier.statut}`}>{chantier.statut?.replace(/_/g, " ")}</span>
+              <div className="text-xs text-encre/60 mb-2">Statut</div>
+              <StatusBadge domaine="chantier" statut={chantier.statut} />
               <LienClientButton token={chantier.token_public} />
             </div>
             {estAdministrateur && (

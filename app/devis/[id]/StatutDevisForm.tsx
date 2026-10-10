@@ -94,7 +94,7 @@ export default function StatutDevisForm({
   return (
     <div className="print:hidden flex flex-col gap-3">
       <div className="flex flex-wrap items-center gap-2">
-        <span className="text-xs font-mono text-neige/50">STATUT</span>
+        <span className="text-xs font-mono text-encre/60">STATUT</span>
         {STATUTS.map((s) => (
           <button
             key={s.valeur}
@@ -102,7 +102,7 @@ export default function StatutDevisForm({
             disabled={chargement}
             onClick={() => changerStatut(s.valeur)}
             className={`text-xs font-medium rounded-lg px-3 py-1.5 border transition disabled:opacity-50 ${
-              statut === s.valeur ? "border-rouille bg-rouille/10 text-neige" : "border-ligne text-neige/60"
+              statut === s.valeur ? "border-primaire bg-primaire/10 text-encre" : "border-ligne text-encre/70"
             }`}
           >
             {s.label}
@@ -110,10 +110,10 @@ export default function StatutDevisForm({
         ))}
       </div>
 
-      {erreur && <div className="text-xs text-[#FF8A80]">{erreur}</div>}
+      {erreur && <div className="text-xs text-rouge">{erreur}</div>}
 
       {factureId ? (
-        <Link href={`/factures/${factureId}`} className="text-sm text-rouille font-medium">
+        <Link href={`/factures/${factureId}`} className="text-sm text-primaire font-medium">
           Voir la facture →
         </Link>
       ) : statut === "accepte" ? (
@@ -121,7 +121,7 @@ export default function StatutDevisForm({
           type="button"
           onClick={genererFacture}
           disabled={chargementFacture}
-          className="self-start bg-rouille text-white text-sm font-semibold px-4 py-2 rounded-lg disabled:opacity-60"
+          className="self-start bg-primaire text-white text-sm font-semibold px-4 py-2 rounded-lg disabled:opacity-60"
         >
           {chargementFacture ? "Génération…" : "Générer la facture"}
         </button>
