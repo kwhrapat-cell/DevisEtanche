@@ -10,19 +10,7 @@ import { StatusBadge } from "@/components/ui/StatusBadge";
 import { STATUTS, TONS } from "@/lib/statuts";
 import { getUtilisateurCourant } from "@/lib/supabase/auth";
 import { createClient } from "@/lib/supabase/server";
-import { cn } from "@/lib/utils";
-
-function tempsEcoule(iso: string): string {
-  const diffMs = Date.now() - new Date(iso).getTime();
-  const min = Math.floor(diffMs / 60000);
-  if (min < 1) return "à l'instant";
-  if (min < 60) return `il y a ${min} min`;
-  const h = Math.floor(min / 60);
-  if (h < 24) return `il y a ${h} h`;
-  const j = Math.floor(h / 24);
-  if (j === 1) return "hier";
-  return `il y a ${j} j`;
-}
+import { cn, tempsEcoule } from "@/lib/utils";
 
 type ChantierResume = { id: string; nom: string; ville: string | null; statut: string; avancement_pct: number | null; surface_totale_m2: number | null };
 

@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import TopBar from "@/components/TopBar";
-import { Camera, FileText, HardHat, Plus, TriangleAlert } from "@/components/icons";
+import { Activity, Camera, FileText, HardHat, Image, LayoutDashboard, Map as IconePlan, Plus, TriangleAlert } from "@/components/icons";
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ProgressBar, ProgressRing } from "@/components/ui/Progress";
 import { StatCard } from "@/components/ui/StatCard";
 import { StatusBadge } from "@/components/ui/StatusBadge";
+import { Tabs } from "@/components/ui/Tabs";
 import { STATUTS, TONS, type Domaine } from "@/lib/statuts";
 import { cn } from "@/lib/utils";
 
@@ -103,6 +104,21 @@ export default function DesignPage() {
             <Button taille="lg" variante="secondaire" icone={FileText} pleineLargeur>
               Nouveau devis
             </Button>
+          </Card>
+        </Section>
+
+        <Section titre="Onglets">
+          <Card className="p-5">
+            <Tabs
+              actif="photos"
+              onglets={[
+                { cle: "apercu", label: "Vue d'ensemble", labelCourt: "Aperçu", href: "/design", icone: LayoutDashboard },
+                { cle: "plan", label: "Plan", href: "/design", icone: IconePlan, compteur: 4 },
+                { cle: "photos", label: "Photos", href: "/design", icone: Image, compteur: 12 },
+                { cle: "docs", label: "Docs", href: "/design", icone: FileText },
+                { cle: "activite", label: "Activité", href: "/design", icone: Activity },
+              ]}
+            />
           </Card>
         </Section>
 

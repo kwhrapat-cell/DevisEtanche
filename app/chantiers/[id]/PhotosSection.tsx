@@ -4,6 +4,11 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { tenterVidage } from "@/lib/offline/queue";
 import { envoyerPhoto, type PhotoChantier as Photo } from "@/lib/photos";
+import { Camera, Image } from "@/components/icons";
+import { classesBouton } from "@/components/ui/Button";
+import { Card, CardHeader } from "@/components/ui/Card";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { cn } from "@/lib/utils";
 
 export default function PhotosSection({ chantierId, photosInitiales }: { chantierId: string; photosInitiales: Photo[] }) {
   const [photos, setPhotos] = useState(photosInitiales);
@@ -30,24 +35,31 @@ export default function PhotosSection({ chantierId, photosInitiales }: { chantie
   }
 
   return (
-    <div className="card p-6 mt-6">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="font-display font-semibold text-encre">Photos</h2>
-        <label className="text-sm text-primaire font-medium cursor-pointer">
-          {envoi ? "Envoi…" : "+ Ajouter une photo"}
-          <input type="file" accept="image/*" capture="environment" onChange={surSelection} className="hidden" disabled={envoi} />
-        </label>
-      </div>
-      {erreur && <div className="text-sm text-rouge bg-rouge/10 rounded-lg px-3 py-2 mb-3">{erreur}</div>}
+    <Card className="p-5">
+      <CardHeader
+        titre="Photos"
+        sousTitre={photos.length > 0 ? `${photos.length} photo${photos.length > 1 ? "s" : ""}` : undefined}
+        action={
+          // <label> plutôt que <Button> : c'est lui qui ouvre l'appareil photo.
+          <label className={cn(classesBouton({ taille: "lg" }), "cursor-pointer", envoi && "pointer-events-none opacity-50")}>
+            <Camera size={20} className="shrink-0" />
+            {envoi ? "Envoi…" : "Prendre une photo"}
+            <input type="file" accept="image/*" capture="environment" onChange={surSelection} className="hidden" disabled={envoi} />
+          </label>
+        }
+      />
+      {erreur && <div className="mb-3 rounded-lg bg-rouge/10 px-3 py-2 text-sm text-rouge">{erreur}</div>}
       {photos.length === 0 ? (
-        <p className="text-sm text-encre/60">Aucune photo pour l'instant.</p>
+        <EmptyState icone={Image} titre="Aucune photo pour l'instant" texte="Les photos prises sur le chantier apparaîtront ici." />
       ) : (
-        <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+        <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 sm:gap-3 lg:grid-cols-6">
           {photos.map((p) => (
-            <img key={p.id} src={p.url} alt={p.legende ?? "Photo de chantier"} className="w-full h-24 object-cover rounded-lg" />
+            <a key={p.id} href={p.url} target="_blank" rel="noreferrer">
+              <img src={p.url} alt={p.legende ?? "Photo de chantier"} className="aspect-square w-full rounded-lg object-cover" />
+            </a>
           ))}
         </div>
       )}
-    </div>
+    </Card>
   );
 }
