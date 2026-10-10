@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { Calculator, FileText, HardHat, House, Menu, Plus, type Icon } from "@/components/icons";
 import { estActif } from "@/components/navigation";
 import { useSidebar } from "@/components/SidebarContext";
+import { pageAccueil } from "@/lib/accueil";
 import { cn } from "@/lib/utils";
 
 /**
@@ -14,7 +15,7 @@ import { cn } from "@/lib/utils";
  */
 export default function BottomNav() {
   const pathname = usePathname();
-  const { setOuvert, restreint } = useSidebar();
+  const { setOuvert, profil, restreint } = useSidebar();
 
   const onglet = (href: string, label: string, IconeOnglet: Icon) => {
     const actif = estActif(pathname, href);
@@ -36,7 +37,8 @@ export default function BottomNav() {
       aria-label="Navigation rapide"
     >
       <div className="mx-auto grid h-16 max-w-md grid-cols-5 items-center">
-        {onglet("/dashboard", "Accueil", House)}
+        {/* L'onglet Accueil mène à la page d'arrivée du rôle (voir lib/accueil.ts). */}
+        {onglet(pageAccueil(profil?.role), "Accueil", House)}
         {onglet("/chantiers", "Chantiers", HardHat)}
         {restreint ? (
           <span />

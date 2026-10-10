@@ -7,6 +7,7 @@ import Logo from "@/components/Logo";
 import { X } from "@/components/icons";
 import { NAV_BAS, NAV_OUTILS, NAV_PRINCIPALE, estActif, type LienNav } from "@/components/navigation";
 import { LABEL_ROLE, useSidebar } from "@/components/SidebarContext";
+import { pageAccueil } from "@/lib/accueil";
 import { cn, initiales } from "@/lib/utils";
 
 export default function Sidebar() {
@@ -48,7 +49,7 @@ export default function Sidebar() {
         )}
       >
         <div className="flex items-center justify-between px-5 pb-6 pt-6">
-          <Link href="/dashboard" onClick={() => setOuvert(false)}>
+          <Link href={pageAccueil(profil?.role)} onClick={() => setOuvert(false)}>
             <Logo clair />
           </Link>
           <button

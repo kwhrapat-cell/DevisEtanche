@@ -6,6 +6,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import IllustrationArchitecture from "@/components/IllustrationArchitecture";
 import Logo from "@/components/Logo";
+import { pageAccueil } from "@/lib/accueil";
 
 function IconeOeil({ visible }: { visible: boolean }) {
   return visible ? (
@@ -35,9 +36,9 @@ function LoginForm() {
     setErreur(null);
     setChargement(true);
     const supabase = createClient();
-    const { error } = await supabase.auth.signInWithPassword({ email, password: motDePasse });
-    setChargement(false);
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password: motDePasse });
     if (error) {
+      setChargement(false);
       if (error.message.toLowerCase().includes("email not confirmed")) {
         setErreur("E-mail non confirmé — vérifiez votre boîte mail, ou contactez l'administrateur si la confirmation reste bloquée.");
       } else if (error.message.toLowerCase().includes("invalid login credentials")) {
@@ -47,7 +48,13 @@ function LoginForm() {
       }
       return;
     }
-    router.push(params.get("suivant") || "/dashboard");
+    // Sans page demandée, chacun arrive sur l'accueil de son rôle (lib/accueil.ts).
+    let destination = params.get("suivant");
+    if (!destination) {
+      const { data: profil } = await supabase.from("profiles").select("role").eq("id", data.user.id).maybeSingle();
+      destination = pageAccueil(profil?.role);
+    }
+    router.push(destination);
     router.refresh();
   }
 

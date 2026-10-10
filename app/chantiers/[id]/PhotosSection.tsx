@@ -2,10 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
-import { queueAction, tenterVidage } from "@/lib/offline/queue";
-
-interface Photo { id: string; url: string; legende: string | null; }
+import { tenterVidage } from "@/lib/offline/queue";
+import { envoyerPhoto, type PhotoChantier as Photo } from "@/lib/photos";
 
 export default function PhotosSection({ chantierId, photosInitiales }: { chantierId: string; photosInitiales: Photo[] }) {
   const [photos, setPhotos] = useState(photosInitiales);
@@ -22,36 +20,13 @@ export default function PhotosSection({ chantierId, photosInitiales }: { chantie
     if (!fichier) return;
     setErreur(null);
     setEnvoi(true);
-    const supabase = createClient();
-    const chemin = `${chantierId}/${Date.now()}-${fichier.name}`;
-
-    if (!navigator.onLine) {
-      // Hors connexion : on prévient l'utilisateur, l'upload binaire ne peut pas
-      // être mis en file d'attente aussi simplement qu'une écriture texte.
-      setEnvoi(false);
-      setErreur("Vous êtes hors connexion — reprenez la photo une fois reconnecté.");
-      return;
-    }
-
-    const { error: uploadError } = await supabase.storage.from("photos").upload(chemin, fichier);
-    if (uploadError) {
-      setEnvoi(false);
-      setErreur("L'envoi de la photo a échoué.");
-      return;
-    }
-    const { data: urlData } = supabase.storage.from("photos").getPublicUrl(chemin);
-    const { data: photo, error: dbError } = await supabase
-      .from("photos")
-      .insert({ chantier_id: chantierId, url: urlData.publicUrl })
-      .select()
-      .single();
-
+    const resultat = await envoyerPhoto(chantierId, fichier);
     setEnvoi(false);
-    if (dbError || !photo) {
-      setErreur("Photo envoyée mais non enregistrée.");
+    if ("erreur" in resultat) {
+      setErreur(resultat.erreur);
       return;
     }
-    setPhotos((prev) => [photo, ...prev]);
+    setPhotos((prev) => [resultat.photo, ...prev]);
   }
 
   return (
