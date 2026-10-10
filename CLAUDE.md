@@ -77,7 +77,7 @@ pourrait les effacer de son téléphone. Leur nettoyage se fera à part, avec lu
 1. ✅ Design system, shell et tableau de bord
 2. ✅ Accueil « Mode Chantier » (« Que souhaitez-vous faire aujourd'hui ? », gros boutons)
 3. ✅ Fiche chantier à onglets (Vue d'ensemble, Plan, Photos, Docs, Activité)
-4. Plan interactif : image du plan + zones en SVG (coordonnées 0–1 en `jsonb`), panneau de zone
+4. ✅ Plan interactif : image du plan + zones en SVG (coordonnées 0–1 en `jsonb`), panneau de zone
 5. Espace client avec la frise d'étapes (Préparation → Isolation → Étanchéité → Contrôle → Réception)
 
 Hors périmètre pour l'instant : réseau pro, appels d'offres, recrutement, formations, commande vocale.

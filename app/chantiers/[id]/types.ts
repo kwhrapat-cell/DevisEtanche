@@ -5,6 +5,8 @@ export interface Zone {
   surface_m2: number | null;
   statut: string;
   avancement_pct: number | null;
+  /** Forme de la zone sur le plan du chantier, points en fraction de l'image (0 à 1). */
+  contour?: [number, number][] | null;
   created_at: string;
 }
 
