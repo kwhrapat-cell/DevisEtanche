@@ -107,8 +107,9 @@ export default function RejoindreChantierPage() {
     const { data, error } = await supabase.rpc("rejoindre_chantier_via_code", { p_code: code.trim(), p_nom: nom.trim() });
     setChargement(false);
 
-    if (error) {
-      setErreur(mapErreurRpc(error.message));
+    // Code refusé : la fonction renvoie { erreur } (voir supabase/migration-securite-invitations.sql).
+    if (error || data?.erreur) {
+      setErreur(mapErreurRpc(error?.message ?? data.erreur));
       return;
     }
 

@@ -413,29 +413,34 @@ begin
 
   insert into tentatives_code_invitation (utilisateur_id) values (auth.uid());
 
+  -- À partir d'ici, un code refusé renvoie {"erreur": "..."} au lieu de lever
+  -- une exception : une exception annulerait toute la transaction, y compris
+  -- l'enregistrement de la tentative ci-dessus — les essais ratés ne seraient
+  -- alors jamais comptés et la limite ne servirait à rien.
+
   select * into v_invitation from invitations_soustraitance
     where code = upper(trim(p_code)) for update;
 
   if not found then
-    raise exception 'Code invalide.';
+    return json_build_object('erreur', 'Code invalide.');
   end if;
 
   if v_invitation.revoquee then
-    raise exception 'Ce code a été annulé par l''entreprise.';
+    return json_build_object('erreur', 'Ce code a été annulé par l''entreprise.');
   end if;
 
   if v_invitation.utilise then
-    raise exception 'Ce code a déjà été utilisé.';
+    return json_build_object('erreur', 'Ce code a déjà été utilisé.');
   end if;
 
   if v_invitation.date_expiration <= now() then
-    raise exception 'Ce code a expiré.';
+    return json_build_object('erreur', 'Ce code a expiré.');
   end if;
 
   select * into v_chantier from chantiers where id = v_invitation.chantier_id;
 
   if v_chantier.statut = 'termine' then
-    raise exception 'Ce chantier est terminé, le code n''est plus valide.';
+    return json_build_object('erreur', 'Ce chantier est terminé, le code n''est plus valide.');
   end if;
 
   insert into profiles (id, entreprise_id, nom, role, chantier_assigne_id)
