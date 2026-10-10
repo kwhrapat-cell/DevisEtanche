@@ -19,6 +19,11 @@ create table entreprises (
   telephone text,
   email text,
   numero_identification text,
+  -- Mentions obligatoires sur les devis/factures exportés (forme juridique du
+  -- prestataire, conditions de règlement, durée de validité du devis en jours).
+  forme_juridique text,
+  conditions_reglement text,
+  validite_devis_jours integer not null default 30,
   stripe_customer_id text,
   stripe_subscription_id text,
   created_at timestamptz default now()
@@ -274,7 +279,8 @@ create policy "Modification entreprise membres" on entreprises for update
 revoke update on entreprises from authenticated;
 grant update (
   nom, adresse, telephone, email, numero_identification,
-  devise, libelle_taxe, taux_taxe_defaut
+  devise, libelle_taxe, taux_taxe_defaut,
+  forme_juridique, conditions_reglement, validite_devis_jours
 ) on entreprises to authenticated;
 -- La colonne dernier_taux_horaire_interne (ajoutée par migration-calcul-interne-
 -- elements.sql, après ce script) est incluse dans le GRANT de migration-

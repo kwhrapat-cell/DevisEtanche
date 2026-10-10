@@ -68,3 +68,4 @@ export const Map = creerIcone("Map", <><path d="M14.106 5.553a2 2 0 0 0 1.788 0l
 export const Activity = creerIcone("Activity", <><path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2" /></>);
 export const Undo2 = creerIcone("Undo2", <><path d="M9 14 4 9l5-5" /><path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5a5.5 5.5 0 0 1-5.5 5.5H11" /></>);
 export const KeyRound = creerIcone("KeyRound", <><path d="M2.586 17.414A2 2 0 0 0 2 18.828V21a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h1a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h.172a2 2 0 0 0 1.414-.586l.814-.814a6.5 6.5 0 1 0-4-4z" /><circle cx="16.5" cy="7.5" r=".5" fill="currentColor" /></>);
+export const ArrowLeft = creerIcone("ArrowLeft", <><path d="m12 19-7-7 7-7" /><path d="M19 12H5" /></>);

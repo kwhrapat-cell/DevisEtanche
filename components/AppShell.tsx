@@ -15,6 +15,9 @@ const ROUTES_SANS_SIDEBAR = [
   "/mot-de-passe-oublie",
   "/reinitialiser-mot-de-passe",
   "/rejoindre-chantier",
+  "/mentions-legales",
+  "/cgv",
+  "/confidentialite",
 ];
 
 export default function AppShell({ children }: { children: ReactNode }) {
