@@ -8,7 +8,10 @@
 -- À exécuter dans l'éditeur SQL de Supabase, après schema.sql. La fonction
 -- donneur_ordre_elements_zone() (section 6) dépend en plus de la table
 -- elements_zone créée par migration-calcul-interne-elements.sql : exécuter
--- cette dernière avant si ce n'est pas déjà fait.
+-- cette dernière avant si ce n'est pas déjà fait. rejoindre_chantier_via_code()
+-- (section 7) dépend de la table tentatives_code_invitation créée par
+-- migration-securite-invitations.sql : exécuter cette dernière avant aussi,
+-- sous peine de régresser la limite anti brute-force qu'elle met en place.
 
 -- 1) Rôle de compte --------------------------------------------------------
 alter table profiles drop constraint if exists profiles_role_check;
@@ -203,47 +206,63 @@ declare
   v_invitation invitations_soustraitance;
   v_chantier chantiers;
   v_profil_existant profiles;
+  v_tentatives_recentes int;
 begin
   if auth.uid() is null then
     raise exception 'Utilisateur non authentifié.';
   end if;
 
+  select count(*) into v_tentatives_recentes
+    from tentatives_code_invitation
+    where utilisateur_id = auth.uid() and tentee_at > now() - interval '15 minutes';
+
+  if v_tentatives_recentes >= 5 then
+    raise exception 'Trop de tentatives — réessayez dans quelques minutes.';
+  end if;
+
+  insert into tentatives_code_invitation (utilisateur_id) values (auth.uid());
+
+  -- À partir d'ici, un code refusé renvoie {"erreur": "..."} au lieu de lever
+  -- une exception : une exception annulerait toute la transaction, y compris
+  -- l'enregistrement de la tentative ci-dessus — les essais ratés ne seraient
+  -- alors jamais comptés et la limite ne servirait à rien.
+
   select * into v_invitation from invitations_soustraitance
     where code = upper(trim(p_code)) for update;
 
   if not found then
-    raise exception 'Code invalide.';
+    return json_build_object('erreur', 'Code invalide.');
   end if;
 
   if v_invitation.revoquee then
-    raise exception 'Ce code a été annulé par l''entreprise.';
+    return json_build_object('erreur', 'Ce code a été annulé par l''entreprise.');
   end if;
 
   if v_invitation.utilise then
-    raise exception 'Ce code a déjà été utilisé.';
+    return json_build_object('erreur', 'Ce code a déjà été utilisé.');
   end if;
 
   if v_invitation.date_expiration <= now() then
-    raise exception 'Ce code a expiré.';
+    return json_build_object('erreur', 'Ce code a expiré.');
   end if;
 
   select * into v_chantier from chantiers where id = v_invitation.chantier_id;
 
   if v_chantier.statut = 'termine' then
-    raise exception 'Ce chantier est terminé, le code n''est plus valide.';
+    return json_build_object('erreur', 'Ce chantier est terminé, le code n''est plus valide.');
   end if;
 
   select * into v_profil_existant from profiles where id = auth.uid();
 
   if v_invitation.type_emetteur = 'donneur_ordre' then
     if v_profil_existant is null then
-      raise exception 'Connectez-vous avec le compte administrateur de votre entreprise avant de saisir ce code.';
+      return json_build_object('erreur', 'Connectez-vous avec le compte administrateur de votre entreprise avant de saisir ce code.');
     end if;
     if v_profil_existant.role <> 'administrateur' then
-      raise exception 'Seul un compte administrateur peut rattacher son entreprise à ce chantier.';
+      return json_build_object('erreur', 'Seul un compte administrateur peut rattacher son entreprise à ce chantier.');
     end if;
     if v_chantier.entreprise_id is not null then
-      raise exception 'Ce chantier a déjà une entreprise exécutante rattachée.';
+      return json_build_object('erreur', 'Ce chantier a déjà une entreprise exécutante rattachée.');
     end if;
 
     update chantiers set entreprise_id = v_profil_existant.entreprise_id where id = v_chantier.id;
@@ -255,7 +274,7 @@ begin
   -- Cas existant : sous-traitance, compte créé à la volée avec accès
   -- restreint à ce seul chantier.
   if v_profil_existant is not null then
-    raise exception 'Un profil existe déjà pour ce compte.';
+    return json_build_object('erreur', 'Un profil existe déjà pour ce compte.');
   end if;
 
   insert into profiles (id, entreprise_id, nom, role, chantier_assigne_id)

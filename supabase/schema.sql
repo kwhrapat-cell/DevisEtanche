@@ -408,7 +408,7 @@ create policy "Creation invitation donneur d'ordre" on invitations_soustraitance
 -- Lecture/révocation de la liste des codes : réservée aux administrateurs et
 -- donneurs d'ordre, chacun sur les codes de sa propre entreprise/portefeuille
 -- (pas de listing possible pour un sous-traitant, qui ne peut valider un code
--- que via la fonction invitation_par_code ci-dessous).
+-- que via la fonction rejoindre_chantier_via_code ci-dessous).
 create policy "Lecture invitations entreprise" on invitations_soustraitance for select
   using (
     entreprise_id = public.entreprise_id_courante()
@@ -422,37 +422,20 @@ create policy "Revocation invitation administrateur" on invitations_soustraitanc
   )
   with check (entreprise_id = public.entreprise_id_courante());
 
--- Validation d'un code par un sous-traitant : une policy RLS classique sur la
--- table ne peut pas distinguer "je connais le code" de "je liste toutes les
--- lignes valides" (RLS filtre des lignes, pas la forme de la requête) — un
--- utilisateur pourrait donc énumérer tous les codes valides de toutes les
--- entreprises. On expose donc la lecture par code via une fonction security
--- definer (même principe que espace_client_chantier ci-dessus) : seul celui
--- qui connaît déjà le code exact obtient un résultat.
-create or replace function public.invitation_par_code(p_code text)
-returns json
-language sql
-security definer
-stable
-set search_path = public
-as $$
-  select json_build_object(
-    'chantier_id', i.chantier_id,
-    'chantier_nom', c.nom,
-    'entreprise_nom', e.nom,
-    'role_autorise', i.role_autorise
-  )
-  from invitations_soustraitance i
-  join chantiers c on c.id = i.chantier_id
-  join entreprises e on e.id = i.entreprise_id
-  where i.code = upper(trim(p_code))
-    and not i.utilise
-    and not i.revoquee
-    and i.date_expiration > now()
-    and c.statut <> 'termine';
-$$;
+-- Anti brute-force sur la validation de code (voir rejoindre_chantier_via_code
+-- ci-dessous) : une ligne par tentative, jamais accessible directement (RLS
+-- activée sans aucune policy) — seule la fonction security definer y écrit et
+-- y lit, avec les droits du propriétaire.
+create table if not exists tentatives_code_invitation (
+  id bigint generated always as identity primary key,
+  utilisateur_id uuid not null references auth.users(id) on delete cascade,
+  tentee_at timestamptz not null default now()
+);
 
-grant execute on function public.invitation_par_code(text) to authenticated;
+create index if not exists idx_tentatives_code_invitation_utilisateur
+  on tentatives_code_invitation (utilisateur_id, tentee_at);
+
+alter table tentatives_code_invitation enable row level security;
 
 -- Validation + rattachement effectif : transaction atomique (verrou de ligne
 -- via "for update") pour éviter qu'un même code soit consommé deux fois en cas
@@ -465,6 +448,11 @@ grant execute on function public.invitation_par_code(text) to authenticated;
 -- volée par cette même fonction) et transfère la propriété du chantier
 -- (entreprise_id) à son entreprise, sans jamais toucher à donneur_ordre_id
 -- ni à l'historique du chantier (zones, photos, statut, token_public).
+--
+-- Anti brute-force : un compte authentifié peut appeler cette fonction en
+-- boucle (échouer ne coûte rien d'autre qu'un compte gratuit, pour le cas
+-- sous-traitant) — on limite donc à 5 tentatives par compte sur une fenêtre
+-- glissante de 15 minutes, quel que soit le code essayé ou le type d'appelant.
 create or replace function public.rejoindre_chantier_via_code(p_code text, p_nom text)
 returns json
 language plpgsql
@@ -475,47 +463,63 @@ declare
   v_invitation invitations_soustraitance;
   v_chantier chantiers;
   v_profil_existant profiles;
+  v_tentatives_recentes int;
 begin
   if auth.uid() is null then
     raise exception 'Utilisateur non authentifié.';
   end if;
 
+  select count(*) into v_tentatives_recentes
+    from tentatives_code_invitation
+    where utilisateur_id = auth.uid() and tentee_at > now() - interval '15 minutes';
+
+  if v_tentatives_recentes >= 5 then
+    raise exception 'Trop de tentatives — réessayez dans quelques minutes.';
+  end if;
+
+  insert into tentatives_code_invitation (utilisateur_id) values (auth.uid());
+
+  -- À partir d'ici, un code refusé renvoie {"erreur": "..."} au lieu de lever
+  -- une exception : une exception annulerait toute la transaction, y compris
+  -- l'enregistrement de la tentative ci-dessus — les essais ratés ne seraient
+  -- alors jamais comptés et la limite ne servirait à rien.
+
   select * into v_invitation from invitations_soustraitance
     where code = upper(trim(p_code)) for update;
 
   if not found then
-    raise exception 'Code invalide.';
+    return json_build_object('erreur', 'Code invalide.');
   end if;
 
   if v_invitation.revoquee then
-    raise exception 'Ce code a été annulé par l''entreprise.';
+    return json_build_object('erreur', 'Ce code a été annulé par l''entreprise.');
   end if;
 
   if v_invitation.utilise then
-    raise exception 'Ce code a déjà été utilisé.';
+    return json_build_object('erreur', 'Ce code a déjà été utilisé.');
   end if;
 
   if v_invitation.date_expiration <= now() then
-    raise exception 'Ce code a expiré.';
+    return json_build_object('erreur', 'Ce code a expiré.');
   end if;
 
   select * into v_chantier from chantiers where id = v_invitation.chantier_id;
 
   if v_chantier.statut = 'termine' then
-    raise exception 'Ce chantier est terminé, le code n''est plus valide.';
+    return json_build_object('erreur', 'Ce chantier est terminé, le code n''est plus valide.');
   end if;
 
   select * into v_profil_existant from profiles where id = auth.uid();
 
   if v_invitation.type_emetteur = 'donneur_ordre' then
     if v_profil_existant is null then
-      raise exception 'Connectez-vous avec le compte administrateur de votre entreprise avant de saisir ce code.';
+      return json_build_object('erreur', 'Connectez-vous avec le compte administrateur de votre entreprise avant de saisir ce code.');
     end if;
     if v_profil_existant.role <> 'administrateur' then
-      raise exception 'Seul un compte administrateur peut rattacher son entreprise à ce chantier.';
+      return json_build_object('erreur', 'Seul un compte administrateur peut rattacher son entreprise à ce chantier.');
     end if;
     if v_chantier.entreprise_id is not null then
-      raise exception 'Ce chantier a déjà une entreprise exécutante rattachée.';
+      return json_build_object('erreur', 'Ce chantier a déjà une entreprise exécutante rattachée.');
     end if;
 
     update chantiers set entreprise_id = v_profil_existant.entreprise_id where id = v_chantier.id;
@@ -527,7 +531,7 @@ begin
   -- Cas existant : sous-traitance, compte créé à la volée avec accès
   -- restreint à ce seul chantier.
   if v_profil_existant is not null then
-    raise exception 'Un profil existe déjà pour ce compte.';
+    return json_build_object('erreur', 'Un profil existe déjà pour ce compte.');
   end if;
 
   insert into profiles (id, entreprise_id, nom, role, chantier_assigne_id)
