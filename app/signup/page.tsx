@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import IllustrationArchitecture from "@/components/IllustrationArchitecture";
+import Footer from "@/components/Footer";
 import Logo from "@/components/Logo";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -55,6 +56,7 @@ export default function SignupPage() {
   const [motDePasseVisible, setMotDePasseVisible] = useState(false);
   const [erreur, setErreur] = useState<string | null>(null);
   const [chargement, setChargement] = useState(false);
+  const [cgvAcceptees, setCgvAcceptees] = useState(false);
   const router = useRouter();
 
   const nomValide = nom.trim().length > 1;
@@ -66,11 +68,15 @@ export default function SignupPage() {
   const labelForce = score <= 1 ? "Mot de passe faible" : score <= 2 ? "Mot de passe moyen" : score === 3 ? "Mot de passe bon" : "Mot de passe fort";
   const couleurForce = score <= 1 ? "#DC2626" : score <= 2 ? "#D97706" : "#16A34A";
 
-  const formulaireValide = nomValide && entrepriseValide && emailValide && mdpValide;
+  const formulaireValide = nomValide && entrepriseValide && emailValide && mdpValide && cgvAcceptees;
   const aCommence = nom.length > 0 || entreprise.length > 0 || email.length > 0 || motDePasse.length > 0;
 
   async function creerCompte(e: React.FormEvent) {
     e.preventDefault();
+    if (!cgvAcceptees) {
+      setErreur("Vous devez accepter la politique de confidentialité et les CGV pour créer votre compte.");
+      return;
+    }
     setErreur(null);
     setChargement(true);
     const supabase = createClient();
@@ -109,7 +115,7 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="relative min-h-screen overflow-hidden flex items-center justify-center bg-fond px-4 py-10">
+    <div className="relative min-h-screen overflow-hidden flex flex-col items-center justify-center bg-fond px-4 py-10">
       <IllustrationArchitecture />
       <form onSubmit={creerCompte} className="relative card w-full max-w-sm p-8">
         <div className="flex items-center gap-2 font-display font-semibold text-lg text-encre mb-1">
@@ -197,7 +203,29 @@ export default function SignupPage() {
           </ul>
         </div>
 
-        <button type="submit" disabled={chargement} className="w-full bg-primaire text-white font-semibold rounded-lg py-2.5 disabled:opacity-60">
+        {/* Consentement obligatoire (RGPD / CGV) avant la création du compte. */}
+        <label className="mb-6 flex min-h-[44px] cursor-pointer items-start gap-3 text-sm text-encre/80">
+          <input
+            type="checkbox"
+            required
+            checked={cgvAcceptees}
+            onChange={(e) => setCgvAcceptees(e.target.checked)}
+            className="mt-0.5 h-5 w-5 shrink-0 accent-primaire"
+          />
+          <span>
+            J'accepte la{" "}
+            <Link href="/confidentialite" target="_blank" className="font-medium text-primaire">
+              politique de confidentialité
+            </Link>{" "}
+            et les{" "}
+            <Link href="/cgv" target="_blank" className="font-medium text-primaire">
+              conditions générales de vente
+            </Link>
+            .
+          </span>
+        </label>
+
+        <button type="submit" disabled={chargement || !cgvAcceptees} className="w-full bg-primaire text-white font-semibold rounded-lg py-2.5 disabled:opacity-60">
           {chargement ? "Création…" : "Créer mon compte"}
         </button>
         <p className="text-xs text-encre/60 text-center mt-5">
@@ -208,6 +236,7 @@ export default function SignupPage() {
           <Link href="/rejoindre-chantier" className="text-primaire font-medium">Rejoindre un chantier avec un code</Link>
         </p>
       </form>
+      <Footer className="mt-4" />
     </div>
   );
 }

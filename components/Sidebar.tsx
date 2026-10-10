@@ -78,6 +78,19 @@ export default function Sidebar() {
           </div>
           <BoutonDeconnexion />
         </div>
+        <div className="flex flex-wrap items-center gap-x-1.5 px-6 pb-4 text-[11px] text-white/50">
+          <Link href="/mentions-legales" onClick={() => setOuvert(false)} className="hover:text-white">
+            Mentions légales
+          </Link>
+          <span aria-hidden="true">·</span>
+          <Link href="/cgv" onClick={() => setOuvert(false)} className="hover:text-white">
+            CGV
+          </Link>
+          <span aria-hidden="true">·</span>
+          <Link href="/confidentialite" onClick={() => setOuvert(false)} className="hover:text-white">
+            Confidentialité
+          </Link>
+        </div>
       </aside>
     </>
   );

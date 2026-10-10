@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import IllustrationArchitecture from "@/components/IllustrationArchitecture";
+import Footer from "@/components/Footer";
 import Logo from "@/components/Logo";
 import { pageAccueil } from "@/lib/accueil";
 
@@ -59,7 +60,7 @@ function LoginForm() {
   }
 
   return (
-    <div className="relative min-h-screen overflow-hidden flex items-center justify-center bg-fond px-4">
+    <div className="relative min-h-screen overflow-hidden flex flex-col items-center justify-center bg-fond px-4 py-10">
       <IllustrationArchitecture />
       <form onSubmit={seConnecter} className="relative card w-full max-w-sm p-8">
         <div className="flex items-center gap-2 font-display font-semibold text-lg text-encre mb-1">
@@ -115,6 +116,7 @@ function LoginForm() {
           Pas encore de compte ? <Link href="/signup" className="text-primaire font-medium">Créer un compte</Link>
         </p>
       </form>
+      <Footer className="mt-4" />
     </div>
   );
 }

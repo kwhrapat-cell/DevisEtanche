@@ -11,7 +11,7 @@ export default async function FactureDetailPage({ params }: { params: Promise<{ 
   const { data: facture } = await supabase
     .from("factures")
     .select(
-      "*, chantiers(nom, ville), clients(nom, ville, email, telephone), entreprises(nom, adresse, telephone, email, numero_identification, devise, libelle_taxe)"
+      "*, chantiers(nom, ville), clients(nom, ville, email, telephone), entreprises(*)"
     )
     .eq("id", id)
     .single();
@@ -24,6 +24,10 @@ export default async function FactureDetailPage({ params }: { params: Promise<{ 
   const devise = facture.entreprises?.devise ?? "XPF";
   const libelleTaxe = facture.entreprises?.libelle_taxe ?? "TGC";
   const entrepriseNom = facture.entreprises?.nom ?? "—";
+  // Mentions obligatoires (supabase/migration-mentions-legales-devis.sql) — absentes tant que la migration n'est pas passée.
+  const formeJuridique: string | null = facture.entreprises?.forme_juridique ?? null;
+  const conditionsReglement: string | null = facture.entreprises?.conditions_reglement ?? null;
+  const dateEmission = new Date(facture.created_at).toLocaleDateString("fr-FR");
 
   return (
     <div className="max-w-3xl mx-auto py-10 px-6">
@@ -34,7 +38,10 @@ export default async function FactureDetailPage({ params }: { params: Promise<{ 
 
       <div className="flex justify-between items-start mb-10">
         <div>
-          <div className="font-display font-semibold text-xl text-encre mb-1">{entrepriseNom}</div>
+          <div className="font-display font-semibold text-xl text-encre mb-1">
+            {entrepriseNom}
+            {formeJuridique && <span className="font-normal text-encre/60"> — {formeJuridique}</span>}
+          </div>
           {facture.entreprises?.adresse && <div className="text-xs text-encre/60">{facture.entreprises.adresse}</div>}
           <div className="text-xs text-encre/60">
             {[facture.entreprises?.telephone, facture.entreprises?.email].filter(Boolean).join(" · ")}
@@ -43,6 +50,7 @@ export default async function FactureDetailPage({ params }: { params: Promise<{ 
             <div className="text-xs text-encre/60">{facture.entreprises.numero_identification}</div>
           )}
           <div className="text-xs text-encre/60 mt-2">Facture n° {facture.numero}</div>
+          <div className="text-xs text-encre/60">Émise le {dateEmission}</div>
           {facture.date_echeance && <div className="text-xs text-encre/60">Échéance : {facture.date_echeance}</div>}
         </div>
         <div className="text-right text-sm">
@@ -88,6 +96,13 @@ export default async function FactureDetailPage({ params }: { params: Promise<{ 
           <div className="flex justify-between py-2 border-t border-marine mt-1 font-semibold text-encre"><span>Total TTC</span><span className="font-mono">{formatMontant(Number(facture.total_ttc), devise)}</span></div>
         </div>
       </div>
+
+      {conditionsReglement && (
+        <div className="mt-10 border-t border-ligne pt-4 text-xs text-encre/60">
+          <span className="font-medium text-encre/80">Conditions de règlement — </span>
+          {conditionsReglement}
+        </div>
+      )}
     </div>
   );
 }

@@ -1,6 +1,10 @@
 import TopBar from "@/components/TopBar";
 import { getUtilisateurCourant } from "@/lib/supabase/auth";
 import { createClient } from "@/lib/supabase/server";
+import { CircleAlert } from "@/components/icons";
+import { classesBouton } from "@/components/ui/Button";
+import { Card, CardHeader } from "@/components/ui/Card";
+import { COMPANY_INFO } from "@/lib/company-info";
 import ForfaitCard from "./ForfaitCard";
 import MarcheForm from "./MarcheForm";
 import CoordonneesForm from "./CoordonneesForm";
@@ -36,6 +40,9 @@ export default async function ParametresPage() {
                 telephone={entreprise.telephone}
                 email={entreprise.email}
                 numeroIdentification={entreprise.numero_identification}
+                formeJuridique={entreprise.forme_juridique ?? null}
+                conditionsReglement={entreprise.conditions_reglement ?? null}
+                validiteDevisJours={entreprise.validite_devis_jours ?? 30}
               />
               <MarcheForm
                 entrepriseId={entrepriseId}
@@ -76,6 +83,22 @@ export default async function ParametresPage() {
             <div className="font-medium text-encre mb-1">Mode hors ligne</div>
             <p className="text-sm text-encre/60">Actif — vos modifications se synchronisent automatiquement au retour du réseau.</p>
           </div>
+
+          <Card className="p-5 lg:col-span-2">
+            <CardHeader titre="Confidentialité et données" />
+            <p className="mb-4 text-sm text-encre/70">
+              Consultez notre{" "}
+              <a href="/confidentialite" className="font-medium text-primaire hover:underline">
+                politique de confidentialité
+              </a>
+              . Pour supprimer votre compte et toutes les données associées (entreprise, chantiers, devis, factures, clients, photos), envoyez une
+              demande à {COMPANY_INFO.email} depuis l'adresse e-mail de votre compte. La suppression est faite sous 30 jours.
+            </p>
+            <a href={`mailto:${COMPANY_INFO.email}?subject=${encodeURIComponent("Suppression de compte")}`} className={classesBouton({ variante: "secondaire" })}>
+              <CircleAlert size={18} className="shrink-0 text-rouge" />
+              Demander la suppression de mon compte
+            </a>
+          </Card>
         </div>
     </>
   );
