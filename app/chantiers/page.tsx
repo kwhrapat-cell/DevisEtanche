@@ -1,14 +1,13 @@
 import Link from "next/link";
 import TopBar from "@/components/TopBar";
+import { HardHat, MapPin, Plus, Ruler } from "@/components/icons";
+import { ButtonLink } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { ProgressBar } from "@/components/ui/Progress";
+import { StatusBadge } from "@/components/ui/StatusBadge";
 import { getUtilisateurCourant } from "@/lib/supabase/auth";
 import { createClient } from "@/lib/supabase/server";
-
-const labelStatut: Record<string, string> = {
-  en_preparation: "en préparation",
-  en_cours: "en cours",
-  termine: "terminé",
-  en_attente: "en attente",
-};
 
 export default async function ChantiersPage() {
   const session = await getUtilisateurCourant();
@@ -24,62 +23,64 @@ export default async function ChantiersPage() {
 
   return (
     <>
-        <TopBar titre="Chantiers" sousTitre={`${chantiers?.length ?? 0} chantiers`} />
-        <div className="p-4 sm:p-8">
-          <div className="mb-5">
-            <Link href="/chantiers/nouveau" className="inline-flex items-center gap-2 bg-rouille text-white text-sm font-semibold px-4 py-2 rounded-lg">
-              + Nouveau chantier
-            </Link>
-          </div>
-          {!chantiers || chantiers.length === 0 ? (
-            <div className="card p-10 text-center">
-              <div className="font-display font-semibold text-neige mb-2">Aucun chantier pour l'instant</div>
-              <p className="text-sm text-neige/50 mb-5 max-w-sm mx-auto">
-                Créez votre premier chantier depuis Supabase (table <code>chantiers</code>) ou exécutez{" "}
-                <code>supabase/seed.sql</code> pour charger des données de démonstration.
-              </p>
-            </div>
-          ) : (
-            <div className="card overflow-hidden">
-              <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="text-left text-xs text-neige/50 border-b border-ligne">
-                    <th className="px-5 py-3 font-medium">Chantier</th>
-                    <th className="px-5 py-3 font-medium">Statut</th>
-                    <th className="px-5 py-3 font-medium">Surface</th>
-                    <th className="px-5 py-3 font-medium">Avancement</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {chantiers.map((c) => (
-                    <tr key={c.id} className="border-b border-ligne last:border-0 hover:bg-sable/40">
-                      <td className="px-5 py-4">
-                        <Link href={`/chantiers/${c.id}`} className="font-medium text-neige hover:text-rouille">
-                          {c.nom}
-                        </Link>
-                        <div className="text-xs text-neige/50">{c.ville}</div>
-                      </td>
-                      <td className="px-5 py-4">
-                        <span className={`badge badge-${c.statut}`}>{labelStatut[c.statut] ?? c.statut}</span>
-                      </td>
-                      <td className="px-5 py-4 font-mono">{c.surface_totale_m2} m²</td>
-                      <td className="px-5 py-4">
-                        <div className="flex items-center gap-2">
-                          <div className="w-28 h-2 bg-sable rounded-full overflow-hidden">
-                            <div className="h-full bg-vert" style={{ width: `${c.avancement_pct}%` }} />
-                          </div>
-                          <span className="font-mono text-xs">{c.avancement_pct}%</span>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              </div>
-            </div>
-          )}
-        </div>
+      <TopBar
+        titre="Chantiers"
+        sousTitre={`${chantiers?.length ?? 0} chantier${(chantiers?.length ?? 0) > 1 ? "s" : ""}`}
+        action={
+          <ButtonLink href="/chantiers/nouveau" icone={Plus} className="hidden sm:inline-flex">
+            Nouveau chantier
+          </ButtonLink>
+        }
+      />
+      <div className="p-4 sm:p-8">
+        {!chantiers || chantiers.length === 0 ? (
+          <Card>
+            <EmptyState
+              icone={HardHat}
+              titre="Aucun chantier pour l'instant"
+              texte="Créez votre premier chantier pour suivre son avancement zone par zone."
+              action={
+                <ButtonLink href="/chantiers/nouveau" icone={Plus} taille="lg">
+                  Créer un chantier
+                </ButtonLink>
+              }
+            />
+          </Card>
+        ) : (
+          <ul className="grid grid-cols-1 gap-3 lg:grid-cols-2">
+            {chantiers.map((c) => (
+              <li key={c.id}>
+                <Link
+                  href={`/chantiers/${c.id}`}
+                  className="card flex flex-col gap-3 p-4 transition-colors hover:border-primaire/40 sm:p-5"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <div className="truncate font-semibold text-encre">{c.nom}</div>
+                      <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-encre/60">
+                        {c.ville && (
+                          <span className="flex items-center gap-1">
+                            <MapPin size={13} className="shrink-0" />
+                            {c.ville}
+                          </span>
+                        )}
+                        {c.surface_totale_m2 != null && (
+                          <span className="flex items-center gap-1">
+                            <Ruler size={13} className="shrink-0" />
+                            {c.surface_totale_m2} m²
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <StatusBadge domaine="chantier" statut={c.statut} />
+                  </div>
+                  <ProgressBar valeur={c.avancement_pct ?? 0} afficherValeur />
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
     </>
   );
 }

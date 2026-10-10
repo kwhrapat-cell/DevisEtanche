@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import IllustrationArchitecture from "@/components/IllustrationArchitecture";
+import Logo from "@/components/Logo";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -26,7 +27,7 @@ function evaluerMotDePasse(mdp: string): { score: number; criteres: CritereMotDe
 
 function Coche({ ok }: { ok: boolean }) {
   return (
-    <svg viewBox="0 0 20 20" fill="none" className={`w-4 h-4 shrink-0 ${ok ? "text-vert" : "text-neige/25"}`}>
+    <svg viewBox="0 0 20 20" fill="none" className={`w-4 h-4 shrink-0 ${ok ? "text-emerald-700" : "text-encre/40"}`}>
       <circle cx="10" cy="10" r="9" stroke="currentColor" strokeWidth="1.4" />
       {ok && <path d="M6 10.3l2.4 2.4L14 7.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />}
     </svg>
@@ -63,7 +64,7 @@ export default function SignupPage() {
   const mdpValide = score === criteres.length;
 
   const labelForce = score <= 1 ? "Mot de passe faible" : score <= 2 ? "Mot de passe moyen" : score === 3 ? "Mot de passe bon" : "Mot de passe fort";
-  const couleurForce = score <= 1 ? "#FF8A80" : score <= 2 ? "#FBBF24" : "#6EE7A0";
+  const couleurForce = score <= 1 ? "#DC2626" : score <= 2 ? "#D97706" : "#16A34A";
 
   const formulaireValide = nomValide && entrepriseValide && emailValide && mdpValide;
   const aCommence = nom.length > 0 || entreprise.length > 0 || email.length > 0 || motDePasse.length > 0;
@@ -108,48 +109,48 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="relative min-h-screen overflow-hidden flex items-center justify-center bg-papier px-4 py-10">
+    <div className="relative min-h-screen overflow-hidden flex items-center justify-center bg-fond px-4 py-10">
       <IllustrationArchitecture />
       <form onSubmit={creerCompte} className="relative card w-full max-w-sm p-8">
-        <div className="flex items-center gap-2 font-display font-semibold text-lg text-neige mb-1">
-          <span className="w-6 h-6 rounded-md bg-gradient-to-br from-rouille to-ambre inline-block" />
+        <div className="flex items-center gap-2 font-display font-semibold text-lg text-encre mb-1">
+          <Logo avecNom={false} />
           DevisEtanche
         </div>
-        <p className="text-sm text-neige/50 mb-6">Créer votre espace</p>
+        <p className="text-sm text-encre/60 mb-6">Créer votre espace</p>
 
-        {erreur && <div className="text-sm text-[#FF8A80] bg-[#3B1418] rounded-lg px-3 py-2 mb-4">{erreur}</div>}
+        {erreur && <div className="text-sm text-rouge bg-rouge/10 rounded-lg px-3 py-2 mb-4">{erreur}</div>}
         {!erreur && aCommence && (
           <div
             className="text-sm rounded-lg px-3 py-2 mb-4"
             style={
               formulaireValide
-                ? { color: "#6EE7A0", background: "rgba(110,231,160,0.12)" }
-                : { color: "#EAF0FB99", background: "rgba(234,240,251,0.06)" }
+                ? { color: "#047857", background: "#ECFDF5" }
+                : { color: "rgb(15 27 45 / 0.7)", background: "rgb(238 242 247)" }
             }
           >
             {formulaireValide ? "Aucun problème détecté. Vous pouvez créer votre compte." : "Complétez les champs ci-dessous pour continuer."}
           </div>
         )}
 
-        <label className="text-xs font-mono text-neige/60 block mb-1">VOTRE NOM</label>
+        <label className="text-xs font-mono text-encre/70 block mb-1">VOTRE NOM</label>
         <div className="relative mb-4">
           <input required value={nom} onChange={(e) => setNom(e.target.value)} className="w-full border border-ligne rounded-lg px-3 py-2 pr-9" />
           {nom.length > 0 && <span className="absolute right-3 top-1/2 -translate-y-1/2"><Coche ok={nomValide} /></span>}
         </div>
 
-        <label className="text-xs font-mono text-neige/60 block mb-1">NOM DE L'ENTREPRISE</label>
+        <label className="text-xs font-mono text-encre/70 block mb-1">NOM DE L'ENTREPRISE</label>
         <div className="relative mb-4">
           <input required value={entreprise} onChange={(e) => setEntreprise(e.target.value)} className="w-full border border-ligne rounded-lg px-3 py-2 pr-9" />
           {entreprise.length > 0 && <span className="absolute right-3 top-1/2 -translate-y-1/2"><Coche ok={entrepriseValide} /></span>}
         </div>
 
-        <label className="text-xs font-mono text-neige/60 block mb-1">E-MAIL</label>
+        <label className="text-xs font-mono text-encre/70 block mb-1">E-MAIL</label>
         <div className="relative mb-4">
           <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} className="w-full border border-ligne rounded-lg px-3 py-2 pr-9" />
           {email.length > 0 && <span className="absolute right-3 top-1/2 -translate-y-1/2"><Coche ok={emailValide} /></span>}
         </div>
 
-        <label className="text-xs font-mono text-neige/60 block mb-1">MOT DE PASSE</label>
+        <label className="text-xs font-mono text-encre/70 block mb-1">MOT DE PASSE</label>
         <div className="relative mb-2">
           <input
             type={motDePasseVisible ? "text" : "password"}
@@ -162,7 +163,7 @@ export default function SignupPage() {
           <button
             type="button"
             onClick={() => setMotDePasseVisible((v) => !v)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-neige/40 hover:text-neige/70"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-encre/60 hover:text-encre/80"
             aria-label={motDePasseVisible ? "Masquer le mot de passe" : "Afficher le mot de passe"}
           >
             <IconeOeil visible={motDePasseVisible} />
@@ -176,7 +177,7 @@ export default function SignupPage() {
                 <span
                   key={i}
                   className="h-1 flex-1 rounded-full"
-                  style={{ background: score > i * (criteres.length / 3) ? couleurForce : "rgba(234,240,251,0.12)" }}
+                  style={{ background: score > i * (criteres.length / 3) ? couleurForce : "rgb(226 232 240)" }}
                 />
               ))}
             </div>
@@ -184,11 +185,11 @@ export default function SignupPage() {
           </div>
         )}
 
-        <div className="rounded-lg px-3 py-2.5 mb-6" style={{ background: "rgba(234,240,251,0.04)" }}>
-          <div className="text-xs font-medium text-neige/70 mb-1.5">Votre sécurité est notre priorité</div>
+        <div className="rounded-lg px-3 py-2.5 mb-6" style={{ background: "rgb(238 242 247)" }}>
+          <div className="text-xs font-medium text-encre/80 mb-1.5">Votre sécurité est notre priorité</div>
           <ul className="grid grid-cols-2 gap-x-3 gap-y-1">
             {criteres.map((c) => (
-              <li key={c.label} className="flex items-center gap-1.5 text-xs text-neige/60">
+              <li key={c.label} className="flex items-center gap-1.5 text-xs text-encre/70">
                 <Coche ok={c.ok} />
                 {c.label}
               </li>
@@ -196,15 +197,15 @@ export default function SignupPage() {
           </ul>
         </div>
 
-        <button type="submit" disabled={chargement} className="w-full bg-rouille text-white font-semibold rounded-lg py-2.5 disabled:opacity-60">
+        <button type="submit" disabled={chargement} className="w-full bg-primaire text-white font-semibold rounded-lg py-2.5 disabled:opacity-60">
           {chargement ? "Création…" : "Créer mon compte"}
         </button>
-        <p className="text-xs text-neige/50 text-center mt-5">
-          Déjà un compte ? <Link href="/login" className="text-rouille font-medium">Se connecter</Link>
+        <p className="text-xs text-encre/60 text-center mt-5">
+          Déjà un compte ? <Link href="/login" className="text-primaire font-medium">Se connecter</Link>
         </p>
-        <p className="text-xs text-neige/50 text-center mt-2">
+        <p className="text-xs text-encre/60 text-center mt-2">
           Vous avez été invité par une entreprise ?{" "}
-          <Link href="/rejoindre-chantier" className="text-rouille font-medium">Rejoindre un chantier avec un code</Link>
+          <Link href="/rejoindre-chantier" className="text-primaire font-medium">Rejoindre un chantier avec un code</Link>
         </p>
       </form>
     </div>

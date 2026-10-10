@@ -55,24 +55,24 @@ export default function NouveauChantierForm({ entrepriseId, clients }: Props) {
 
   return (
     <form onSubmit={creerChantier} className="card p-6 flex flex-col gap-4">
-      {erreur && <div className="text-sm text-[#FF8A80] bg-[#3B1418] rounded-lg px-3 py-2">{erreur}</div>}
+      {erreur && <div className="text-sm text-rouge bg-rouge/10 rounded-lg px-3 py-2">{erreur}</div>}
       {clients.length === 0 && (
-        <div className="text-sm text-neige/60 bg-sable rounded-lg px-3 py-2">
+        <div className="text-sm text-encre/70 bg-sable rounded-lg px-3 py-2">
           Aucun client enregistré — vous pourrez en associer un plus tard depuis la page Clients.
         </div>
       )}
 
       <div>
-        <label className="text-xs font-mono text-neige/60 block mb-1">NOM DU CHANTIER</label>
+        <label className="text-xs font-mono text-encre/70 block mb-1">NOM DU CHANTIER</label>
         <input required value={nom} onChange={(e) => setNom(e.target.value)} className="w-full border border-ligne rounded-lg px-3 py-2" />
       </div>
       <div>
-        <label className="text-xs font-mono text-neige/60 block mb-1">VILLE</label>
+        <label className="text-xs font-mono text-encre/70 block mb-1">VILLE</label>
         <input value={ville} onChange={(e) => setVille(e.target.value)} className="w-full border border-ligne rounded-lg px-3 py-2" />
       </div>
       {clients.length > 0 && (
         <div>
-          <label className="text-xs font-mono text-neige/60 block mb-1">CLIENT</label>
+          <label className="text-xs font-mono text-encre/70 block mb-1">CLIENT</label>
           <select value={clientId} onChange={(e) => setClientId(e.target.value)} className="w-full border border-ligne rounded-lg px-3 py-2">
             {clients.map((c) => (
               <option key={c.id} value={c.id}>{c.nom}</option>
@@ -81,7 +81,7 @@ export default function NouveauChantierForm({ entrepriseId, clients }: Props) {
         </div>
       )}
       <div>
-        <label className="text-xs font-mono text-neige/60 block mb-1">SURFACE TOTALE (M²)</label>
+        <label className="text-xs font-mono text-encre/70 block mb-1">SURFACE TOTALE (M²)</label>
         <input
           type="number"
           min={0}
@@ -91,7 +91,7 @@ export default function NouveauChantierForm({ entrepriseId, clients }: Props) {
         />
       </div>
       <div>
-        <label className="text-xs font-mono text-neige/60 block mb-1">SYSTÈME D'ÉTANCHÉITÉ</label>
+        <label className="text-xs font-mono text-encre/70 block mb-1">SYSTÈME D'ÉTANCHÉITÉ</label>
         <select value={systeme} onChange={(e) => setSysteme(e.target.value as typeof systeme)} className="w-full border border-ligne rounded-lg px-3 py-2">
           <option value="bicouche">Bicouche bitumineuse</option>
           <option value="pvc">Membrane PVC monocouche</option>
@@ -99,7 +99,7 @@ export default function NouveauChantierForm({ entrepriseId, clients }: Props) {
         </select>
       </div>
 
-      <button type="submit" disabled={chargement} className="bg-rouille text-white font-semibold rounded-lg py-2.5 disabled:opacity-60">
+      <button type="submit" disabled={chargement} className="bg-primaire text-white font-semibold rounded-lg py-2.5 disabled:opacity-60">
         {chargement ? "Création…" : "Créer le chantier"}
       </button>
     </form>

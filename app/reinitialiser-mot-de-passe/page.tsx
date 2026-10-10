@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import IllustrationArchitecture from "@/components/IllustrationArchitecture";
+import Logo from "@/components/Logo";
 
 function IconeOeil({ visible }: { visible: boolean }) {
   return visible ? (
@@ -21,8 +22,8 @@ function IconeOeil({ visible }: { visible: boolean }) {
 
 function EnTete() {
   return (
-    <div className="flex items-center gap-2 font-display font-semibold text-lg text-neige mb-1">
-      <span className="w-6 h-6 rounded-md bg-gradient-to-br from-rouille to-ambre inline-block" />
+    <div className="flex items-center gap-2 font-display font-semibold text-lg text-encre mb-1">
+      <Logo avecNom={false} />
       DevisEtanche
     </div>
   );
@@ -91,11 +92,11 @@ function ReinitialiserMotDePasseForm() {
 
   if (verificationEnCours) {
     return (
-      <div className="relative min-h-screen overflow-hidden flex items-center justify-center bg-papier px-4">
+      <div className="relative min-h-screen overflow-hidden flex items-center justify-center bg-fond px-4">
         <IllustrationArchitecture />
         <div className="relative card w-full max-w-sm p-8 text-center">
           <EnTete />
-          <p className="text-sm text-neige/50 mt-6">Vérification du lien…</p>
+          <p className="text-sm text-encre/60 mt-6">Vérification du lien…</p>
         </div>
       </div>
     );
@@ -103,15 +104,15 @@ function ReinitialiserMotDePasseForm() {
 
   if (!lienValide) {
     return (
-      <div className="relative min-h-screen overflow-hidden flex items-center justify-center bg-papier px-4">
+      <div className="relative min-h-screen overflow-hidden flex items-center justify-center bg-fond px-4">
         <IllustrationArchitecture />
         <div className="relative card w-full max-w-sm p-8">
           <EnTete />
-          <p className="text-sm text-neige/50 mb-6">Réinitialiser votre mot de passe</p>
-          <div className="text-sm text-[#FF8A80] bg-[#3B1418] rounded-lg px-3 py-2 mb-4">
+          <p className="text-sm text-encre/60 mb-6">Réinitialiser votre mot de passe</p>
+          <div className="text-sm text-rouge bg-rouge/10 rounded-lg px-3 py-2 mb-4">
             Ce lien de réinitialisation est invalide ou a expiré.
           </div>
-          <Link href="/mot-de-passe-oublie" className="inline-block text-rouille font-medium text-sm">
+          <Link href="/mot-de-passe-oublie" className="inline-block text-primaire font-medium text-sm">
             Demander un nouveau lien
           </Link>
         </div>
@@ -120,15 +121,15 @@ function ReinitialiserMotDePasseForm() {
   }
 
   return (
-    <div className="relative min-h-screen overflow-hidden flex items-center justify-center bg-papier px-4">
+    <div className="relative min-h-screen overflow-hidden flex items-center justify-center bg-fond px-4">
       <IllustrationArchitecture />
       <form onSubmit={reinitialiser} className="relative card w-full max-w-sm p-8">
         <EnTete />
-        <p className="text-sm text-neige/50 mb-6">Choisissez un nouveau mot de passe</p>
+        <p className="text-sm text-encre/60 mb-6">Choisissez un nouveau mot de passe</p>
 
-        {erreur && <div className="text-sm text-[#FF8A80] bg-[#3B1418] rounded-lg px-3 py-2 mb-4">{erreur}</div>}
+        {erreur && <div className="text-sm text-rouge bg-rouge/10 rounded-lg px-3 py-2 mb-4">{erreur}</div>}
 
-        <label className="text-xs font-mono text-neige/60 block mb-1">NOUVEAU MOT DE PASSE</label>
+        <label className="text-xs font-mono text-encre/70 block mb-1">NOUVEAU MOT DE PASSE</label>
         <div className="relative mb-4">
           <input
             type={motDePasseVisible ? "text" : "password"}
@@ -141,14 +142,14 @@ function ReinitialiserMotDePasseForm() {
           <button
             type="button"
             onClick={() => setMotDePasseVisible((v) => !v)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-neige/40 hover:text-neige/70"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-encre/60 hover:text-encre/80"
             aria-label={motDePasseVisible ? "Masquer le mot de passe" : "Afficher le mot de passe"}
           >
             <IconeOeil visible={motDePasseVisible} />
           </button>
         </div>
 
-        <label className="text-xs font-mono text-neige/60 block mb-1">CONFIRMER LE MOT DE PASSE</label>
+        <label className="text-xs font-mono text-encre/70 block mb-1">CONFIRMER LE MOT DE PASSE</label>
         <div className="relative mb-6">
           <input
             type={motDePasseVisible ? "text" : "password"}
@@ -163,7 +164,7 @@ function ReinitialiserMotDePasseForm() {
         <button
           type="submit"
           disabled={chargement}
-          className="w-full bg-rouille text-white font-semibold rounded-lg py-2.5 disabled:opacity-60"
+          className="w-full bg-primaire text-white font-semibold rounded-lg py-2.5 disabled:opacity-60"
         >
           {chargement ? "Mise à jour…" : "Mettre à jour le mot de passe"}
         </button>
