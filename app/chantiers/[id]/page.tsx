@@ -84,6 +84,7 @@ export default async function ChantierDetailPage({
             zones={listeZones}
             photos={listePhotos}
             invitations={estAdministrateur ? invitations ?? [] : null}
+            peutChangerEtape={!restreint}
           />
         )}
         {ongletActif === "plan" && (

@@ -1,81 +1,128 @@
-import { createClient } from "@/lib/supabase/server";
 import Logo from "@/components/Logo";
+import { CircleAlert, MapPin } from "@/components/icons";
+import { Card, CardHeader } from "@/components/ui/Card";
+import { FriseEtapes } from "@/components/ui/FriseEtapes";
+import { ProgressBar, ProgressRing } from "@/components/ui/Progress";
 import { StatusBadge } from "@/components/ui/StatusBadge";
+import { infoStatut } from "@/lib/statuts";
+import { createClient } from "@/lib/supabase/server";
 
+const formatDate = (iso: string | null | undefined) =>
+  iso ? new Date(iso).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" }) : null;
+
+/** Espace client public : suivi du chantier via le lien personnel (sans compte). */
 export default async function EspaceClientPage({ params }: { params: Promise<{ token: string }> }) {
   const { token } = await params;
   const supabase = await createClient();
   const { data, error } = await supabase.rpc("espace_client_chantier", { p_token: token });
 
   const chantier = data?.chantier;
-  const zones = data?.zones ?? [];
-  const photos = data?.photos ?? [];
+  const zones: { nom: string; avancement_pct: number | null; statut: string }[] = data?.zones ?? [];
+  const photos: { url: string }[] = data?.photos ?? [];
 
   if (error || !chantier) {
     return (
-      <div className="min-h-screen bg-fond flex items-center justify-center p-6">
-        <div className="card p-8 text-center max-w-sm">
-          <div className="font-display font-semibold text-encre mb-2">Lien introuvable</div>
+      <div className="flex min-h-screen items-center justify-center bg-fond p-4">
+        <Card className="flex max-w-sm flex-col items-center p-8 text-center">
+          <CircleAlert size={32} className="mb-3 text-encre/50" />
+          <h1 className="mb-2 font-semibold text-encre">Lien introuvable</h1>
           <p className="text-sm text-encre/60">Ce lien de suivi n'est plus valide. Contactez votre entreprise d'étanchéité.</p>
-        </div>
+        </Card>
       </div>
     );
   }
 
+  const termine = chantier.statut === "termine";
+  const debut = formatDate(chantier.date_debut);
+  const finPrevue = formatDate(chantier.date_fin_prevue);
+
   return (
     <div className="min-h-screen bg-fond">
-      <div className="bg-marine text-white px-6 py-8">
-        <div className="max-w-2xl mx-auto">
-          <div className="mb-5 flex items-center gap-3">
+      <header className="bg-marine px-4 pb-8 pt-6 text-white sm:px-6">
+        <div className="mx-auto max-w-2xl">
+          <div className="mb-6 flex items-center gap-3">
             <Logo clair />
             <span className="text-sm text-white/60">Suivi de chantier</span>
           </div>
-          <h1 className="text-2xl font-display font-semibold">{chantier.nom}</h1>
-          <p className="text-white/60 text-sm">{chantier.ville}</p>
+          <h1 className="text-2xl font-bold tracking-tight">{chantier.nom}</h1>
+          {chantier.ville && (
+            <p className="mt-1 flex items-center gap-1 text-sm text-white/70">
+              <MapPin size={15} className="shrink-0" />
+              {chantier.ville}
+            </p>
+          )}
         </div>
-      </div>
+      </header>
 
-      <div className="max-w-2xl mx-auto px-6 py-8 flex flex-col gap-6">
-        <div className="card p-6 flex items-center justify-between">
-          <div>
-            <div className="text-xs text-encre/60 mb-1">Avancement global</div>
-            <div className="font-mono text-3xl font-semibold text-encre">{chantier.avancement_pct}%</div>
+      <main className="mx-auto -mt-4 flex max-w-2xl flex-col gap-4 px-4 pb-8 sm:gap-6 sm:px-6">
+        <Card className="flex items-center gap-5 p-5">
+          <ProgressRing valeur={termine ? 100 : chantier.avancement_pct ?? 0} taille={104} epaisseur={9} />
+          <div className="min-w-0 flex-1">
+            <div className="text-sm font-medium text-encre/70">Avancement</div>
+            <StatusBadge domaine="chantier" statut={chantier.statut} className="mt-2" />
+            {(debut || finPrevue) && (
+              <dl className="mt-3 flex flex-col gap-1 text-sm">
+                {debut && (
+                  <div className="flex gap-1.5">
+                    <dt className="whitespace-nowrap text-encre/60">Début :</dt>
+                    <dd className="font-medium text-encre">{debut}</dd>
+                  </div>
+                )}
+                {finPrevue && (
+                  <div className="flex gap-1.5">
+                    <dt className="whitespace-nowrap text-encre/60">Fin prévue :</dt>
+                    <dd className="font-medium text-encre">{finPrevue}</dd>
+                  </div>
+                )}
+              </dl>
+            )}
           </div>
-          <StatusBadge domaine="chantier" statut={chantier.statut} />
-        </div>
+        </Card>
+
+        {/* `etape` n'est renvoyée qu'après supabase/migration-etapes-chantier.sql. */}
+        {"etape" in chantier && (
+          <Card className="p-5">
+            <CardHeader titre="Où en est votre chantier ?" />
+            <FriseEtapes etape={chantier.etape} termine={termine} />
+          </Card>
+        )}
 
         {zones.length > 0 && (
-          <div className="card p-6">
-            <div className="font-medium text-encre mb-3">Zones</div>
-            <div className="flex flex-col divide-y divide-ligne">
-              {zones.map((z: any, i: number) => (
-                <div key={i} className="flex flex-wrap items-center justify-between gap-2 py-2 text-sm">
-                  <span className="text-encre">{z.nom}</span>
-                  <div className="flex items-center gap-2">
-                    <div className="w-16 sm:w-28 h-2 bg-sable rounded-full overflow-hidden">
-                      <div className="h-full bg-vert" style={{ width: `${z.avancement_pct}%` }} />
-                    </div>
-                    <span className="font-mono text-xs w-10 text-right">{z.avancement_pct}%</span>
+          <Card className="p-5">
+            <CardHeader titre="Avancement par zone" />
+            <ul className="flex flex-col divide-y divide-ligne">
+              {zones.map((z, i) => (
+                <li key={i} className="flex flex-col gap-2 py-3 first:pt-0 last:pb-0">
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="min-w-0 truncate font-medium text-encre">{z.nom}</span>
+                    <StatusBadge domaine="zone" statut={z.statut} />
                   </div>
-                </div>
+                  <ProgressBar
+                    valeur={z.statut === "termine" ? 100 : z.avancement_pct ?? 0}
+                    ton={infoStatut("zone", z.statut).ton}
+                    afficherValeur
+                  />
+                </li>
               ))}
-            </div>
-          </div>
+            </ul>
+          </Card>
         )}
 
         {photos.length > 0 && (
-          <div className="card p-6">
-            <div className="font-medium text-encre mb-3">Dernières photos</div>
-            <div className="grid grid-cols-3 gap-3">
-              {photos.map((p: any, i: number) => (
-                <img key={i} src={p.url} alt="Photo de chantier" className="w-full h-24 object-cover rounded-lg" />
+          <Card className="p-5">
+            <CardHeader titre="Dernières photos" />
+            <div className="grid grid-cols-3 gap-2 sm:gap-3">
+              {photos.map((p, i) => (
+                <a key={i} href={p.url} target="_blank" rel="noreferrer">
+                  <img src={p.url} alt="Photo du chantier" className="aspect-square w-full rounded-lg object-cover" />
+                </a>
               ))}
             </div>
-          </div>
+          </Card>
         )}
 
-        <p className="text-xs text-encre/60 text-center">Ce lien est personnel — ne le partagez pas.</p>
-      </div>
+        <p className="text-center text-xs text-encre/60">Ce lien est personnel — ne le partagez pas.</p>
+      </main>
     </div>
   );
 }
