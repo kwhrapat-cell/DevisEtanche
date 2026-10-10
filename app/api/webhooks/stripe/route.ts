@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe/client";
-import { createClient } from "@supabase/supabase-js";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 /**
  * À configurer dans Stripe Dashboard > Developers > Webhooks :
@@ -9,12 +9,10 @@ import { createClient } from "@supabase/supabase-js";
  * Copier le "Signing secret" dans STRIPE_WEBHOOK_SECRET.
  *
  * Utilise la clé service_role (jamais exposée au navigateur) car ce
- * endpoint doit pouvoir écrire hors du contexte d'un utilisateur connecté.
+ * endpoint doit pouvoir écrire "forfait"/"stripe_subscription_id", que RLS
+ * réserve désormais à ce rôle (voir supabase/migration-securite-entreprises.sql).
  */
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+const supabaseAdmin = createAdminClient();
 
 export async function POST(request: Request) {
   const corps = await request.text();

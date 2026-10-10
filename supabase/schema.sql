@@ -220,14 +220,32 @@ create policy "Lecture equipe entreprise" on profiles for select
 create policy "Creation profil propre" on profiles for insert with check (id = auth.uid());
 
 -- entreprises : lecture/écriture réservées aux membres de l'entreprise.
--- L'INSERT reste ouvert (nécessaire à la création de compte /signup, avant
--- qu'un profil n'existe encore) — à restreindre davantage en production.
+-- Pas de policy INSERT : la création d'entreprise passe exclusivement par
+-- creer_entreprise_et_profil() (security definer, plus bas), qui contourne
+-- RLS — une policy INSERT ouverte ici serait soit inutile (restreinte aux
+-- membres, qui n'existent pas encore à l'inscription), soit exploitable
+-- (ouverte à tous, y compris au rôle anon). Voir supabase/migration-securite-
+-- entreprises.sql pour le détail de cette correction.
 alter table entreprises enable row level security;
 create policy "Lecture entreprise membres" on entreprises for select
   using (id in (select entreprise_id from profiles where id = auth.uid()));
 create policy "Modification entreprise membres" on entreprises for update
   using (id in (select entreprise_id from profiles where id = auth.uid()));
-create policy "Creation entreprise a l'inscription" on entreprises for insert with check (true);
+
+-- Restriction au niveau colonne : RLS ne filtre que les lignes, pas les
+-- colonnes — sans ceci, la policy UPDATE ci-dessus laisserait n'importe quel
+-- membre de l'entreprise modifier "forfait" ou les identifiants Stripe
+-- directement depuis le client, en contournant app/api/checkout +
+-- app/api/webhooks/stripe (seul flux prévu pour ces colonnes, via la clé
+-- service_role qui n'est pas soumise à ce GRANT).
+revoke update on entreprises from authenticated;
+grant update (
+  nom, adresse, telephone, email, numero_identification,
+  devise, libelle_taxe, taux_taxe_defaut
+) on entreprises to authenticated;
+-- La colonne dernier_taux_horaire_interne (ajoutée par migration-calcul-interne-
+-- elements.sql, après ce script) est incluse dans le GRANT de migration-
+-- securite-entreprises.sql, à exécuter après les deux.
 
 -- Création de compte : entreprise + profil dans une même transaction, en tant
 -- que propriétaire de la fonction (security definer). Nécessaire car juste
