@@ -5,9 +5,9 @@ import { useRouter } from "next/navigation";
 import AjouterElementForm from "./AjouterElementForm";
 import { ProgressBar } from "@/components/ui/Progress";
 import { StatusBadge } from "@/components/ui/StatusBadge";
-import { createClient } from "@/lib/supabase/client";
 import { infoStatut, ORDRE_STATUTS_ZONE, TONS } from "@/lib/statuts";
 import { cn } from "@/lib/utils";
+import { changerStatutZone } from "@/lib/zones";
 
 export default function ZoneCard({ zone }: { zone: any }) {
   const [ouvert, setOuvert] = useState(false);
@@ -18,14 +18,14 @@ export default function ZoneCard({ zone }: { zone: any }) {
   async function changerStatut(nouveau: string) {
     setOuvert(false);
 
-    if (!navigator.onLine) {
-      alert("Connexion nécessaire pour changer le statut.");
+    const precedent = statut;
+    setStatut(nouveau);
+    const erreur = await changerStatutZone(zone.id, nouveau);
+    if (erreur) {
+      setStatut(precedent);
+      alert(erreur);
       return;
     }
-
-    setStatut(nouveau);
-    const supabase = createClient();
-    await supabase.from("zones").update({ statut: nouveau }).eq("id", zone.id);
     router.refresh();
   }
 

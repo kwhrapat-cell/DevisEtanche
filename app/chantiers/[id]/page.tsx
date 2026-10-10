@@ -29,7 +29,7 @@ export default async function ChantierDetailPage({
 
   const [{ data: chantier }, { data: zones }, { data: photos }, { data: devis }, { data: factures }, { data: invitations }] = await Promise.all([
     supabase.from("chantiers").select("*, clients(nom)").eq("id", id).single(),
-    supabase.from("zones").select("id, nom, surface_m2, statut, avancement_pct, created_at").eq("chantier_id", id).order("created_at"),
+    supabase.from("zones").select("*").eq("chantier_id", id).order("created_at"),
     supabase.from("photos").select("id, url, legende, created_at").eq("chantier_id", id).order("created_at", { ascending: false }),
     restreint
       ? Promise.resolve({ data: [] })
@@ -86,7 +86,9 @@ export default async function ChantierDetailPage({
             invitations={estAdministrateur ? invitations ?? [] : null}
           />
         )}
-        {ongletActif === "plan" && <OngletPlan chantierId={chantier.id} zones={listeZones} />}
+        {ongletActif === "plan" && (
+          <OngletPlan chantierId={chantier.id} planUrl={chantier.plan_url ?? null} zones={listeZones} peutChangerPlan={!restreint} />
+        )}
         {ongletActif === "photos" && <PhotosSection chantierId={chantier.id} photosInitiales={listePhotos} />}
         {ongletActif === "docs" && <OngletDocs restreint={restreint} devis={listeDevis} factures={listeFactures} devise={devise} />}
         {ongletActif === "activite" && (
