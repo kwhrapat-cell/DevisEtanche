@@ -1,4 +1,4 @@
-import { Calculator, FileText, HardHat, LayoutDashboard, Package, Receipt, Settings, Users, type Icon } from "@/components/icons";
+import { Calculator, FileText, HardHat, House, LayoutDashboard, Package, Receipt, Settings, Users, type Icon } from "@/components/icons";
 
 export interface LienNav {
   href: string;
@@ -9,6 +9,7 @@ export interface LienNav {
 }
 
 export const NAV_PRINCIPALE: LienNav[] = [
+  { href: "/accueil", label: "Accueil chantier", icone: House },
   { href: "/dashboard", label: "Tableau de bord", icone: LayoutDashboard },
   { href: "/chantiers", label: "Chantiers", icone: HardHat },
   { href: "/devis", label: "Devis", icone: FileText, masqueSousTraitant: true },
