@@ -20,7 +20,7 @@ Variables d'environnement : voir `.env.example` ; jamais de clé dans le code ni
 
 - `app/` — pages (une route = un dossier)
 - `components/ui/` — composants de base : `Button`/`ButtonLink`, `Card`/`CardHeader`, `StatusBadge`,
-  `ProgressBar`/`ProgressRing`, `StatCard`, `EmptyState`, `Tabs`
+  `ProgressBar`/`ProgressRing`, `StatCard`, `EmptyState`, `Tabs`, `FriseEtapes`
 - `components/icons.tsx` — icônes (tracés officiels Lucide, mêmes noms que `lucide-react`)
 - `components/` — shell : `AppShell`, `Sidebar`, `BottomNav`, `TopBar`, `Logo`, `navigation.ts`
 - `lib/statuts.ts` — **source unique** des libellés et couleurs de statut (chantier, zone, devis, facture)
@@ -78,6 +78,6 @@ pourrait les effacer de son téléphone. Leur nettoyage se fera à part, avec lu
 2. ✅ Accueil « Mode Chantier » (« Que souhaitez-vous faire aujourd'hui ? », gros boutons)
 3. ✅ Fiche chantier à onglets (Vue d'ensemble, Plan, Photos, Docs, Activité)
 4. ✅ Plan interactif : image du plan + zones en SVG (coordonnées 0–1 en `jsonb`), panneau de zone
-5. Espace client avec la frise d'étapes (Préparation → Isolation → Étanchéité → Contrôle → Réception)
+5. ✅ Espace client avec la frise d'étapes (Préparation → Isolation → Étanchéité → Contrôle → Réception)
 
 Hors périmètre pour l'instant : réseau pro, appels d'offres, recrutement, formations, commande vocale.

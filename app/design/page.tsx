@@ -4,6 +4,7 @@ import { Activity, Camera, FileText, HardHat, Image, LayoutDashboard, Map as Ico
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { FriseEtapes } from "@/components/ui/FriseEtapes";
 import { ProgressBar, ProgressRing } from "@/components/ui/Progress";
 import { StatCard } from "@/components/ui/StatCard";
 import { StatusBadge } from "@/components/ui/StatusBadge";
@@ -119,6 +120,12 @@ export default function DesignPage() {
                 { cle: "activite", label: "Activité", href: "/design", icone: Activity },
               ]}
             />
+          </Card>
+        </Section>
+
+        <Section titre="Frise d'étapes (espace client)">
+          <Card className="p-5">
+            <FriseEtapes etape="etancheite" />
           </Card>
         </Section>
 

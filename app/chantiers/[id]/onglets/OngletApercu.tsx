@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { Card, CardHeader } from "@/components/ui/Card";
+import { FriseEtapes } from "@/components/ui/FriseEtapes";
 import { ProgressRing } from "@/components/ui/Progress";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { infoStatut, ORDRE_STATUTS_ZONE, TONS } from "@/lib/statuts";
 import { cn } from "@/lib/utils";
+import ChangerEtape from "../ChangerEtape";
 import InvitationsSection from "../InvitationsSection";
 import LienClientButton from "../LienClientButton";
 import { formatDate, lienOnglet, type Photo, type Zone } from "../types";
@@ -14,13 +16,19 @@ export default function OngletApercu({
   zones,
   photos,
   invitations,
+  peutChangerEtape,
 }: {
   chantier: any;
   zones: Zone[];
   photos: Photo[];
   /** null : l'utilisateur n'est pas administrateur, la section sous-traitance est masquée. */
   invitations: any[] | null;
+  /** Un sous-traitant restreint ne peut pas modifier la fiche chantier (policies RLS). */
+  peutChangerEtape: boolean;
 }) {
+  // chantiers.etape n'existe qu'après supabase/migration-etapes-chantier.sql.
+  const avecEtapes = "etape" in chantier;
+
   const infos = [
     { label: "Client", valeur: chantier.clients?.nom ?? "Sans client" },
     { label: "Ville", valeur: chantier.ville ?? "—" },
@@ -58,6 +66,18 @@ export default function OngletApercu({
             )}
           </div>
         </Card>
+
+        {avecEtapes && (
+          <Card className="p-5">
+            <CardHeader titre="Étapes du chantier" sousTitre="C'est ce que voit votre client sur son lien de suivi." />
+            <FriseEtapes etape={chantier.etape} termine={chantier.statut === "termine"} />
+            {peutChangerEtape && chantier.statut !== "termine" && (
+              <div className="mt-5 border-t border-ligne pt-4">
+                <ChangerEtape chantierId={chantier.id} etape={chantier.etape} />
+              </div>
+            )}
+          </Card>
+        )}
 
         <Card className="p-5">
           <CardHeader titre="Informations" action={<StatusBadge domaine="chantier" statut={chantier.statut} />} />

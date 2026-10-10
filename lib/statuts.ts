@@ -113,3 +113,23 @@ export function infoStatut(domaine: Domaine, valeur: string | null | undefined):
   const texte = (valeur ?? "inconnu").replace(/_/g, " ");
   return { label: texte.charAt(0).toUpperCase() + texte.slice(1), ton: "neutre" };
 }
+
+/**
+ * Étapes d'un chantier d'étanchéité, dans l'ordre — affichées en frise dans
+ * l'espace client et sur la fiche chantier. Les clés correspondent à
+ * chantiers.etape (supabase/migration-etapes-chantier.sql).
+ */
+export const ETAPES_CHANTIER = [
+  { cle: "preparation", label: "Préparation", description: "Installation du chantier et préparation du support." },
+  { cle: "isolation", label: "Isolation", description: "Pose de l'isolant thermique." },
+  { cle: "etancheite", label: "Étanchéité", description: "Pose du revêtement d'étanchéité." },
+  { cle: "controle", label: "Contrôle", description: "Vérifications et essais d'étanchéité." },
+  { cle: "reception", label: "Réception", description: "Visite de fin de chantier avec vous et remise des documents." },
+] as const;
+
+export type EtapeChantier = (typeof ETAPES_CHANTIER)[number]["cle"];
+
+/** Position (0 à 4) d'une étape dans la frise ; 0 si la valeur est inconnue. */
+export function indexEtape(etape: string | null | undefined): number {
+  return Math.max(0, ETAPES_CHANTIER.findIndex((e) => e.cle === etape));
+}
