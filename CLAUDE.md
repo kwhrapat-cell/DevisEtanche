@@ -11,9 +11,12 @@ sans jargon, et laisse-lui les décisions produit. Il teste sur son téléphone 
 
 - Next.js 14 (App Router, TypeScript), Tailwind CSS 3
 - Supabase : Postgres, Auth, Storage, sécurité par RLS (`supabase/schema.sql`)
-- Déploiement Vercel (projet `devis-etanche`, équipe PKDev) — une preview par branche
+- Déploiement Vercel (projet `devis-etanche`, équipe PKDev) — une preview par branche ; fonctions à
+  Singapour (`vercel.json`, région `sin1`), près de la base Supabase et des utilisateurs calédoniens
 
-Commandes : `npm run dev`, `npm run build`, `npx tsc --noEmit` (vérification des types).
+Commandes : `npm run dev`, `npm run build`, `npx tsc --noEmit` (vérification des types),
+`npm test` (tests du calcul et des montants, dans `tests/`, sans dépendance : testeur intégré de Node).
+La même vérification tourne sur chaque PR (`.github/workflows/verification.yml`) : croix rouge = ne pas fusionner.
 Variables d'environnement : voir `.env.example` ; jamais de clé dans le code ni dans Git.
 
 ## Structure
@@ -57,7 +60,11 @@ Variables d'environnement : voir `.env.example` ; jamais de clé dans le code ni
   (exemple : `app/chantiers/[id]/AjouterZoneForm.tsx`).
 - Montants : `formatMontant` de `lib/devise.ts` (XPF ou EUR selon l'entreprise ; TGC en NC, TVA en France).
 - Modification du schéma : nouveau fichier `supabase/migration-<sujet>.sql`, et le signaler clairement
-  dans la PR (Patrice doit l'exécuter à la main dans Supabase).
+  dans la PR (Patrice doit l'exécuter à la main dans Supabase). Ajouter la ligne dans
+  `supabase/ETAT-MIGRATIONS.md`, et la passer à « Oui » une fois exécutée : deux fichiers n'avaient
+  jamais été passés en production sans que personne le sache (constaté le 19/10/2026).
+- Toute modification du moteur de calcul (`lib/calc/`) ou des montants (`lib/devise.ts`) s'accompagne
+  d'un test dans `tests/`.
 
 ## Façon de travailler
 

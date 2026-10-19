@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test": "node --test tests/*.test.mts",
+    "verifier": "tsc --noEmit && npm test"
   },
   "dependencies": {
     "@supabase/ssr": "^0.5.1",
