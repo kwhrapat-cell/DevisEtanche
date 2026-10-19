@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import BoutonDeconnexion from "@/components/BoutonDeconnexion";
+import { InstallerAppliMenu } from "@/components/InstallerAppli";
 import Logo from "@/components/Logo";
 import { X } from "@/components/icons";
 import { NAV_BAS, NAV_OUTILS, NAV_PRINCIPALE, estActif, type LienNav } from "@/components/navigation";
@@ -65,7 +66,10 @@ export default function Sidebar() {
           {visibles(NAV_PRINCIPALE).map(lien)}
           <div className="px-3 pb-1 pt-5 text-[11px] font-semibold uppercase tracking-wider text-white/40">Outils</div>
           {visibles(NAV_OUTILS).map(lien)}
-          <div className="mt-auto pt-4">{visibles(NAV_BAS).map(lien)}</div>
+          <div className="mt-auto flex flex-col gap-1 pt-4">
+            <InstallerAppliMenu />
+            {visibles(NAV_BAS).map(lien)}
+          </div>
         </nav>
 
         <div className="m-3 flex items-center gap-3 rounded-xl bg-white/5 p-3">

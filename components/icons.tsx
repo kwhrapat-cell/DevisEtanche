@@ -68,3 +68,8 @@ export const Map = creerIcone("Map", <><path d="M14.106 5.553a2 2 0 0 0 1.788 0l
 export const Activity = creerIcone("Activity", <><path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2" /></>);
 export const Undo2 = creerIcone("Undo2", <><path d="M9 14 4 9l5-5" /><path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5a5.5 5.5 0 0 1-5.5 5.5H11" /></>);
 export const ArrowLeft = creerIcone("ArrowLeft", <><path d="m12 19-7-7 7-7" /><path d="M19 12H5" /></>);
+export const Download = creerIcone("Download", <><path d="M12 15V3" /><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><path d="m7 10 5 5 5-5" /></>);
+export const Smartphone = creerIcone("Smartphone", <><rect width="14" height="20" x="5" y="2" rx="2" ry="2" /><path d="M12 18h.01" /></>);
+export const Share = creerIcone("Share", <><path d="M12 2v13" /><path d="m16 6-4-4-4 4" /><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" /></>);
+export const SquarePlus = creerIcone("SquarePlus", <><rect width="18" height="18" x="3" y="3" rx="2" /><path d="M8 12h8" /><path d="M12 8v8" /></>);
+export const EllipsisVertical = creerIcone("EllipsisVertical", <><circle cx="12" cy="12" r="1" /><circle cx="12" cy="5" r="1" /><circle cx="12" cy="19" r="1" /></>);

@@ -8,6 +8,7 @@ import { COMPANY_INFO } from "@/lib/company-info";
 import ForfaitCard from "./ForfaitCard";
 import MarcheForm from "./MarcheForm";
 import CoordonneesForm from "./CoordonneesForm";
+import InstallerAppli from "@/components/InstallerAppli";
 
 const labelRole: Record<string, string> = {
   ouvrier: "Ouvrier",
@@ -78,6 +79,8 @@ export default async function ParametresPage() {
               <ForfaitCard id="entreprise" nom="Entreprise" prix="Sur devis" actuel={entreprise?.forfait === "entreprise"} />
             </div>
           </div>
+
+          <InstallerAppli />
 
           <div className="card p-5">
             <div className="font-medium text-encre mb-1">Mode hors ligne</div>
