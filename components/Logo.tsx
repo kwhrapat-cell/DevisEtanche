@@ -1,18 +1,66 @@
-import { Droplet } from "@/components/icons";
 import { cn } from "@/lib/utils";
 
-/** Logo DevisEtanche. `clair` = sur fond foncé (sidebar, bandeau espace client). */
-export default function Logo({ clair = false, avecNom = true, className }: { clair?: boolean; avecNom?: boolean; className?: string }) {
+/**
+ * Logo DevisEtanche — piste C, « le D en couches » (octobre 2026).
+ *
+ * Tracés générés depuis les fichiers maîtres du logo (dossier marque/, police Inter Display vectorisée) :
+ * ne jamais retaper le nom au clavier ni changer ses couleurs. Le symbole est toujours
+ * orange (`accent`) ; le nom est marine, ou blanc avec `clair` (sidebar, bandeaux foncés).
+ * `avecNom={false}` = symbole seul. La hauteur se règle avec `className` (h-6 par défaut
+ * pour le logo complet, h-7 pour le symbole), la largeur suit.
+ */
+const SYMBOLE = [
+  "M3.69 0 H13.28 L17.48 0.43 L19.18 0.86 L20.47 1.29 L21.54 1.72 L22.46 2.15 L23.29 2.58 L24.03 3.01 L24.7 3.44 L25.33 3.87 L25.91 4.3 L26.45 4.74 L26.95 5.17 L27.42 5.6 L27.87 6.03 L28.29 6.46 L28.68 6.89 L29.06 7.32 L29.41 7.75 L29.75 8.18 L30.07 8.61 L30.37 9.04 L30.65 9.47 L30.92 9.9 L31.18 10.33 H0 V3.69 Q0 0 3.69 0 Z",
+  "M0 15.5 H33.29 L33.4 15.93 L33.49 16.36 L33.58 16.79 L33.66 17.22 L33.72 17.65 L33.78 18.08 L33.83 18.51 L33.87 18.94 L33.9 19.37 L33.93 19.8 L33.94 20.23 L33.95 20.66 L33.94 21.09 L33.93 21.52 L33.9 21.95 L33.87 22.38 L33.83 22.81 L33.78 23.25 L33.72 23.68 L33.66 24.11 L33.58 24.54 L33.49 24.97 L33.4 25.4 L33.29 25.83 H0 V15.5 Z",
+  "M0 30.99 H31.18 L30.92 31.42 L30.65 31.85 L30.37 32.28 L30.07 32.72 L29.75 33.15 L29.41 33.58 L29.06 34.01 L28.68 34.44 L28.29 34.87 L27.87 35.3 L27.42 35.73 L26.95 36.16 L26.45 36.59 L25.91 37.02 L25.33 37.45 L24.7 37.88 L24.03 38.31 L23.29 38.74 L22.46 39.17 L21.54 39.6 L20.47 40.03 L19.18 40.46 L17.48 40.89 L13.28 41.32 H3.69 Q0 41.32 0 37.63 V30.99 Z",
+];
+
+const NOM =
+  "M60.22 35.21C69.17 35.21 74.75 29.55 74.75 20.66C74.75 11.78 69.09 6.11 60.22 6.11H49.42V35.21ZM56.45 29.35V11.97H59.79C65.14 11.97 67.68 14.92 67.68 20.66C67.68 26.38 65.2 29.35 59.87 29.35Z M86.81 35.68C92.02 35.68 96.18 32.77 96.94 28.61H90.91C90.42 29.98 89.02 30.84 87.04 30.84C84.39 30.84 82.82 29.18 82.75 26.56H97.1V24.74C97.1 18.49 92.82 14.12 86.63 14.12C80.52 14.12 76.18 18.61 76.18 24.9C76.18 31.19 80.48 35.68 86.81 35.68ZM82.78 22.54C83.08 20.37 84.54 19.08 86.81 19.08C89.05 19.08 90.54 20.37 90.83 22.54Z M104.35 35.21H111.99L119.51 14.59H112.56L109.63 24.08C109.16 25.72 108.71 27.34 108.26 28.96C107.81 27.34 107.34 25.72 106.85 24.08L103.86 14.59H96.83Z M120.88 35.21H127.6V14.59H120.88ZM124.22 12.58C126.39 12.58 127.93 11.15 127.93 9.18C127.93 7.21 126.39 5.8 124.22 5.8C122.07 5.8 120.53 7.21 120.53 9.18C120.53 11.15 122.07 12.58 124.22 12.58Z M139.85 35.72C145.63 35.72 149.54 32.87 149.54 28.63C149.54 25.56 147.55 23.79 143.31 23.01L139.17 22.24C137.74 21.97 136.94 21.4 136.94 20.54C136.94 19.53 137.96 18.77 139.72 18.77C141.49 18.77 142.78 19.84 142.82 21.29H149.01C148.89 16.89 145.24 14.16 139.48 14.16C133.74 14.16 130.24 16.78 130.24 20.86C130.24 24.12 132.41 26.21 136.47 26.93L140.2 27.6C141.84 27.89 142.7 28.44 142.7 29.33C142.7 30.37 141.61 31.09 139.75 31.09C137.78 31.09 136.59 30.13 136.39 28.61H129.77C130.14 33.01 134.15 35.72 139.85 35.72Z M152.24 35.21H172.46V30.74H157.4V22.63H171.32V18.24H157.4V10.58H172.46V6.11H152.24Z M186.23 14.59H182.03V8.96H177.09V14.59H173.5V18.55H177.09V30.02C177.09 33.55 179.06 35.21 183.26 35.21H186.23V31.25H184.12C182.52 31.25 182.03 30.76 182.03 29.29V18.55H186.23Z M195.47 35.54C198.83 35.54 200.57 34.14 201.55 32.3H201.63V35.21H206.47V21.15C206.47 16.85 203.29 14.18 197.92 14.18C192.52 14.18 189.17 16.89 188.93 20.99H193.68C193.81 19.26 195.42 18.01 197.82 18.01C200.18 18.01 201.59 19.26 201.59 21.01V21.17C201.59 22.58 200.28 22.63 196.45 23.06C192.19 23.51 188.34 24.67 188.34 29.35C188.34 33.47 191.37 35.54 195.47 35.54ZM196.68 31.89C194.54 31.89 193.15 30.94 193.15 29.31C193.15 27.44 194.95 26.68 197.06 26.37C199.09 26.05 201 25.74 201.61 25.35V27.58C201.61 29.98 199.91 31.89 196.68 31.89Z M215.15 23.55C215.15 20.04 217.08 18.49 219.66 18.49C222.3 18.49 223.82 20.08 223.82 23.1V35.21H228.76V22.32C228.76 17.03 225.71 14.18 221.4 14.18C218.57 14.18 216.48 15.43 215.07 17.75V14.59H210.23V35.21H215.15Z M241.66 35.68C246.87 35.68 250.66 32.32 251.01 27.81H246.15C245.68 30.1 244.29 31.58 241.72 31.58C238.47 31.58 236.56 28.98 236.56 24.92C236.56 20.84 238.49 18.22 241.72 18.22C244.27 18.22 245.82 19.76 246.19 21.97H251.01C250.58 17.38 246.83 14.12 241.66 14.12C235.62 14.12 231.58 18.55 231.58 24.92C231.58 31.29 235.62 35.68 241.66 35.68Z M258.63 23.55C258.63 20.04 260.57 18.49 263.15 18.49C265.78 18.49 267.31 20.08 267.31 23.1V35.21H272.25V22.32C272.25 17.03 269.2 14.18 264.88 14.18C262.11 14.18 260.04 15.37 258.63 17.62V6.11H253.71V35.21H258.63Z M285.12 35.68C289.95 35.68 293.78 32.89 294.56 28.85H289.95C289.38 30.6 287.72 31.79 285.24 31.79C281.92 31.79 280.01 29.55 279.89 26.19H294.81V24.84C294.81 18.51 290.87 14.12 284.93 14.12C279.15 14.12 275.07 18.65 275.07 24.92C275.07 31.17 278.93 35.68 285.12 35.68ZM279.93 22.79C280.26 19.84 282.16 18.03 285.01 18.03C287.86 18.03 289.77 19.84 290.09 22.79Z";
+
+const LARGEUR_SYMBOLE = 33.94;
+const LARGEUR_LOGO = 295.96;
+const HAUTEUR = 41.32;
+
+/** Hauteur par défaut, sauf si `className` en donne une (cn() ne fusionne pas les classes). */
+const hauteur = (className: string | undefined, parDefaut: string) => (className && /(^|\s)h-/.test(className) ? "" : parDefaut);
+
+function Couches() {
   return (
-    <span className={cn("inline-flex items-center gap-2.5", className)}>
-      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-accent text-white shadow-sm">
-        <Droplet size={18} strokeWidth={2.25} />
-      </span>
-      {avecNom && (
-        <span className={cn("text-lg font-bold tracking-tight", clair ? "text-white" : "text-encre")}>
-          Devis<span className="text-accent">Etanche</span>
-        </span>
-      )}
-    </span>
+    <>
+      {SYMBOLE.map((d, i) => (
+        <path key={i} d={d} className="fill-accent" />
+      ))}
+    </>
+  );
+}
+
+export default function Logo({ clair = false, avecNom = true, className }: { clair?: boolean; avecNom?: boolean; className?: string }) {
+  if (!avecNom) {
+    return (
+      <svg
+        viewBox={`0 0 ${LARGEUR_SYMBOLE} ${HAUTEUR}`}
+        role="img"
+        preserveAspectRatio="xMinYMid meet"
+        aria-label="DevisEtanche"
+        className={cn(hauteur(className, "h-7"), "w-auto shrink-0", className)}
+        style={{ aspectRatio: `${LARGEUR_SYMBOLE} / ${HAUTEUR}` }}
+      >
+        <Couches />
+      </svg>
+    );
+  }
+  return (
+    <svg
+      viewBox={`0 0 ${LARGEUR_LOGO} ${HAUTEUR}`}
+      role="img"
+      preserveAspectRatio="xMinYMid meet"
+      aria-label="DevisEtanche"
+      className={cn(hauteur(className, "h-6"), "w-auto shrink-0", clair ? "text-white" : "text-marine", className)}
+      style={{ aspectRatio: `${LARGEUR_LOGO} / ${HAUTEUR}` }}
+    >
+      <Couches />
+      <path d={NOM} fill="currentColor" />
+    </svg>
   );
 }

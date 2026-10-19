@@ -84,8 +84,7 @@ export default function CompleterProfilPage() {
       <IllustrationArchitecture />
       <form onSubmit={completer} className="relative card w-full max-w-sm p-8">
         <div className="flex items-center gap-2 font-display font-semibold text-lg text-encre mb-1">
-          <Logo avecNom={false} />
-          DevisEtanche
+          <Logo />
         </div>
         <p className="text-sm text-encre/60 mb-6">
           Votre compte est connecté mais aucune entreprise n'y est encore associée — complétez ces deux champs pour continuer.

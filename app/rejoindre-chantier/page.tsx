@@ -14,8 +14,7 @@ type Etape = "verification" | "deja_associe" | "compte" | "code";
 function EnTete() {
   return (
     <div className="flex items-center gap-2 font-display font-semibold text-lg text-encre mb-1">
-      <Logo avecNom={false} />
-      DevisEtanche
+      <Logo />
     </div>
   );
 }

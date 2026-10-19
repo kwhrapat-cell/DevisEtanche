@@ -45,8 +45,7 @@ export default function MotDePasseOubliePage() {
         <IllustrationArchitecture />
         <div className="relative card w-full max-w-sm p-8 text-center">
           <div className="flex items-center justify-center gap-2 font-display font-semibold text-lg text-encre mb-1">
-            <Logo avecNom={false} />
-            DevisEtanche
+            <Logo />
           </div>
           <p className="text-sm text-encre/80 mt-4">
             Si un compte existe pour <span className="text-encre">{email}</span>, un e-mail contenant un lien de réinitialisation vient de vous être envoyé.
@@ -65,8 +64,7 @@ export default function MotDePasseOubliePage() {
       <IllustrationArchitecture />
       <form onSubmit={envoyerLien} className="relative card w-full max-w-sm p-8">
         <div className="flex items-center gap-2 font-display font-semibold text-lg text-encre mb-1">
-          <Logo avecNom={false} />
-          DevisEtanche
+          <Logo />
         </div>
         <p className="text-sm text-encre/60 mb-6">Mot de passe oublié</p>
 
