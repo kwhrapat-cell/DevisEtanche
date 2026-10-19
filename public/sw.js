@@ -13,6 +13,19 @@ self.addEventListener("activate", (event) => {
   self.clients.claim();
 });
 
+// Hors connexion : la dernière version connue de la page. Si l'on ouvre une page
+// jamais visitée (dont « / », la page d'ouverture de l'appli installée), on retombe
+// sur la dernière page d'accueil connue. Une réponse issue d'une redirection
+// (ex. vers /login) ne peut pas servir une navigation : on la saute.
+async function depuisLeCache(requete) {
+  const candidats = requete.mode === "navigate" ? [requete, "/accueil", "/dashboard"] : [requete];
+  for (const candidat of candidats) {
+    const reponse = await caches.match(candidat);
+    if (reponse && !reponse.redirected) return reponse;
+  }
+  return Response.error();
+}
+
 // Stratégie "réseau puis cache" : privilégie les données fraîches, retombe
 // sur la dernière version connue si hors connexion.
 self.addEventListener("fetch", (event) => {
@@ -24,6 +37,6 @@ self.addEventListener("fetch", (event) => {
         caches.open(CACHE).then((cache) => cache.put(event.request, copie));
         return reponse;
       })
-      .catch(() => caches.match(event.request))
+      .catch(() => depuisLeCache(event.request))
   );
 });
