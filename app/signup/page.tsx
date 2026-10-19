@@ -118,10 +118,10 @@ export default function SignupPage() {
     <div className="relative min-h-screen overflow-hidden flex flex-col items-center justify-center bg-fond px-4 py-10">
       <IllustrationArchitecture />
       <form onSubmit={creerCompte} className="relative card w-full max-w-sm p-8">
-        <div className="flex items-center gap-2 font-display font-semibold text-lg text-encre mb-1">
+        <Link href="/" className="flex w-fit items-center gap-2 font-display font-semibold text-lg text-encre mb-1">
           <Logo avecNom={false} />
           DevisEtanche
-        </div>
+        </Link>
         <p className="text-sm text-encre/60 mb-6">Créer votre espace</p>
 
         {erreur && <div className="text-sm text-rouge bg-rouge/10 rounded-lg px-3 py-2 mb-4">{erreur}</div>}

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import Logo from "@/components/Logo";
 import { CircleAlert, MapPin } from "@/components/icons";
 import { Card, CardHeader } from "@/components/ui/Card";
@@ -122,6 +123,13 @@ export default async function EspaceClientPage({ params }: { params: Promise<{ t
         )}
 
         <p className="text-center text-xs text-encre/60">Ce lien est personnel — ne le partagez pas.</p>
+        {/* Le client final (syndic, propriétaire, donneur d'ordre) découvre l'outil : source suivie dans les demandes pilote. */}
+        <p className="text-center text-xs text-encre/60">
+          Suivi proposé par votre entreprise avec DevisEtanche.{" "}
+          <Link href="/?source=espace-client" className="font-medium text-encre/80 underline underline-offset-2">
+            Découvrir le logiciel
+          </Link>
+        </p>
       </main>
     </div>
   );
