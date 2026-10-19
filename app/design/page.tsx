@@ -89,6 +89,7 @@ export default function DesignPage() {
         <Section titre="Boutons">
           <Card className="flex flex-wrap items-center gap-3 p-5">
             <Button icone={Plus}>Nouveau chantier</Button>
+            <Button variante="marque">Devenir entreprise pilote</Button>
             <Button variante="secondaire">Annuler</Button>
             <Button variante="fantome">Plus tard</Button>
             <Button variante="danger" icone={TriangleAlert}>

@@ -9,8 +9,10 @@ export const COMPANY_INFO = {
   // (démarche en cours sur guichet-entreprises.nc).
   ridet: "en cours d'attribution",
   adresse: "Lot 73, Groupe d'habitation Julisa, 98889 Païta, Nouvelle-Calédonie (BP 622, 98889 Païta)",
-  email: "contact@devisetanche.nc",
-  siteUrl: "https://devisetanche.nc",
+  // Adresses en service aujourd'hui. À remplacer le jour où un domaine propre
+  // (devisetanche.nc ou .fr) est acheté et relié à l'appli.
+  email: "tramea.solutions@gmail.com",
+  siteUrl: "https://devis-etanche.vercel.app",
   hebergeurApplication: "Vercel Inc., 440 N Barranca Ave #4133, Covina, CA 91723, États-Unis",
   hebergeurDonnees: "Supabase Inc. (base de données, authentification, stockage de fichiers)",
   directeurPublication: "Tramea Solutions",

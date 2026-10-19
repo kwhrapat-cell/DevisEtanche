@@ -3,7 +3,8 @@ import type { AnchorHTMLAttributes, ButtonHTMLAttributes, ReactNode } from "reac
 import type { Icon } from "@/components/icons";
 import { cn } from "@/lib/utils";
 
-type Variante = "primaire" | "secondaire" | "fantome" | "danger";
+/** `marque` = orange DevisEtanche, réservé aux pages publiques (accueil, campagnes) ; dans l'appli, `primaire`. */
+type Variante = "primaire" | "marque" | "secondaire" | "fantome" | "danger";
 type Taille = "sm" | "md" | "lg";
 
 interface OptionsBouton {
@@ -15,6 +16,8 @@ interface OptionsBouton {
 
 const VARIANTES: Record<Variante, string> = {
   primaire: "bg-primaire text-white shadow-sm hover:bg-primaire/90",
+  // Texte marine sur orange : 6,3 pour 1 de contraste (le blanc n'atteint que 2,8).
+  marque: "bg-accent text-marine font-semibold shadow-sm hover:bg-accent/90",
   secondaire: "bg-surface text-encre border border-ligne hover:bg-sable",
   fantome: "text-encre/80 hover:bg-sable hover:text-encre",
   danger: "bg-rouge text-white shadow-sm hover:bg-rouge/90",

@@ -4,10 +4,13 @@ import OfflineBanner from "@/components/OfflineBanner";
 import RegisterSW from "@/components/RegisterSW";
 import AppShell from "@/components/AppShell";
 import { SCRIPT_INSTALLATION } from "@/lib/installation";
+import { COMPANY_INFO } from "@/lib/company-info";
 
 export const metadata: Metadata = {
+  // Adresse de base des images d'aperçu (og.png) quand un lien est partagé.
+  metadataBase: new URL(COMPANY_INFO.siteUrl),
   title: "DevisEtanche — Application",
-  description: "L'écosystème des professionnels de l'étanchéité",
+  description: "Le logiciel des chantiers d'étanchéité, du métré à la réception.",
   applicationName: "DevisEtanche",
   // iPhone : nom et icône une fois ajoutée à l'écran d'accueil (Safari → Partager).
   appleWebApp: { capable: true, title: "DevisEtanche", statusBarStyle: "default" },

@@ -3,6 +3,7 @@ import ImprimerButton from "@/components/ImprimerButton";
 import StatutDevisForm from "./StatutDevisForm";
 import type { LigneDevis } from "@/lib/types";
 import { formatMontant } from "@/lib/devise";
+import { COMPANY_INFO } from "@/lib/company-info";
 
 export default async function DevisDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -117,6 +118,11 @@ export default async function DevisDetailPage({ params }: { params: Promise<{ id
           {conditionsReglement}
         </div>
       )}
+
+      {/* Signature discrète : chaque devis envoyé fait connaître l'outil au client final. */}
+      <p className="mt-12 text-center text-xs text-encre/60">
+        Devis établi avec DevisEtanche, le logiciel des chantiers d'étanchéité ({new URL(COMPANY_INFO.siteUrl).host})
+      </p>
     </div>
   );
 }

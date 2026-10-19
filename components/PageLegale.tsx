@@ -15,7 +15,7 @@ export default function PageLegale({ titre, sousTitre, children }: { titre: stri
           <Link href="/" aria-label="DevisEtanche — accueil">
             <Logo />
           </Link>
-          {/* « / » renvoie vers l'accueil du rôle, ou vers la connexion hors session. */}
+          {/* « / » renvoie vers l'accueil du rôle, ou vers la page d'accueil publique hors session. */}
           <ButtonLink href="/" variante="fantome" icone={ArrowLeft}>
             Retour
           </ButtonLink>
