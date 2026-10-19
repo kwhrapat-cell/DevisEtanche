@@ -1,0 +1,15 @@
+Logo DevisEtanche — piste C, le D en couches (19 octobre 2026)
+
+Fichiers vectoriels (SVG) : à donner à un imprimeur, à utiliser pour le site et l'appli.
+Les versions PNG se trouvent dans le zip livré le 19/10/2026 ; components/Logo.tsx reprend ces tracés.
+
+logo-horizontal ............. version principale, sur fond clair
+logo-horizontal-fond-fonce .. sur fond marine ou sombre (nom en blanc)
+logo-noir / logo-blanc ...... une seule couleur (photocopie, tampon, sur l'orange)
+logo-vertical ............... formats carrés (profil, autocollant)
+symbole ..................... le D seul (petites tailles, filigrane)
+icone-appli ................. icône de l'appli (carré orange)
+favicon ..................... onglet du navigateur (16-32 px)
+
+Couleurs : orange #F07C1E, marine #0B1F3A.
+Ne pas retaper le nom au clavier : toujours utiliser ces fichiers.

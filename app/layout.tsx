@@ -16,10 +16,10 @@ export const metadata: Metadata = {
   appleWebApp: { capable: true, title: "DevisEtanche", statusBarStyle: "default" },
   icons: {
     icon: [
-      { url: "/icons/favicon-32.png", sizes: "32x32", type: "image/png" },
-      { url: "/icons/favicon-16.png", sizes: "16x16", type: "image/png" },
+      { url: "/icons/favicon-32.png?v=2", sizes: "32x32", type: "image/png" },
+      { url: "/icons/favicon-16.png?v=2", sizes: "16x16", type: "image/png" },
     ],
-    apple: [{ url: "/icons/apple-touch-icon.png", sizes: "180x180" }],
+    apple: [{ url: "/icons/apple-touch-icon.png?v=2", sizes: "180x180" }],
   },
 };
 

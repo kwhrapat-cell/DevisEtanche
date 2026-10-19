@@ -119,8 +119,7 @@ export default function SignupPage() {
       <IllustrationArchitecture />
       <form onSubmit={creerCompte} className="relative card w-full max-w-sm p-8">
         <Link href="/" className="flex w-fit items-center gap-2 font-display font-semibold text-lg text-encre mb-1">
-          <Logo avecNom={false} />
-          DevisEtanche
+          <Logo />
         </Link>
         <p className="text-sm text-encre/60 mb-6">Créer votre espace</p>
 
