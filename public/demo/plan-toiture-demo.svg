@@ -1,0 +1,105 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 700" width="1000" height="700" font-family="Arial, Helvetica, sans-serif">
+  <!--
+    Plan de toiture fictif, pour le compte de démonstration (supabase/demo.sql).
+    Échelle : 20 unités = 1 m. Les contours des zones dans demo.sql sont exprimés en
+    fraction de ce dessin (x / 1000, y / 700) : ne pas changer ses dimensions.
+  -->
+  <defs>
+    <pattern id="hachures" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="10" stroke="#9AA3AE" stroke-width="1.2" />
+    </pattern>
+    <marker id="fleche" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10z" fill="#5B6573" />
+    </marker>
+  </defs>
+
+  <rect width="1000" height="700" fill="#FFFFFF" />
+
+  <!-- Acrotère (contour du bâtiment) -->
+  <rect x="60" y="60" width="880" height="540" fill="none" stroke="#2B3440" stroke-width="8" />
+  <rect x="74" y="74" width="852" height="512" fill="none" stroke="#2B3440" stroke-width="1.2" />
+
+  <!-- Joint de dilatation entre les deux terrasses -->
+  <line x1="74" y1="315" x2="926" y2="315" stroke="#2B3440" stroke-width="1.5" stroke-dasharray="14 6 3 6" />
+  <text x="300" y="309" font-size="12" fill="#5B6573">Joint de dilatation</text>
+
+  <!-- Émergence : toit de la cage d'ascenseur -->
+  <rect x="570" y="90" width="100" height="90" fill="#F3F5F7" stroke="#2B3440" stroke-width="2" />
+  <line x1="570" y1="90" x2="670" y2="180" stroke="#9AA3AE" stroke-width="1" />
+  <line x1="670" y1="90" x2="570" y2="180" stroke="#9AA3AE" stroke-width="1" />
+
+  <!-- Émergence : local technique, avec skydome -->
+  <rect x="700" y="80" width="220" height="150" fill="#F3F5F7" stroke="#2B3440" stroke-width="2" />
+  <!-- (au coin, pour laisser le centre libre : l'appli y écrit le nom de la zone) -->
+  <circle cx="740" cy="115" r="20" fill="#FFFFFF" stroke="#2B3440" stroke-width="1.5" />
+  <line x1="726" y1="101" x2="754" y2="129" stroke="#2B3440" stroke-width="1.2" />
+  <line x1="754" y1="101" x2="726" y2="129" stroke="#2B3440" stroke-width="1.2" />
+  <text x="766" y="119" font-size="11" fill="#5B6573">Skydome</text>
+
+  <!-- Plots de climatiseurs (terrasse nord), à l'écart du centre de la zone -->
+  <g fill="#FFFFFF" stroke="#2B3440" stroke-width="1.5">
+    <rect x="400" y="100" width="34" height="22" />
+    <rect x="445" y="100" width="34" height="22" />
+    <rect x="490" y="100" width="34" height="22" />
+    <rect x="400" y="145" width="34" height="22" />
+    <rect x="445" y="145" width="34" height="22" />
+    <rect x="490" y="145" width="34" height="22" />
+  </g>
+  <text x="462" y="186" font-size="11" fill="#5B6573" text-anchor="middle">Plots climatiseurs</text>
+
+  <!-- Plots de panneaux solaires (terrasse sud) -->
+  <g fill="url(#hachures)" stroke="#2B3440" stroke-width="1.5">
+    <rect x="600" y="380" width="60" height="40" />
+    <rect x="680" y="380" width="60" height="40" />
+    <rect x="600" y="440" width="60" height="40" />
+    <rect x="680" y="440" width="60" height="40" />
+  </g>
+  <text x="670" y="500" font-size="11" fill="#5B6573" text-anchor="middle">Plots panneaux solaires</text>
+
+  <!-- Jardinières en rive sud -->
+  <rect x="80" y="550" width="840" height="20" fill="url(#hachures)" stroke="#2B3440" stroke-width="1.5" />
+  <line x1="74" y1="540" x2="926" y2="540" stroke="#2B3440" stroke-width="2" />
+
+  <!-- Évacuations d'eaux pluviales -->
+  <g fill="#FFFFFF" stroke="#2B3440" stroke-width="1.5">
+    <circle cx="96" cy="96" r="9" />
+    <circle cx="524" cy="284" r="9" />
+    <circle cx="96" cy="514" r="9" />
+    <circle cx="904" cy="514" r="9" />
+  </g>
+  <g font-size="10" fill="#2B3440" font-weight="bold">
+    <text x="110" y="100">EP</text>
+    <text x="490" y="288">EP</text>
+    <text x="110" y="518">EP</text>
+    <text x="874" y="518">EP</text>
+  </g>
+
+  <!-- Sens des pentes vers les évacuations -->
+  <g stroke="#5B6573" stroke-width="1.5" marker-end="url(#fleche)">
+    <line x1="180" y1="170" x2="125" y2="118" />
+    <line x1="470" y1="250" x2="510" y2="275" />
+    <line x1="220" y1="430" x2="125" y2="500" />
+    <line x1="820" y1="430" x2="880" y2="500" />
+  </g>
+
+  <!-- Cartouche -->
+  <line x1="40" y1="625" x2="960" y2="625" stroke="#2B3440" stroke-width="1.2" />
+  <text x="60" y="655" font-size="17" font-weight="bold" fill="#2B3440">Résidence Les Cocotiers — bâtiment B</text>
+  <text x="60" y="678" font-size="12" fill="#5B6573">Plan de toiture-terrasse · 820 m² · document de démonstration, données fictives</text>
+
+  <!-- Échelle : 5 m = 100 unités -->
+  <g stroke="#2B3440" stroke-width="2">
+    <line x1="640" y1="660" x2="740" y2="660" />
+    <line x1="640" y1="652" x2="640" y2="668" />
+    <line x1="690" y1="655" x2="690" y2="665" />
+    <line x1="740" y1="652" x2="740" y2="668" />
+  </g>
+  <text x="640" y="684" font-size="11" fill="#5B6573" text-anchor="middle">0</text>
+  <text x="740" y="684" font-size="11" fill="#5B6573" text-anchor="middle">5 m</text>
+
+  <!-- Nord -->
+  <g transform="translate(900 655)">
+    <path d="M0 -24 L9 10 L0 3 L-9 10 Z" fill="#2B3440" />
+    <text x="0" y="28" font-size="12" font-weight="bold" fill="#2B3440" text-anchor="middle">N</text>
+  </g>
+</svg>

@@ -11,6 +11,7 @@ Vérifié directement dans la base le 19 octobre 2026, puis le 25 octobre 2026.
 | schema.sql | Oui | Schéma de base |
 | storage.sql | En partie | Dossier « photos » créé ; règle d'envoi ancienne version |
 | seed.sql | — | Données de test, à ne pas exécuter en production |
+| demo.sql | — | Compte démo : relançable à volonté, ne touche qu'une entreprise dont le nom contient « Démo » |
 | fix-creation-entreprise.sql | Oui | |
 | fix-recursion-profils.sql | Oui | |
 | fix-devise-entreprise.sql | Oui | Exécuté le 19/10/2026 |
