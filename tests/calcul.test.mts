@@ -11,7 +11,8 @@ import { calculerEtancheite } from "../lib/calc/etancheite.ts";
 
 test("bicouche 100 m² avec périmètre connu : membrane, relevés, primaire", () => {
   const r = calculerEtancheite({ surface: 100, perimetre: 40, systeme: "bicouche", isolation: false });
-  assert.equal(r.surfaceMembrane, 108); // 8 % de recouvrements
+  assert.equal(r.nombreCouches, 2); // première couche + finition : le devis compte les deux
+  assert.equal(r.surfaceMembrane, 108); // par couche : 8 % de recouvrements
   assert.equal(r.metresReleves, 40);
   assert.equal(r.surfaceReleves, 6); // 40 ml × 0,15 m (relevé mini)
   assert.equal(r.primaireAccrochage, 34.2); // (108 + 6) m² × 0,3 L/m²
@@ -29,6 +30,7 @@ test("PVC 300 m² isolé, gravillons, périmètre estimé", () => {
     epaisseurIsolant: 120,
     protectionLourde: true,
   });
+  assert.equal(r.nombreCouches, 1);
   assert.equal(r.metresReleves, 80); // √300 × 4 × 1,15 ≈ 79,7 → 80 ml
   assert.equal(r.surfaceMembrane, 318); // 6 % de recouvrements
   assert.equal(r.surfaceReleves, 12);
@@ -36,11 +38,20 @@ test("PVC 300 m² isolé, gravillons, périmètre estimé", () => {
   assert.equal(r.fixationsMecaniques, 1050); // 3,5 fixations/m²
   assert.equal(r.isolantSurface, 309); // + 3 % de chutes
   assert.equal(r.isolantVolume, 37.08); // 309 m² × 0,12 m
-  assert.equal(r.protectionGravillon, 15000); // 50 kg/m²
+  assert.equal(r.protectionGravillon, 24000); // 5 cm par défaut × 1 600 kg/m³ = 80 kg/m²
+});
+
+test("gravillons : le poids suit l'épaisseur choisie", () => {
+  const gravillons = (epaisseurGravillonsCm: number) =>
+    calculerEtancheite({ surface: 100, perimetre: 40, systeme: "bicouche", isolation: false, protectionLourde: true, epaisseurGravillonsCm }).protectionGravillon;
+  assert.equal(gravillons(4), 6400); // 100 m² × 0,04 m × 1 600 kg/m³
+  assert.equal(gravillons(5), 8000);
+  assert.equal(gravillons(0), 0);
 });
 
 test("résine liquide : 5 % de pertes, pas de fixation", () => {
   const r = calculerEtancheite({ surface: 200, perimetre: 60, systeme: "resine", isolation: false });
+  assert.equal(r.nombreCouches, 1);
   assert.equal(r.surfaceMembrane, 210);
   assert.equal(r.fixationsMecaniques, 0);
   assert.equal(r.detailsSysteme.reference, "NF DTU 43.6 / Avis Technique");
