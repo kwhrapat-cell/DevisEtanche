@@ -3,8 +3,15 @@ import { stripe, PRIX_STRIPE } from "@/lib/stripe/client";
 import { getUtilisateurCourant } from "@/lib/supabase/auth";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { paiementEnLigneConfigure } from "@/lib/paiement";
 
 export async function POST(request: Request) {
+  // Sans clés Stripe dans Vercel (cas actuel : Stripe refuse les entreprises
+  // calédoniennes), on répond proprement au lieu de planter sur l'appel Stripe.
+  if (!paiementEnLigneConfigure()) {
+    return NextResponse.json({ error: "Paiement en ligne indisponible" }, { status: 503 });
+  }
+
   const { forfait } = await request.json();
   const prixId = PRIX_STRIPE[forfait];
   if (!prixId) {

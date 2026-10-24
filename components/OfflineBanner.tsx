@@ -32,7 +32,7 @@ export default function OfflineBanner() {
   return (
     <div className={`text-xs text-center py-1.5 font-mono ${horsLigne ? "bg-ambre text-encre" : "bg-vert text-white"}`}>
       {horsLigne
-        ? "Hors connexion — vos modifications seront synchronisées automatiquement."
+        ? "Hors connexion — les nouvelles zones seront envoyées au retour du réseau. Photos et statuts : attendre le réseau."
         : `Synchronisation de ${enAttente} modification(s) en attente…`}
     </div>
   );
