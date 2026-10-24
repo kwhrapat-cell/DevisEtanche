@@ -1,3 +1,6 @@
+-- ATTENTION : ne plus exécuter ce fichier. Il est remplacé par
+-- migration-securite-consolidation.sql (voir supabase/ETAT-MIGRATIONS.md).
+--
 -- Corrige deux policies RLS trop permissives sur "entreprises", trouvées lors
 -- d'un audit de sécurité :
 --

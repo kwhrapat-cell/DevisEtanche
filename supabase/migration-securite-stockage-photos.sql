@@ -1,3 +1,6 @@
+-- ATTENTION : ne plus exécuter ce fichier. Il est remplacé par
+-- migration-securite-consolidation.sql (voir supabase/ETAT-MIGRATIONS.md).
+--
 -- Corrige l'absence de cloisonnement par entreprise sur l'upload de photos,
 -- trouvée lors d'un audit de sécurité :
 --
