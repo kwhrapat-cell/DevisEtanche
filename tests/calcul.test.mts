@@ -39,7 +39,7 @@ test("PVC 300 m² isolé, gravillons, périmètre estimé", () => {
   assert.equal(r.metresReleves, 80); // √300 × 4 × 1,15 ≈ 79,7 → 80 ml
   assert.equal(r.surfaceMembrane, 318); // 6 % de recouvrements
   assert.equal(r.surfaceReleves, 12);
-  assert.equal(r.primaireAccrochage, 49.5);
+  assert.equal(r.primaireAccrochage, 0); // PVC fixé mécaniquement : pas de primaire
   assert.equal(r.fixationsMecaniques, 1050); // 3,5 fixations/m²
   assert.equal(r.isolantSurface, 309); // + 3 % de chutes
   assert.equal(r.isolantVolume, 37.08); // 309 m² × 0,12 m
