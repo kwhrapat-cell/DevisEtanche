@@ -5,6 +5,8 @@ import { CircleAlert } from "@/components/icons";
 import { classesBouton } from "@/components/ui/Button";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { COMPANY_INFO } from "@/lib/company-info";
+import type { Devise } from "@/lib/devise";
+import { PRIX_FORFAITS, paiementEnLigneConfigure } from "@/lib/paiement";
 import ForfaitCard from "./ForfaitCard";
 import MarcheForm from "./MarcheForm";
 import CoordonneesForm from "./CoordonneesForm";
@@ -27,6 +29,12 @@ export default async function ParametresPage() {
   const { data: equipe } = entrepriseId
     ? await supabase.from("profiles").select("id, nom, role").eq("entreprise_id", entrepriseId)
     : { data: [] };
+
+  // Prix dans la devise de l'entreprise (XPF en Calédonie, € en métropole), et paiement
+  // en ligne seulement s'il est configuré : sinon, demande par e-mail.
+  const devise: Devise = entreprise?.devise === "EUR" ? "EUR" : "XPF";
+  const prix = PRIX_FORFAITS[devise];
+  const achat = { paiementEnLigne: paiementEnLigneConfigure(), emailContact: COMPANY_INFO.email };
 
   return (
     <>
@@ -73,18 +81,25 @@ export default async function ParametresPage() {
           <div className="lg:col-span-2">
             <div className="font-medium text-encre mb-3">Forfait</div>
             <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-              <ForfaitCard id="decouverte" nom="Découverte" prix="0 €/mois" actuel={entreprise?.forfait === "decouverte"} />
-              <ForfaitCard id="artisan" nom="Artisan" prix="29 €/mois" actuel={entreprise?.forfait === "artisan"} recommande />
-              <ForfaitCard id="pro" nom="Pro" prix="59 €/mois" actuel={entreprise?.forfait === "pro"} />
-              <ForfaitCard id="entreprise" nom="Entreprise" prix="Sur devis" actuel={entreprise?.forfait === "entreprise"} />
+              <ForfaitCard id="decouverte" nom="Découverte" prix={prix.decouverte} actuel={entreprise?.forfait === "decouverte"} {...achat} />
+              <ForfaitCard id="artisan" nom="Artisan" prix={prix.artisan} actuel={entreprise?.forfait === "artisan"} recommande {...achat} />
+              <ForfaitCard id="pro" nom="Pro" prix={prix.pro} actuel={entreprise?.forfait === "pro"} {...achat} />
+              <ForfaitCard id="entreprise" nom="Entreprise" prix="Sur devis" actuel={entreprise?.forfait === "entreprise"} {...achat} />
             </div>
+            <p className="mt-3 text-xs text-encre/60">
+              Prix hors taxes, sans engagement.
+              {!achat.paiementEnLigne && " Pour changer de forfait, écrivez-nous : la facture vous est envoyée directement."}
+            </p>
           </div>
 
           <InstallerAppli />
 
           <div className="card p-5">
             <div className="font-medium text-encre mb-1">Mode hors ligne</div>
-            <p className="text-sm text-encre/60">Actif — vos modifications se synchronisent automatiquement au retour du réseau.</p>
+            <p className="text-sm text-encre/60">
+              Actif — les pages déjà ouvertes restent consultables, et les zones créées sans réseau sont envoyées au retour du signal. Les photos et
+              les changements de statut demandent une connexion.
+            </p>
           </div>
 
           <Card className="p-5 lg:col-span-2">

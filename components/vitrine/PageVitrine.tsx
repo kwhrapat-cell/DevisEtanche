@@ -32,7 +32,7 @@ const ETAPES = [
 
 const TERRAIN = [
   "S'installe sur le téléphone depuis le navigateur, sans passer par un store.",
-  "Fonctionne sans réseau : vos saisies partent dès que le signal revient.",
+  "Peu de réseau ? Les pages déjà ouvertes restent consultables, et les zones créées sans signal partent dès qu'il revient.",
   "Gros boutons, lisibles en plein soleil, utilisables avec des gants.",
   "Un sous-traitant ne voit que le chantier où vous l'avez invité.",
 ];
@@ -56,7 +56,8 @@ const QUESTIONS = [
   },
   {
     question: "Faut-il du réseau sur le chantier ?",
-    reponse: "Non. Ce que vous saisissez hors connexion est gardé sur le téléphone et envoyé dès que le signal revient.",
+    reponse:
+      "Pas pour consulter : les pages déjà ouvertes restent disponibles. Les zones créées sans réseau sont gardées sur le téléphone et envoyées dès que le signal revient. Les photos et les changements de statut demandent encore une connexion.",
   },
   {
     question: "Mes clients doivent-ils créer un compte ?",
@@ -86,7 +87,7 @@ export default function PageVitrine() {
             </h1>
             <p className="mt-5 max-w-xl text-lg leading-relaxed text-encre/70">
               Chiffrez une toiture-terrasse selon les DTU, avec les vraies références fabricants. Puis suivez chaque zone, chaque équipe et chaque photo
-              jusqu'à la réception. Sur le téléphone, même sans réseau.
+              jusqu'à la réception, depuis votre téléphone.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <ButtonLink href="#pilote" variante="marque" taille="lg">

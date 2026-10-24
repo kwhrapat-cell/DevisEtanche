@@ -6,7 +6,7 @@ import { getUtilisateurCourant } from "@/lib/supabase/auth";
 
 const TITRE = "DevisEtanche — le logiciel des chantiers d'étanchéité";
 const DESCRIPTION =
-  "Chiffrez une toiture-terrasse selon les DTU avec les vraies références fabricants, puis suivez chaque zone jusqu'à la réception. Sur le téléphone, même sans réseau.";
+  "Chiffrez une toiture-terrasse selon les DTU avec les vraies références fabricants, puis suivez chaque zone jusqu'à la réception, depuis votre téléphone.";
 
 // Aperçu affiché quand le lien est partagé (LinkedIn, Facebook, WhatsApp, Messenger).
 export const metadata: Metadata = {
