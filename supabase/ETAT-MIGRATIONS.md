@@ -4,7 +4,7 @@ Supabase ne garde aucune trace des fichiers exécutés à la main dans le SQL Ed
 Ce tableau la tient à jour, en attendant le passage aux migrations suivies
 (étape 2 de l'audit CPO/CTO). **Après chaque exécution, mettre la ligne à jour.**
 
-Vérifié directement dans la base le 19 octobre 2026.
+Vérifié directement dans la base le 19 octobre 2026, puis le 25 octobre 2026.
 
 | Fichier | En production | Remarque |
 | --- | --- | --- |
@@ -26,4 +26,4 @@ Vérifié directement dans la base le 19 octobre 2026.
 | migration-demandes-pilote.sql | Oui | Exécuté le 19/10/2026 |
 | migration-securite-entreprises.sql | Non | Remplacé : ne plus exécuter |
 | migration-securite-stockage-photos.sql | Non | Remplacé : ne plus exécuter |
-| migration-securite-consolidation.sql | **Non** | À exécuter après la French Tech |
+| migration-securite-consolidation.sql | Oui | Exécuté le 25/10/2026 par Patrice ; vérifié dans la base le même jour |
