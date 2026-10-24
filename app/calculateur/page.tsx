@@ -164,7 +164,10 @@ export default function CalculateurPage() {
         prix_unitaire: prixMembraneParM2,
         produit_id: produitMembrane?.id,
       },
-      { designation: designationPrimaire, quantite: resultat.primaireAccrochage, unite: "L", prix_unitaire: prixPrimaire, produit_id: produitPrimaire?.id },
+      // Pas de ligne de primaire quand le système n'en demande pas (PVC fixé mécaniquement).
+      ...(resultat.primaireAccrochage > 0
+        ? [{ designation: designationPrimaire, quantite: resultat.primaireAccrochage, unite: "L", prix_unitaire: prixPrimaire, produit_id: produitPrimaire?.id }]
+        : []),
       { designation: "Évacuations eaux pluviales", quantite: resultat.evacuationsEP, unite: "u.", prix_unitaire: prixLigneOuDefaut(undefined, 65, devise) },
       ...(resultat.fixationsMecaniques > 0
         ? [{ designation: "Fixations mécaniques", quantite: resultat.fixationsMecaniques, unite: "u.", prix_unitaire: prixLigneOuDefaut(undefined, 0.8, devise) }]
@@ -301,7 +304,10 @@ export default function CalculateurPage() {
                 valeur={`${resultat.surfaceReleves} m²`}
               />
               <Resultat label="Linéaire relevés" valeur={`${resultat.metresReleves} ml`} />
-              <Resultat label="Primaire d'accrochage" valeur={`${resultat.primaireAccrochage} L`} />
+              <Resultat
+                label="Primaire d'accrochage"
+                valeur={resultat.primaireAccrochage > 0 ? `${resultat.primaireAccrochage} L` : "aucun (fixation mécanique)"}
+              />
               <Resultat label="Évacuations EP" valeur={`${resultat.evacuationsEP} u.`} />
               <Resultat
                 label="Fixations mécaniques"

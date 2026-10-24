@@ -65,7 +65,7 @@ const SYSTEMES: Record<Systeme, { nom: string; reference: string; couches: numbe
     reference: "DTU 43.3 (bac acier) / Avis Technique",
     couches: 1,
     pertes: 0.06,
-    primaireLm2: 0.15,
+    primaireLm2: 0, // membrane PVC fixée mécaniquement : pas de primaire (confirmé par Patrice, 25/10/2026)
     fixationsU_m2: 3.5, // fixation mécanique moyenne courant/rive confondus
   },
   resine: {
