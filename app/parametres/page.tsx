@@ -9,6 +9,8 @@ import type { Devise } from "@/lib/devise";
 import { PRIX_FORFAITS, paiementEnLigneConfigure } from "@/lib/paiement";
 import ForfaitCard from "./ForfaitCard";
 import MarcheForm from "./MarcheForm";
+import PertesForm from "./PertesForm";
+import { reglagesPertesEntreprise } from "@/lib/calc/etancheite";
 import CoordonneesForm from "./CoordonneesForm";
 import InstallerAppli from "@/components/InstallerAppli";
 
@@ -59,6 +61,7 @@ export default async function ParametresPage() {
                 libelleTaxe={entreprise.libelle_taxe}
                 tauxTaxeDefaut={Number(entreprise.taux_taxe_defaut)}
               />
+              <PertesForm entrepriseId={entrepriseId} reglages={reglagesPertesEntreprise(entreprise)} />
             </>
           )}
 

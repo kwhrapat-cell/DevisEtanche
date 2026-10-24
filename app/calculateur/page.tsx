@@ -1,9 +1,17 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import TopBar from "@/components/TopBar";
-import { calculerEtancheite, type Systeme } from "@/lib/calc/etancheite";
+import {
+  calculerEtancheite,
+  pertesDuSysteme,
+  reglagesPertesEntreprise,
+  REGLAGES_PERTES_PAR_DEFAUT,
+  type ReglagesPertes,
+  type Systeme,
+} from "@/lib/calc/etancheite";
 import { createClient } from "@/lib/supabase/client";
 import type { ProduitEtancheite } from "@/lib/types";
 import { GAMME_PAR_SYSTEME, prixLigneOuDefaut } from "@/lib/catalogue";
@@ -22,6 +30,9 @@ export default function CalculateurPage() {
   const [catalogue, setCatalogue] = useState<ProduitEtancheite[]>([]);
   const [fabricant, setFabricant] = useState("");
   const [devise, setDevise] = useState<Devise>("XPF");
+  // Pertes et chutes de l'entreprise (Paramètres) ; valeurs usuelles en attendant le chargement.
+  const [reglages, setReglages] = useState<ReglagesPertes>(REGLAGES_PERTES_PAR_DEFAUT);
+  const chute = reglages.chuteRouleauxPct / 100;
 
   useEffect(() => {
     const supabase = createClient();
@@ -34,8 +45,13 @@ export default function CalculateurPage() {
       if (!userData.user) return;
       const { data: profile } = await supabase.from("profiles").select("entreprise_id").eq("id", userData.user.id).single();
       if (!profile?.entreprise_id) return;
-      const { data: entreprise } = await supabase.from("entreprises").select("devise").eq("id", profile.entreprise_id).single();
-      if (entreprise) setDevise(entreprise.devise);
+      // « * » plutôt qu'une liste : si les colonnes de pertes n'existent pas encore dans la
+      // base, la lecture fonctionne quand même et les valeurs usuelles s'appliquent.
+      const { data: entreprise } = await supabase.from("entreprises").select("*").eq("id", profile.entreprise_id).single();
+      if (entreprise) {
+        setDevise(entreprise.devise);
+        setReglages(reglagesPertesEntreprise(entreprise));
+      }
     })();
   }, []);
 
@@ -62,8 +78,9 @@ export default function CalculateurPage() {
         epaisseurIsolant,
         protectionLourde,
         epaisseurGravillonsCm,
+        pertes: pertesDuSysteme(systeme, reglages),
       }),
-    [surface, perimetre, systeme, isolation, epaisseurIsolant, protectionLourde, epaisseurGravillonsCm]
+    [surface, perimetre, systeme, isolation, epaisseurIsolant, protectionLourde, epaisseurGravillonsCm, reglages]
   );
 
   const bicouche = resultat.nombreCouches > 1;
@@ -76,8 +93,8 @@ export default function CalculateurPage() {
 
   const rouleauxNecessaires = useMemo(() => {
     if (!produitMembrane?.surface_couverte_m2) return null;
-    return calculerRouleaux(resultat.surfaceMembrane, produitMembrane);
-  }, [produitMembrane, resultat.surfaceMembrane]);
+    return calculerRouleaux(resultat.surfaceMembrane, produitMembrane, chute);
+  }, [produitMembrane, resultat.surfaceMembrane, chute]);
 
   // Bicouche : la première couche (Sopralène Base, Topfix…) se pose sous la finition, sur
   // toute la partie courante. Elle était absente du calcul et du devis.
@@ -88,8 +105,8 @@ export default function CalculateurPage() {
 
   const rouleauxPremiereCouche = useMemo(() => {
     if (!produitPremiereCouche?.surface_couverte_m2) return null;
-    return calculerRouleaux(resultat.surfaceMembrane, produitPremiereCouche);
-  }, [produitPremiereCouche, resultat.surfaceMembrane]);
+    return calculerRouleaux(resultat.surfaceMembrane, produitPremiereCouche, chute);
+  }, [produitPremiereCouche, resultat.surfaceMembrane, chute]);
 
   function genererDevis() {
     const produitPrimaire = catalogue.find((p) => p.fabricant === fabricant && p.usage_type === "primaire");
@@ -300,10 +317,14 @@ export default function CalculateurPage() {
                 <Resultat label={`Protection gravillon (${epaisseurGravillonsCm} cm)`} valeur={`${resultat.protectionGravillon.toLocaleString("fr-FR")} kg`} />
               )}
             </div>
-            <p className="text-xs text-white/40 mt-6">
-              Estimation de chantier basée sur des ratios usuels ({(resultat.detailsSysteme.pertes * 100).toFixed(0)}%
-              de pertes/recouvrement pour ce système). À confirmer par une note de calcul et le DTU applicable au
-              support réel avant commande.
+            <p className="text-xs text-white/60 mt-6">
+              Pertes de votre entreprise : {formatPct(resultat.detailsSysteme.pertes * 100)} de{" "}
+              {systeme === "resine" ? "pertes de résine" : "recouvrements"}
+              {systeme !== "resine" && <>, puis {formatPct(reglages.chuteRouleauxPct)} de chute sur les rouleaux</>}.{" "}
+              <Link href="/parametres" className="underline underline-offset-2">
+                Modifier dans Paramètres
+              </Link>
+              . Estimation à confirmer par une note de calcul et le DTU applicable au support réel avant commande.
             </p>
             <button onClick={genererDevis} className="w-full bg-primaire text-white font-semibold rounded-lg py-2.5 mt-4">
               Générer un devis à partir de ce calcul
@@ -321,4 +342,9 @@ function Resultat({ label, valeur }: { label: string; valeur: string }) {
       <div className="text-xs text-white/55 mt-1">{label}</div>
     </div>
   );
+}
+
+/** « 8 % », « 7,5 % » : pourcentage à la française, sans décimales inutiles. */
+function formatPct(valeur: number): string {
+  return `${(Math.round(valeur * 10) / 10).toLocaleString("fr-FR")} %`;
 }
