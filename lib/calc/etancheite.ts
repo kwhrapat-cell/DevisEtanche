@@ -29,6 +29,11 @@ export interface CalculInput {
   protectionLourde?: boolean;
   /** Épaisseur de la couche de gravillons en cm, si protection lourde (5 cm par défaut) */
   epaisseurGravillonsCm?: number;
+  /**
+   * Pertes de recouvrement propres à l'entreprise, en fraction (0,08 = 8 %). Absentes ou
+   * hors limites (0 à 50 %) : la valeur usuelle du système s'applique.
+   */
+  pertes?: number;
 }
 
 export interface CalculResult {
@@ -76,6 +81,60 @@ const SYSTEMES: Record<Systeme, { nom: string; reference: string; couches: numbe
 /** Masse volumique apparente de gravillons roulés, en kg/m³ (ordre de grandeur : 1 500 à 1 700). */
 export const MASSE_VOLUMIQUE_GRAVILLONS_KG_M3 = 1600;
 
+/**
+ * Réglages de pertes d'une entreprise, en pourcentage (Paramètres > Pertes et chutes).
+ * Chaque entreprise chiffre avec ses propres habitudes de pose.
+ */
+export interface ReglagesPertes {
+  /** Recouvrements des lés en bicouche, en % de la surface */
+  recouvrementBicouchePct: number;
+  /** Recouvrements des lés en PVC, en % de la surface */
+  recouvrementPvcPct: number;
+  /** Pertes de résine liquide, en % de la surface */
+  pertesResinePct: number;
+  /** Chute à la coupe, ajoutée au calcul du nombre de rouleaux, en % */
+  chuteRouleauxPct: number;
+}
+
+/** Limite haute acceptée pour un pourcentage de pertes (même limite que dans la base). */
+export const PERTES_MAX_PCT = 50;
+
+/** Valeurs usuelles, appliquées tant que l'entreprise n'a rien réglé. */
+export const REGLAGES_PERTES_PAR_DEFAUT: ReglagesPertes = {
+  recouvrementBicouchePct: Math.round(SYSTEMES.bicouche.pertes * 1000) / 10,
+  recouvrementPvcPct: Math.round(SYSTEMES.pvc.pertes * 1000) / 10,
+  pertesResinePct: Math.round(SYSTEMES.resine.pertes * 1000) / 10,
+  chuteRouleauxPct: 10,
+};
+
+/** Pourcentage valide (nombre entre 0 et PERTES_MAX_PCT), sinon la valeur de repli. */
+function pourcentageOuDefaut(valeur: unknown, defaut: number): number {
+  if (valeur === null || valeur === undefined || valeur === "") return defaut;
+  const n = Number(valeur);
+  return Number.isFinite(n) && n >= 0 && n <= PERTES_MAX_PCT ? n : defaut;
+}
+
+/**
+ * Lit les réglages de pertes dans une ligne de la table entreprises. Une colonne absente
+ * (migration pas encore exécutée), vide ou hors limites reprend la valeur usuelle.
+ */
+export function reglagesPertesEntreprise(entreprise: Record<string, unknown> | null | undefined): ReglagesPertes {
+  const d = REGLAGES_PERTES_PAR_DEFAUT;
+  return {
+    recouvrementBicouchePct: pourcentageOuDefaut(entreprise?.recouvrement_bicouche_pct, d.recouvrementBicouchePct),
+    recouvrementPvcPct: pourcentageOuDefaut(entreprise?.recouvrement_pvc_pct, d.recouvrementPvcPct),
+    pertesResinePct: pourcentageOuDefaut(entreprise?.pertes_resine_pct, d.pertesResinePct),
+    chuteRouleauxPct: pourcentageOuDefaut(entreprise?.chute_rouleaux_pct, d.chuteRouleauxPct),
+  };
+}
+
+/** Pertes de recouvrement à appliquer pour un système, en fraction (0,08 = 8 %). */
+export function pertesDuSysteme(systeme: Systeme, reglages: ReglagesPertes): number {
+  const pct =
+    systeme === "bicouche" ? reglages.recouvrementBicouchePct : systeme === "pvc" ? reglages.recouvrementPvcPct : reglages.pertesResinePct;
+  return pct / 100;
+}
+
 /** Estime un périmètre plausible à partir de la surface si aucun n'est fourni,
  *  en supposant une forme proche du carré avec un facteur d'irrégularité de chantier. */
 function estimerPerimetre(surface: number): number {
@@ -89,8 +148,12 @@ export function calculerEtancheite(input: CalculInput): CalculResult {
   const perimetre = input.perimetre && input.perimetre > 0 ? input.perimetre : estimerPerimetre(surface);
   const hauteurReleves = input.hauteurReleves ?? 0.15; // 15 cm mini au-dessus du niveau fini
   const sys = SYSTEMES[input.systeme];
+  const pertes =
+    input.pertes !== undefined && Number.isFinite(input.pertes) && input.pertes >= 0 && input.pertes <= PERTES_MAX_PCT / 100
+      ? input.pertes
+      : sys.pertes;
 
-  const surfaceMembrane = Math.round(surface * (1 + sys.pertes) * 100) / 100;
+  const surfaceMembrane = Math.round(surface * (1 + pertes) * 100) / 100;
   const surfaceReleves = Math.round(perimetre * hauteurReleves * 100) / 100;
   const primaireAccrochage = Math.round((surfaceMembrane + surfaceReleves) * sys.primaireLm2 * 10) / 10;
   const fixationsMecaniques = Math.round(surface * sys.fixationsU_m2);
@@ -119,6 +182,6 @@ export function calculerEtancheite(input: CalculInput): CalculResult {
     isolantSurface,
     isolantVolume,
     protectionGravillon,
-    detailsSysteme: { nom: sys.nom, reference: sys.reference, pertes: sys.pertes },
+    detailsSysteme: { nom: sys.nom, reference: sys.reference, pertes },
   };
 }

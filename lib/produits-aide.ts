@@ -1,4 +1,5 @@
 import type { ProduitEtancheite } from "@/lib/types";
+import { REGLAGES_PERTES_PAR_DEFAUT } from "@/lib/calc/etancheite";
 
 export type TypeElementZone =
   | "terrasse_courante"
@@ -7,7 +8,9 @@ export type TypeElementZone =
   | "point_singulier" // plots climatiseurs, panneaux solaires, émergences, skydomes
   | "toit_ascenseur";
 
-const CHUTE_PAR_DEFAUT = 0.1; // 10 % de chute, ajustable par chantier
+// Chute usuelle (10 %) ; chaque entreprise peut régler la sienne dans Paramètres,
+// les appelants la passent alors en 3e argument de calculerRouleaux.
+const CHUTE_PAR_DEFAUT = REGLAGES_PERTES_PAR_DEFAUT.chuteRouleauxPct / 100;
 
 const REFERENCES_PAR_ELEMENT: Record<TypeElementZone, string[]> = {
   terrasse_courante: ["SOPRALENE-BASE", "SOPRALENE-FLAM-180", "AXTER-TOPFIX-FMP-GRESE", "AXTER-TOPAZ-25", "SARNAFIL-G410"],

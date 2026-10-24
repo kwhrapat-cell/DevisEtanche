@@ -7,7 +7,12 @@
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { calculerEtancheite } from "../lib/calc/etancheite.ts";
+import {
+  calculerEtancheite,
+  pertesDuSysteme,
+  reglagesPertesEntreprise,
+  REGLAGES_PERTES_PAR_DEFAUT,
+} from "../lib/calc/etancheite.ts";
 
 test("bicouche 100 m² avec périmètre connu : membrane, relevés, primaire", () => {
   const r = calculerEtancheite({ surface: 100, perimetre: 40, systeme: "bicouche", isolation: false });
@@ -77,4 +82,36 @@ test("surface vide ou négative : aucun matériau compté", () => {
     assert.equal(r.isolantSurface, 0);
     assert.equal(r.protectionGravillon, 0);
   }
+});
+
+test("pertes de l'entreprise : elles remplacent la valeur usuelle du système", () => {
+  const base = { surface: 100, perimetre: 40, systeme: "bicouche" as const, isolation: false };
+  assert.equal(calculerEtancheite(base).surfaceMembrane, 108); // 8 % par défaut
+  const r = calculerEtancheite({ ...base, pertes: 0.12 });
+  assert.equal(r.surfaceMembrane, 112);
+  assert.equal(r.detailsSysteme.pertes, 0.12); // le résultat affiche la valeur réellement utilisée
+  assert.equal(r.primaireAccrochage, 35.4); // (112 + 6) m² × 0,3 L/m²
+  assert.equal(calculerEtancheite({ ...base, pertes: 0 }).surfaceMembrane, 100);
+});
+
+test("pertes hors limites ou illisibles : la valeur usuelle s'applique", () => {
+  const base = { surface: 100, perimetre: 40, systeme: "bicouche" as const, isolation: false };
+  for (const pertes of [-0.05, 0.8, Number.NaN]) {
+    assert.equal(calculerEtancheite({ ...base, pertes }).surfaceMembrane, 108);
+  }
+});
+
+test("réglages lus dans la table entreprises", () => {
+  // Migration pas encore exécutée : aucune colonne, valeurs usuelles.
+  assert.deepEqual(reglagesPertesEntreprise({ devise: "XPF" }), REGLAGES_PERTES_PAR_DEFAUT);
+  assert.deepEqual(reglagesPertesEntreprise(null), { recouvrementBicouchePct: 8, recouvrementPvcPct: 6, pertesResinePct: 5, chuteRouleauxPct: 10 });
+  // Valeurs réglées (Postgres peut renvoyer un texte pour une colonne numeric).
+  const r = reglagesPertesEntreprise({ recouvrement_bicouche_pct: "7.5", recouvrement_pvc_pct: 4, pertes_resine_pct: null, chute_rouleaux_pct: 60 });
+  assert.equal(r.recouvrementBicouchePct, 7.5);
+  assert.equal(r.recouvrementPvcPct, 4);
+  assert.equal(r.pertesResinePct, 5); // vide : valeur usuelle
+  assert.equal(r.chuteRouleauxPct, 10); // 60 % refusé : valeur usuelle
+  assert.equal(pertesDuSysteme("bicouche", r), 0.075);
+  assert.equal(pertesDuSysteme("pvc", r), 0.04);
+  assert.equal(pertesDuSysteme("resine", r), 0.05);
 });

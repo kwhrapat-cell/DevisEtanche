@@ -27,3 +27,4 @@ Vérifié directement dans la base le 19 octobre 2026, puis le 25 octobre 2026.
 | migration-securite-entreprises.sql | Non | Remplacé : ne plus exécuter |
 | migration-securite-stockage-photos.sql | Non | Remplacé : ne plus exécuter |
 | migration-securite-consolidation.sql | Oui | Exécuté le 25/10/2026 par Patrice ; vérifié dans la base le même jour |
+| migration-pertes-entreprise.sql | **Non** | Pertes et chutes réglables par entreprise ; à exécuter avant de fusionner la PR |

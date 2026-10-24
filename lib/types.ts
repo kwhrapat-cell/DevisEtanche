@@ -90,6 +90,11 @@ export interface Entreprise {
   forme_juridique?: string | null;
   conditions_reglement?: string | null;
   validite_devis_jours?: number;
+  /** Pertes et chutes de l'entreprise, en % (migration-pertes-entreprise.sql) */
+  recouvrement_bicouche_pct?: number;
+  recouvrement_pvc_pct?: number;
+  pertes_resine_pct?: number;
+  chute_rouleaux_pct?: number;
 }
 
 export interface ProduitEtancheite {

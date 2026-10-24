@@ -8,6 +8,7 @@ import type { LigneDevis, ProduitEtancheite } from "@/lib/types";
 import { prixMoyen } from "@/lib/catalogue";
 import { calculerConsommationLiquide, calculerRouleaux, verifierCompatibiliteMarque } from "@/lib/produits-aide";
 import { convertirEurVersDevise, formatMontant, type Devise } from "@/lib/devise";
+import { reglagesPertesEntreprise, REGLAGES_PERTES_PAR_DEFAUT } from "@/lib/calc/etancheite";
 
 interface ChantierOption { id: string; nom: string; client_id: string | null; }
 
@@ -52,6 +53,8 @@ export default function NouveauDevisPage() {
   // designation/quantite/unite/prix_unitaire sur chaque ligne).
   const [tauxHoraireDefaut, setTauxHoraireDefaut] = useState<number | null>(null);
   const [calcOuvert, setCalcOuvert] = useState<boolean[]>([]);
+  // Chute à la coupe réglée par l'entreprise (Paramètres > Pertes et chutes), en %.
+  const [chuteRouleauxPct, setChuteRouleauxPct] = useState(REGLAGES_PERTES_PAR_DEFAUT.chuteRouleauxPct);
 
   useEffect(() => {
     const supabase = createClient();
@@ -61,16 +64,14 @@ export default function NouveauDevisPage() {
       if (!profile) return;
       const { data } = await supabase.from("chantiers").select("id, nom, client_id").eq("entreprise_id", profile.entreprise_id).order("nom");
       setChantiersList(data ?? []);
-      const { data: entreprise } = await supabase
-        .from("entreprises")
-        .select("devise, libelle_taxe, taux_taxe_defaut, dernier_taux_horaire_interne")
-        .eq("id", profile.entreprise_id)
-        .single();
+      // « * » : fonctionne aussi avant la migration des pertes (valeurs usuelles alors).
+      const { data: entreprise } = await supabase.from("entreprises").select("*").eq("id", profile.entreprise_id).single();
       if (entreprise) {
         setDevise(entreprise.devise);
         setLibelleTaxe(entreprise.libelle_taxe);
         setTva(entreprise.taux_taxe_defaut);
         setTauxHoraireDefaut(entreprise.dernier_taux_horaire_interne ?? null);
+        setChuteRouleauxPct(reglagesPertesEntreprise(entreprise).chuteRouleauxPct);
       }
     })();
     (async () => {
@@ -120,7 +121,7 @@ export default function NouveauDevisPage() {
     let unite = uniteParDefaut(p);
     if (surfaceVisee > 0) {
       if (p.surface_couverte_m2) {
-        quantite = calculerRouleaux(surfaceVisee, p);
+        quantite = calculerRouleaux(surfaceVisee, p, chuteRouleauxPct / 100);
         unite = "rouleau";
       } else if (p.consommation_min != null || p.consommation_max != null) {
         quantite = calculerConsommationLiquide(surfaceVisee, p);
