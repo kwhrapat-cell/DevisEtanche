@@ -27,11 +27,15 @@ export interface CalculInput {
   epaisseurIsolant?: number;
   /** Protection lourde (gravillon / dalles) au lieu d'autoprotection */
   protectionLourde?: boolean;
+  /** Épaisseur de la couche de gravillons en cm, si protection lourde (5 cm par défaut) */
+  epaisseurGravillonsCm?: number;
 }
 
 export interface CalculResult {
-  surfaceMembrane: number; // m²
-  surfaceReleves: number; // m²
+  /** Nombre de couches de membrane : 2 en bicouche, 1 sinon. */
+  nombreCouches: number;
+  surfaceMembrane: number; // m², pour UNE couche de partie courante
+  surfaceReleves: number; // m², pour UNE couche de relevé
   metresReleves: number; // ml
   primaireAccrochage: number; // L
   fixationsMecaniques: number; // unités (0 si système collé/soudé plein)
@@ -42,10 +46,11 @@ export interface CalculResult {
   detailsSysteme: { nom: string; reference: string; pertes: number };
 }
 
-const SYSTEMES: Record<Systeme, { nom: string; reference: string; pertes: number; primaireLm2: number; fixationsU_m2: number }> = {
+const SYSTEMES: Record<Systeme, { nom: string; reference: string; couches: number; pertes: number; primaireLm2: number; fixationsU_m2: number }> = {
   bicouche: {
     nom: "Bicouche bitumineuse soudée",
     reference: "DTU 43.1 / 43.4",
+    couches: 2, // première couche + couche de finition, en partie courante comme en relevé
     pertes: 0.08, // recouvrements 2 lés x ~10cm
     primaireLm2: 0.3,
     fixationsU_m2: 0, // soudée, pas de fixation mécanique
@@ -53,6 +58,7 @@ const SYSTEMES: Record<Systeme, { nom: string; reference: string; pertes: number
   pvc: {
     nom: "Membrane PVC monocouche",
     reference: "DTU 43.3 (bac acier) / Avis Technique",
+    couches: 1,
     pertes: 0.06,
     primaireLm2: 0.15,
     fixationsU_m2: 3.5, // fixation mécanique moyenne courant/rive confondus
@@ -60,11 +66,15 @@ const SYSTEMES: Record<Systeme, { nom: string; reference: string; pertes: number
   resine: {
     nom: "Résine liquide (SEL)",
     reference: "NF DTU 43.6 / Avis Technique",
+    couches: 1,
     pertes: 0.05,
     primaireLm2: 0.25,
     fixationsU_m2: 0,
   },
 };
+
+/** Masse volumique apparente de gravillons roulés, en kg/m³ (ordre de grandeur : 1 500 à 1 700). */
+export const MASSE_VOLUMIQUE_GRAVILLONS_KG_M3 = 1600;
 
 /** Estime un périmètre plausible à partir de la surface si aucun n'est fourni,
  *  en supposant une forme proche du carré avec un facteur d'irrégularité de chantier. */
@@ -93,10 +103,13 @@ export function calculerEtancheite(input: CalculInput): CalculResult {
   const isolantSurface = input.isolation ? Math.round(surface * 1.03 * 100) / 100 : 0;
   const isolantVolume = input.isolation ? Math.round(isolantSurface * epaisseur * 1000) / 1000 : 0;
 
-  // Protection gravillon : ~50 kg/m² pour 5 cm d'épaisseur (usage courant toiture-terrasse accessible technique)
-  const protectionGravillon = input.protectionLourde ? Math.round(surface * 50) : 0;
+  // Protection gravillon : surface × épaisseur × masse volumique. 5 cm à 1 600 kg/m³ = 80 kg/m².
+  // (L'ancienne valeur de 50 kg/m² correspondait à environ 3 cm, pas aux 5 cm annoncés.)
+  const epaisseurGravillons = Math.max(0, input.epaisseurGravillonsCm ?? 5) / 100; // m
+  const protectionGravillon = input.protectionLourde ? Math.round(surface * epaisseurGravillons * MASSE_VOLUMIQUE_GRAVILLONS_KG_M3) : 0;
 
   return {
+    nombreCouches: sys.couches,
     surfaceMembrane,
     surfaceReleves,
     metresReleves: perimetre,

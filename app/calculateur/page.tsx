@@ -18,6 +18,7 @@ export default function CalculateurPage() {
   const [isolation, setIsolation] = useState(true);
   const [epaisseurIsolant, setEpaisseurIsolant] = useState(100);
   const [protectionLourde, setProtectionLourde] = useState(false);
+  const [epaisseurGravillonsCm, setEpaisseurGravillonsCm] = useState(5);
   const [catalogue, setCatalogue] = useState<ProduitEtancheite[]>([]);
   const [fabricant, setFabricant] = useState("");
   const [devise, setDevise] = useState<Devise>("XPF");
@@ -60,9 +61,12 @@ export default function CalculateurPage() {
         isolation,
         epaisseurIsolant,
         protectionLourde,
+        epaisseurGravillonsCm,
       }),
-    [surface, perimetre, systeme, isolation, epaisseurIsolant, protectionLourde]
+    [surface, perimetre, systeme, isolation, epaisseurIsolant, protectionLourde, epaisseurGravillonsCm]
   );
+
+  const bicouche = resultat.nombreCouches > 1;
 
   const produitMembrane = useMemo(() => {
     const gammeCible = GAMME_PAR_SYSTEME[systeme];
@@ -74,6 +78,18 @@ export default function CalculateurPage() {
     if (!produitMembrane?.surface_couverte_m2) return null;
     return calculerRouleaux(resultat.surfaceMembrane, produitMembrane);
   }, [produitMembrane, resultat.surfaceMembrane]);
+
+  // Bicouche : la première couche (Sopralène Base, Topfix…) se pose sous la finition, sur
+  // toute la partie courante. Elle était absente du calcul et du devis.
+  const produitPremiereCouche = useMemo(() => {
+    if (!bicouche) return undefined;
+    return catalogue.find((p) => p.fabricant === fabricant && p.gamme === GAMME_PAR_SYSTEME[systeme] && p.usage_type === "premiere_couche");
+  }, [bicouche, catalogue, fabricant, systeme]);
+
+  const rouleauxPremiereCouche = useMemo(() => {
+    if (!produitPremiereCouche?.surface_couverte_m2) return null;
+    return calculerRouleaux(resultat.surfaceMembrane, produitPremiereCouche);
+  }, [produitPremiereCouche, resultat.surfaceMembrane]);
 
   function genererDevis() {
     const produitPrimaire = catalogue.find((p) => p.fabricant === fabricant && p.usage_type === "primaire");
@@ -99,12 +115,38 @@ export default function CalculateurPage() {
       : prixMembrane;
     const prixPrimaire = prixLigneOuDefaut(produitPrimaire, 8.5, devise);
 
+    // Première couche du bicouche : même logique que la finition (au rouleau si le catalogue
+    // donne la surface d'un rouleau, sinon au m²) ; même prix de repli tant que le catalogue
+    // n'a pas de prix renseigné.
+    const designationPremiereCouche = produitPremiereCouche
+      ? `${produitPremiereCouche.fabricant} — ${produitPremiereCouche.nom} (${produitPremiereCouche.reference}) — première couche`
+      : "Première couche bitumineuse (sous la finition)";
+    const prixPremiereCouche = prixLigneOuDefaut(
+      produitPremiereCouche,
+      rouleauxPremiereCouche != null && produitPremiereCouche?.surface_couverte_m2 ? 15.5 * produitPremiereCouche.surface_couverte_m2 : 15.5,
+      devise
+    );
+    const lignePremiereCouche = !bicouche
+      ? []
+      : [
+          rouleauxPremiereCouche != null
+            ? { designation: designationPremiereCouche, quantite: rouleauxPremiereCouche, unite: "rouleau", prix_unitaire: prixPremiereCouche, produit_id: produitPremiereCouche?.id }
+            : { designation: designationPremiereCouche, quantite: resultat.surfaceMembrane, unite: "m²", prix_unitaire: prixPremiereCouche, produit_id: produitPremiereCouche?.id },
+        ];
+
     const lignes = [
+      ...lignePremiereCouche,
       rouleauxNecessaires != null
         ? { designation: designationMembrane, quantite: rouleauxNecessaires, unite: "rouleau", prix_unitaire: prixMembrane, produit_id: produitMembrane?.id }
         : { designation: designationMembrane, quantite: resultat.surfaceMembrane, unite: "m²", prix_unitaire: prixMembrane, produit_id: produitMembrane?.id },
-      // Même membrane de finition, posée verticalement en about de relevé : même prix au m² que la ligne membrane.
-      { designation: "Relevés d'étanchéité", quantite: resultat.surfaceReleves, unite: "m²", prix_unitaire: prixMembraneParM2, produit_id: produitMembrane?.id },
+      // Relevés : autant de couches qu'en partie courante (2 en bicouche), au prix au m² de la finition.
+      {
+        designation: bicouche ? `Relevés d'étanchéité (${resultat.nombreCouches} couches)` : "Relevés d'étanchéité",
+        quantite: Math.round(resultat.surfaceReleves * resultat.nombreCouches * 100) / 100,
+        unite: "m²",
+        prix_unitaire: prixMembraneParM2,
+        produit_id: produitMembrane?.id,
+      },
       { designation: designationPrimaire, quantite: resultat.primaireAccrochage, unite: "L", prix_unitaire: prixPrimaire, produit_id: produitPrimaire?.id },
       { designation: "Évacuations eaux pluviales", quantite: resultat.evacuationsEP, unite: "u.", prix_unitaire: prixLigneOuDefaut(undefined, 65, devise) },
       ...(resultat.fixationsMecaniques > 0
@@ -114,7 +156,7 @@ export default function CalculateurPage() {
         ? [{ designation: `Isolant thermique ${epaisseurIsolant}mm`, quantite: resultat.isolantSurface, unite: "m²", prix_unitaire: prixLigneOuDefaut(undefined, 12.8, devise) }]
         : []),
       ...(protectionLourde
-        ? [{ designation: "Protection gravillon", quantite: resultat.protectionGravillon / 50, unite: "sacs 50kg", prix_unitaire: prixLigneOuDefaut(undefined, 6, devise) }]
+        ? [{ designation: `Protection gravillon (${epaisseurGravillonsCm} cm)`, quantite: Math.ceil(resultat.protectionGravillon / 50), unite: "sacs 50kg", prix_unitaire: prixLigneOuDefaut(undefined, 6, devise) }]
         : []),
     ];
     sessionStorage.setItem("devisetanche.lignes_calcul", JSON.stringify(lignes));
@@ -204,20 +246,43 @@ export default function CalculateurPage() {
               />
               <label htmlFor="protection" className="text-sm">Protection lourde (gravillon)</label>
             </div>
+            {protectionLourde && (
+              <div>
+                <label className="text-xs font-mono text-encre/70 block mb-1">ÉPAISSEUR GRAVILLONS (CM)</label>
+                <input
+                  type="number"
+                  value={epaisseurGravillonsCm}
+                  onChange={(e) => setEpaisseurGravillonsCm(parseFloat(e.target.value) || 0)}
+                  className="w-full border border-ligne rounded-lg px-3 py-2"
+                />
+              </div>
+            )}
           </div>
 
           <div className="card p-6 bg-marine text-white">
             <div className="text-xs font-mono text-white/50 mb-1">SYSTÈME · {resultat.detailsSysteme.reference}</div>
             <div className="font-display font-semibold mb-5">{resultat.detailsSysteme.nom}</div>
             <div className="grid grid-cols-2 gap-3">
-              <Resultat label="Surface membrane / résine" valeur={`${resultat.surfaceMembrane} m²`} />
+              <Resultat
+                label={bicouche ? `Surface membrane, par couche (${resultat.nombreCouches} couches)` : "Surface membrane / résine"}
+                valeur={`${resultat.surfaceMembrane} m²`}
+              />
+              {rouleauxPremiereCouche != null && (
+                <Resultat
+                  label={`Rouleaux première couche — ${produitPremiereCouche!.nom} (${produitPremiereCouche!.surface_couverte_m2} m²/rouleau)`}
+                  valeur={`${rouleauxPremiereCouche} rouleaux`}
+                />
+              )}
               {rouleauxNecessaires != null && (
                 <Resultat
-                  label={`Rouleaux — ${produitMembrane!.nom} (${produitMembrane!.surface_couverte_m2} m²/rouleau)`}
+                  label={`Rouleaux ${bicouche ? "finition " : ""}— ${produitMembrane!.nom} (${produitMembrane!.surface_couverte_m2} m²/rouleau)`}
                   valeur={`${rouleauxNecessaires} rouleaux`}
                 />
               )}
-              <Resultat label="Surface relevés" valeur={`${resultat.surfaceReleves} m²`} />
+              <Resultat
+                label={bicouche ? `Surface relevés, par couche (${resultat.nombreCouches} couches)` : "Surface relevés"}
+                valeur={`${resultat.surfaceReleves} m²`}
+              />
               <Resultat label="Linéaire relevés" valeur={`${resultat.metresReleves} ml`} />
               <Resultat label="Primaire d'accrochage" valeur={`${resultat.primaireAccrochage} L`} />
               <Resultat label="Évacuations EP" valeur={`${resultat.evacuationsEP} u.`} />
@@ -232,7 +297,7 @@ export default function CalculateurPage() {
                 </>
               )}
               {protectionLourde && (
-                <Resultat label="Protection gravillon" valeur={`${resultat.protectionGravillon.toLocaleString("fr-FR")} kg`} />
+                <Resultat label={`Protection gravillon (${epaisseurGravillonsCm} cm)`} valeur={`${resultat.protectionGravillon.toLocaleString("fr-FR")} kg`} />
               )}
             </div>
             <p className="text-xs text-white/40 mt-6">
