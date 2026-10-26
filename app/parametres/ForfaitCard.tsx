@@ -3,8 +3,8 @@
 import { useState } from "react";
 
 /**
- * Carte de forfait dans Paramètres. Paiement en ligne seulement s'il est configuré
- * (`paiementEnLigne`) et pour Artisan ou Pro ; sinon le bouton ouvre un e-mail prérempli.
+ * Carte de forfait dans Paramètres. Paiement en ligne (Lemon Squeezy) seulement s'il est
+ * configuré (`paiementEnLigne`) et pour Artisan ou Pro ; sinon le bouton ouvre un e-mail prérempli.
  */
 export default function ForfaitCard({
   id,
@@ -43,7 +43,7 @@ export default function ForfaitCard({
         window.location.href = data.url;
         return;
       }
-      setErreur("Le paiement en ligne n'a pas pu démarrer. Écrivez-nous pour changer de forfait.");
+      setErreur(data.message ?? "Le paiement en ligne n'a pas pu démarrer. Écrivez-nous pour changer de forfait.");
     } catch {
       setErreur("Le paiement en ligne n'a pas pu démarrer. Écrivez-nous pour changer de forfait.");
     }

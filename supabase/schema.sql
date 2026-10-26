@@ -239,9 +239,9 @@ create policy "Modification entreprise membres" on entreprises for update
 
 -- Restriction au niveau colonne : RLS ne filtre que les lignes, pas les
 -- colonnes — sans ceci, la policy UPDATE ci-dessus laisserait n'importe quel
--- membre de l'entreprise modifier "forfait" ou les identifiants Stripe
+-- membre de l'entreprise modifier "forfait" ou les identifiants de paiement
 -- directement depuis le client, en contournant app/api/checkout +
--- app/api/webhooks/stripe (seul flux prévu pour ces colonnes, via la clé
+-- app/api/webhooks/lemonsqueezy (seul flux prévu pour ces colonnes, via la clé
 -- service_role qui n'est pas soumise à ce GRANT).
 revoke update on entreprises from authenticated;
 grant update (

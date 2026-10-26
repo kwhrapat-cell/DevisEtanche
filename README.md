@@ -57,28 +57,44 @@ Chantiers affichera alors ces données réelles.
 4. Déployer. Chaque `git push` redéploie automatiquement — aucune
    intervention manuelle nécessaire ensuite.
 
-## 6. Activer les paiements (Stripe) — pour une mise en service avec profits
+## 6. Activer les paiements (Lemon Squeezy) — pour une mise en service avec profits
 
-1. Créer un compte sur [stripe.com](https://stripe.com) (mode test au départ).
-2. Dans **Products**, créer deux produits récurrents : "Artisan" (29 €/mois)
-   et "Pro" (59 €/mois). Copier leurs `price_id` dans `.env.local`
-   (`STRIPE_PRICE_ARTISAN`, `STRIPE_PRICE_PRO`).
-3. Copier la clé secrète (`STRIPE_SECRET_KEY`) depuis **Developers → API keys**.
-4. Dans **Developers → Webhooks**, ajouter un endpoint pointant vers
-   `https://votre-domaine/api/webhooks/stripe`, événements
-   `checkout.session.completed` et `customer.subscription.deleted`. Copier
-   le "Signing secret" dans `STRIPE_WEBHOOK_SECRET`.
-5. Dans Supabase → **Project Settings → API**, copier la clé
-   `service_role` (⚠️ secrète, jamais publique) dans
-   `SUPABASE_SERVICE_ROLE_KEY` — elle permet au webhook de mettre à jour
-   le forfait sans dépendre d'une session utilisateur.
+Stripe refuse les entreprises basées en Nouvelle-Calédonie : les forfaits sont
+encaissés par **Lemon Squeezy**, qui est le vendeur officiel vis-à-vis du client
+(« merchant of record ») : il encaisse la carte ou PayPal, applique les taxes,
+envoie la facture au client, puis reverse l'argent sur **PayPal** (la
+Nouvelle-Calédonie n'est pas dans sa liste de virements bancaires). Frais
+indicatifs : 5 % + 0,50 $ par paiement, plus des frais de versement PayPal —
+à revérifier sur leur page de tarifs.
 
-Depuis `/parametres`, choisir un forfait payant ouvre une session Stripe
-Checkout ; une fois le paiement confirmé, le webhook met automatiquement à
-jour `entreprises.forfait` — aucune action manuelle nécessaire.
+1. Exécuter `supabase/migration-paiement-lemonsqueezy.sql` dans Supabase →
+   SQL Editor, puis passer sa ligne à « Oui » dans `supabase/ETAT-MIGRATIONS.md`.
+2. Créer un compte sur [lemonsqueezy.com](https://lemonsqueezy.com). La boutique
+   démarre en **mode test** : tout peut être essayé sans vrai paiement.
+3. Dans **Products**, créer deux abonnements mensuels : « Artisan » (29 €/mois)
+   et « Pro » (59 €/mois). Noter le numéro de la variante de chacun.
+4. Dans **Settings → API**, créer une clé. Dans **Settings → Stores**, noter le
+   numéro de la boutique.
+5. Dans **Settings → Webhooks**, ajouter
+   `https://devis-etanche.vercel.app/api/webhooks/lemonsqueezy`, choisir une
+   phrase secrète au hasard, et cocher tous les événements `subscription_…`.
+6. Dans Vercel → **Settings → Environment Variables**, renseigner
+   `LEMONSQUEEZY_API_KEY`, `LEMONSQUEEZY_STORE_ID`,
+   `LEMONSQUEEZY_VARIANT_ARTISAN`, `LEMONSQUEEZY_VARIANT_PRO`,
+   `LEMONSQUEEZY_WEBHOOK_SECRET`, et `SUPABASE_SERVICE_ROLE_KEY` (Supabase →
+   Project Settings → API, ⚠️ secrète, jamais publique), puis redéployer.
 
-En production, remplacer les clés `sk_test_...` par les clés live une fois
-prêt à encaisser réellement.
+Depuis `/parametres`, choisir un forfait payant ouvre la page de paiement
+Lemon Squeezy ; une fois le paiement confirmé, le webhook met automatiquement
+à jour `entreprises.forfait`. Le bouton « Gérer mon abonnement » renvoie
+ensuite vers l'espace Lemon Squeezy (changer de forfait, de carte, résilier,
+factures). À la fin d'un abonnement résilié ou impayé, l'entreprise revient
+d'elle-même au forfait Découverte.
+
+Pour encaisser réellement : activer la boutique dans Lemon Squeezy
+(questionnaire + vérification d'identité, compter jusqu'à quelques semaines),
+puis remplacer la clé, les numéros de variantes et le webhook de test par ceux
+du mode réel.
 
 ## 7. Photos de chantier (Supabase Storage)
 
@@ -144,12 +160,12 @@ d'informations sur les autres chantiers) via la fonction Postgres
 | Devis (liste + création) | ✅ Connectée, formulaire avec lignes dynamiques et calcul auto HT/TTC |
 | Clients (liste + création) | ✅ Connectée, formulaire "Nouveau client" fonctionnel |
 | Calculateur | ✅ Formules DTU réelles, aucune donnée externe requise |
-| Paramètres | ✅ Connectée : entreprise, équipe, forfait + paiement Stripe |
+| Paramètres | ✅ Connectée : entreprise, équipe, forfait + paiement Lemon Squeezy |
 | Connexion / Inscription | ✅ Fonctionnel (Supabase Auth) |
 | Photos de chantier | ✅ Upload réel (Supabase Storage) |
 | Export PDF devis | ✅ Page imprimable dédiée par devis |
 | Mode hors ligne | ✅ Cache + file de synchronisation basique |
-| Paiement / forfaits | ✅ Stripe Checkout + webhook de mise à jour automatique |
+| Paiement / forfaits | ✅ Lemon Squeezy (page de paiement + webhook de mise à jour automatique) |
 | Calculateur → Devis | ✅ Génération de devis pré-rempli en un clic |
 | Espace client | ✅ Page publique de suivi via lien sécurisé (sans compte) |
 

@@ -68,8 +68,8 @@ export default function ConfidentialitePage() {
             <strong>Vercel</strong> — hébergement de l'application.
           </li>
           <li>
-            <strong>Stripe</strong> (ou un prestataire de paiement équivalent, tel que Lyra pour la zone Nouvelle-Calédonie/Pacifique) —
-            traitement des paiements d'abonnement.
+            <strong>Lemon Squeezy</strong> (groupe Stripe) — encaissement des abonnements payés en ligne, en tant que revendeur : il reçoit
+            l'adresse e-mail et les informations de paiement saisies sur sa page de paiement.
           </li>
         </ul>
         <p className="text-xs text-encre/60">

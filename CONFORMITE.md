@@ -34,13 +34,13 @@ Wallis-et-Futuna).
 1. Créer `app/confidentialite/page.tsx` — politique de confidentialité couvrant : responsable de
    traitement (Tramea Solutions, RIDET en cours d'attribution), données collectées (comptes,
    chantiers, clients, photos), finalités, base légale (exécution du contrat), durée de
-   conservation, liste des sous-traitants (Supabase, Vercel, Resend, Stripe/Lyra selon zone),
+   conservation, liste des sous-traitants (Supabase, Vercel, Resend, Lemon Squeezy),
    droits RGPD (accès/rectification/effacement/portabilité) et contact pour les exercer.
 2. Vérifier la région du projet Supabase (Dashboard > Project Settings). Si hébergement hors UE,
    ajouter une clause de transfert de données dans la politique de confidentialité.
 3. Ajouter dans Paramètres une action "supprimer mon compte et mes données" — ou a minima
    documenter une procédure manuelle de suppression sur demande (adresse de contact visible).
-4. Vérifier que Supabase, Vercel, Resend et Stripe/Lyra proposent un DPA (Data Processing
+4. Vérifier que Supabase, Vercel, Resend et Lemon Squeezy proposent un DPA (Data Processing
    Agreement) et l'accepter dans leurs dashboards respectifs si ce n'est pas déjà fait.
 5. Repasser sur les policies RLS existantes pour confirmer qu'un utilisateur/sous-traitant ne peut
    accéder qu'aux données de ses propres chantiers (déjà largement en place — vérification plutôt
@@ -60,7 +60,7 @@ Wallis-et-Futuna).
 2. Créer `app/mentions-legales/page.tsx` : éditeur, statut (Entreprise individuelle / patenté),
    adresse, contact, hébergeur (Vercel Inc., + Supabase), directeur de publication.
 3. Créer `app/cgv/page.tsx` : objet du service, tarifs/abonnement, modalités de paiement
-   (Stripe/Lyra selon zone du client), durée et résiliation, responsabilité, propriété des
+   (Lemon Squeezy, revendeur des abonnements), durée et résiliation, responsabilité, propriété des
    données saisies par le client, disponibilité, droit applicable.
 4. Lier ces deux pages dans un composant `Footer.tsx` (si pas déjà présent) et sur la page
    d'inscription.
@@ -105,7 +105,7 @@ Wallis-et-Futuna).
 - ✅ 1.3 Section "Confidentialité et données" ajoutée dans `/parametres` avec une procédure
   documentée (lien mailto pré-rempli vers l'adresse de contact) — suppression manuelle sous 30
   jours, pas d'automatisation destructive ajoutée pour l'instant.
-- ⚠️ 1.4 Action externe (dashboards Supabase/Vercel/Stripe) — à faire manuellement, hors du champ
+- ⚠️ 1.4 Action externe (dashboards Supabase/Vercel/Lemon Squeezy) — à faire manuellement, hors du champ
   d'un changement de code. Resend et Lyra ne sont pas encore intégrés dans le code actuel (aucune
   dépendance ni appel API trouvés) : rien à accepter côté DPA pour ces deux-là tant qu'ils ne sont
   pas branchés.

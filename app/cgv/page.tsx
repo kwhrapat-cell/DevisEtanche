@@ -30,15 +30,17 @@ export default function CGVPage() {
 
       <SectionLegale titre="3. Modalités de paiement">
         <p>
-          Le paiement des abonnements payants s'effectue par carte bancaire via un prestataire de paiement sécurisé (Stripe, ou un prestataire
-          équivalent tel que Lyra selon la zone géographique du client). Le prélèvement est automatique et récurrent, à la même date chaque mois,
-          jusqu'à résiliation.
+          Le paiement en ligne des abonnements payants s'effectue par carte bancaire ou PayPal auprès de Lemon Squeezy, revendeur agréé qui
+          agit en tant que vendeur officiel (« merchant of record ») : Lemon Squeezy encaisse le paiement, applique les taxes éventuellement
+          dues et adresse la facture au client. Le prélèvement est automatique et récurrent, à la même date chaque mois, jusqu'à résiliation.
+          Un abonnement souscrit par e-mail auprès de {COMPANY_INFO.raisonSociale} est facturé directement par celle-ci.
         </p>
       </SectionLegale>
 
       <SectionLegale titre="4. Durée et résiliation">
         <p>
-          L'abonnement est reconduit tacitement chaque mois. Le client peut le résilier à tout moment en écrivant à{" "}
+          L'abonnement est reconduit tacitement chaque mois. Le client peut le résilier à tout moment depuis « Gérer mon abonnement » dans les
+          Paramètres de l'application, ou en écrivant à{" "}
           <a href={`mailto:${COMPANY_INFO.email}`} className={classeLien}>
             {COMPANY_INFO.email}
           </a>{" "}
