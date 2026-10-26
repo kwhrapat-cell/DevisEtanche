@@ -28,4 +28,4 @@ Vérifié directement dans la base le 19 octobre 2026, puis le 25 octobre 2026.
 | migration-securite-stockage-photos.sql | Non | Remplacé : ne plus exécuter |
 | migration-securite-consolidation.sql | Oui | Exécuté le 25/10/2026 par Patrice ; vérifié dans la base le même jour |
 | migration-pertes-entreprise.sql | Oui | Exécuté le 25/10/2026 par Patrice ; vérifié dans la base le même jour (4 colonnes, limites 0–50 %, droit d’écriture) |
-| migration-paiement-lemonsqueezy.sql | Non | À exécuter avant de renseigner les réglages Lemon Squeezy dans Vercel |
+| migration-paiement-lemonsqueezy.sql | Oui | Exécuté le 26/10/2026 par Claude à la demande de Patrice ; vérifié dans la base le même jour (3 colonnes, lisibles mais non modifiables depuis une session) |
