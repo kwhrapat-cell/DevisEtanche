@@ -1,13 +1,13 @@
 import type { Devise } from "@/lib/devise";
+import { configurationLemonSqueezy } from "@/lib/lemonsqueezy";
 
 /**
- * Le paiement en ligne (Stripe) n'est proposé que si ses clés sont renseignées dans
- * Vercel. Stripe n'accepte pas les entreprises calédoniennes : tant qu'aucune solution
- * de paiement n'est branchée, les forfaits payants se demandent par e-mail et se
- * facturent à la main. À lire côté serveur uniquement (les clés ne sont pas publiques).
+ * Le paiement en ligne (Lemon Squeezy) n'est proposé que si ses réglages sont renseignés
+ * dans Vercel. Tant qu'il en manque un, les forfaits payants se demandent par e-mail et
+ * se facturent à la main. À lire côté serveur uniquement (les clés ne sont pas publiques).
  */
 export function paiementEnLigneConfigure(): boolean {
-  return Boolean(process.env.STRIPE_SECRET_KEY && process.env.STRIPE_PRICE_ARTISAN && process.env.STRIPE_PRICE_PRO);
+  return configurationLemonSqueezy() !== null;
 }
 
 /** Prix mensuels hors taxes affichés dans Paramètres — les mêmes que sur la page d'accueil. */

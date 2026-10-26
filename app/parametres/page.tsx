@@ -1,7 +1,7 @@
 import TopBar from "@/components/TopBar";
 import { getUtilisateurCourant } from "@/lib/supabase/auth";
 import { createClient } from "@/lib/supabase/server";
-import { CircleAlert } from "@/components/icons";
+import { CircleAlert, CircleCheck } from "@/components/icons";
 import { classesBouton } from "@/components/ui/Button";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { COMPANY_INFO } from "@/lib/company-info";
@@ -22,7 +22,26 @@ const labelRole: Record<string, string> = {
   client: "Client",
 };
 
-export default async function ParametresPage() {
+/** Messages affichés au retour de Lemon Squeezy (?paiement=…) ou de « Gérer mon abonnement » (?abonnement=…). */
+const MESSAGES_RETOUR: Record<string, { texte: string; ok: boolean }> = {
+  "paiement:succes": {
+    texte: "Paiement reçu, merci ! Votre forfait s'active dans la minute : rechargez la page s'il n'apparaît pas encore.",
+    ok: true,
+  },
+  "abonnement:aucun": { texte: "Aucun abonnement en ligne n'est enregistré pour votre entreprise.", ok: false },
+  "abonnement:indisponible": {
+    texte: "L'espace abonnement est momentanément indisponible. Réessayez dans quelques minutes ou écrivez-nous.",
+    ok: false,
+  },
+};
+
+export default async function ParametresPage({ searchParams }: { searchParams: Promise<{ paiement?: string; abonnement?: string }> }) {
+  const { paiement, abonnement } = await searchParams;
+  const retour =
+    (typeof paiement === "string" && MESSAGES_RETOUR[`paiement:${paiement}`]) ||
+    (typeof abonnement === "string" && MESSAGES_RETOUR[`abonnement:${abonnement}`]) ||
+    null;
+
   const session = await getUtilisateurCourant();
   const supabase = await createClient();
 
@@ -83,6 +102,12 @@ export default async function ParametresPage() {
 
           <div className="lg:col-span-2">
             <div className="font-medium text-encre mb-3">Forfait</div>
+            {retour && (
+              <p role="status" className={`mb-3 flex items-start gap-2 rounded-lg px-3 py-2 text-sm ${retour.ok ? "bg-emerald-50 text-emerald-700" : "bg-rouge/10 text-rouge"}`}>
+                {retour.ok ? <CircleCheck size={18} className="mt-0.5 shrink-0" /> : <CircleAlert size={18} className="mt-0.5 shrink-0" />}
+                {retour.texte}
+              </p>
+            )}
             <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
               <ForfaitCard id="decouverte" nom="Découverte" prix={prix.decouverte} actuel={entreprise?.forfait === "decouverte"} {...achat} />
               <ForfaitCard id="artisan" nom="Artisan" prix={prix.artisan} actuel={entreprise?.forfait === "artisan"} recommande {...achat} />
@@ -91,8 +116,15 @@ export default async function ParametresPage() {
             </div>
             <p className="mt-3 text-xs text-encre/60">
               Prix hors taxes, sans engagement.
-              {!achat.paiementEnLigne && " Pour changer de forfait, écrivez-nous : la facture vous est envoyée directement."}
+              {achat.paiementEnLigne
+                ? " Paiement par carte ou PayPal, encaissé par notre revendeur Lemon Squeezy, qui vous envoie la facture."
+                : " Pour changer de forfait, écrivez-nous : la facture vous est envoyée directement."}
             </p>
+            {achat.paiementEnLigne && entreprise?.paiement_abonnement_id && (
+              <a href="/api/abonnement" className={`mt-4 ${classesBouton({ variante: "secondaire", taille: "lg" })}`}>
+                Gérer mon abonnement
+              </a>
+            )}
           </div>
 
           <InstallerAppli />
